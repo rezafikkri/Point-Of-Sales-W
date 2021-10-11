@@ -1,5 +1,11 @@
 {
     "require": {
         "codeigniter4/framework": "^4.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit --testdox --no-logging"
     }
 }
