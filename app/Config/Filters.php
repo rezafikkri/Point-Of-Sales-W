@@ -19,6 +19,7 @@ class Filters extends BaseConfig
         'csrf'     => CSRF::class,
         'toolbar'  => DebugToolbar::class,
         'honeypot' => Honeypot::class,
+        'hasSignedIn' => \App\Filters\HasSignedIn::class
     ];
 
     /**
@@ -31,6 +32,7 @@ class Filters extends BaseConfig
         'before' => [
             // 'honeypot',
             'csrf',
+            'hasSignedIn' => ['except' => ['admin', 'kasir', 'admin/*', 'kasir/*', 'sign_out']]
         ],
         'after' => [
             'toolbar',

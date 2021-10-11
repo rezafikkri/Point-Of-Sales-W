@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="8.46667mm"
+   height="8.4666662mm"
+   viewBox="0 0 8.4666705 8.4666608"
+   version="1.1"
+   id="svg12"
+   sodipodi:docname="favicon.svg"
+   inkscape:version="1.1 (1:1.1+202106031931+af4d65493e)"
+   inkscape:export-filename="/home/reza/PROGRAMMING/htdocs/Point-Of-Sales-W/public/dist/images/favicon.png"
+   inkscape:export-xdpi="96.000008"
+   inkscape:export-ydpi="96.000008"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs16" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="711"
+     id="namedview14"
+     showgrid="false"
+     units="mm"
+     inkscape:zoom="15.656251"
+     inkscape:cx="15.999999"
+     inkscape:cy="15.999999"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm" />
+  <rect
+     style="fill:#7874f7;fill-opacity:1;stroke-width:0.583391;stroke-linecap:round;stroke-linejoin:round;paint-order:stroke markers fill"
+     id="rect2849"
+     width="8.4666662"
+     height="8.4666662"
+     x="1.9073486e-06"
+     y="-2.220446e-16"
+     ry="0.5036577"
+     inkscape:export-filename="/home/reza/PROGRAMMING/htdocs/Point-Of-Sales-W/public/dist/images/favicon.png"
+     inkscape:export-xdpi="48.000004"
+     inkscape:export-ydpi="48.000004" />
+  <path
+     style="fill:#ffffff;stroke-width:0.123545;fill-opacity:1"
+     d="M 0.78600024,1.7621661 H 2.0376034 L 2.882513,5.1526567 H 2.912485 L 3.8111386,1.7621661 h 0.8505941 l 0.898653,3.3904906 h 0.029972 L 6.4347508,1.7621661 h 1.245919 L 6.2730036,6.7045001 H 5.027085 L 4.2364356,3.9305093 3.4457863,6.7045001 H 2.1936662 Z"
+     id="path2654" />
+</svg>

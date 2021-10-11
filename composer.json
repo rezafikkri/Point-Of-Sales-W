@@ -6,6 +6,7 @@
         "phpunit/phpunit": "^9.5"
     },
     "scripts": {
+        "dev": "php spark serve --port 8000",
         "test": "./vendor/bin/phpunit --testdox --no-logging"
     }
 }
