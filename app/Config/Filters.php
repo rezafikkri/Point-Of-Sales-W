@@ -19,7 +19,9 @@ class Filters extends BaseConfig
         'csrf'     => CSRF::class,
         'toolbar'  => DebugToolbar::class,
         'honeypot' => Honeypot::class,
-        'hasSignedIn' => \App\Filters\HasSignedIn::class
+        'hasSignedIn' => \App\Filters\HasSignedIn::class,
+        'adminPermission' => \App\Filters\AdminPermission::class,
+        'cashierPermission' => \App\Filters\CashierPermission::class
     ];
 
     /**
@@ -32,7 +34,9 @@ class Filters extends BaseConfig
         'before' => [
             // 'honeypot',
             'csrf',
-            'hasSignedIn' => ['except' => ['admin', 'kasir', 'admin/*', 'kasir/*', 'sign_out']]
+            'hasSignedIn' => ['except' => ['admin', 'kasir', 'admin/*', 'kasir/*', 'sign_out']],
+            'adminPermission' => ['except' => ['sign_in', 'sign_out', 'kasir', 'kasir/*']],
+            'cashierPermission' => ['except' => ['sign_in', 'sign_out', 'admin', 'admin/*']]
         ],
         'after' => [
             'toolbar',
