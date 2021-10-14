@@ -35,8 +35,8 @@ class Filters extends BaseConfig
             // 'honeypot',
             'csrf',
             'hasSignedIn' => ['except' => ['admin', 'kasir', 'admin/*', 'kasir/*', 'sign_out']],
-            'adminPermission' => ['except' => ['sign_in', 'sign_out', 'kasir', 'kasir/*']],
-            'cashierPermission' => ['except' => ['sign_in', 'sign_out', 'admin', 'admin/*']]
+            'adminPermission' => ['except' => ['sign_in', '/', 'sign_out', 'kasir', 'kasir/*']],
+            'cashierPermission' => ['except' => ['sign_in', '/', 'sign_out', 'admin', 'admin/*']]
         ],
         'after' => [
             'toolbar',
