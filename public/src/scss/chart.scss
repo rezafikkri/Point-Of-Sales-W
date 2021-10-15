@@ -2,11 +2,9 @@
     background-color: #fff;
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    padding: 14px;
 
     &__header {
-        padding: 15px;
-        padding-bottom: 0;
-
         h5 {
             font-family: 'roboto-medium';
             color: var(--gray);

@@ -1,19 +1,13 @@
 @mixin info_box_color($color_name, $bg_color) {
-    &__item--#{$color_name} {
+    &--#{$color_name} {
         background-color: $bg_color;
     }
 }
 
 .info-box {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-
-    &__item {
-        display: flex;
-        align-items: center;
-        border-radius: 4px;
-    }
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
 
     @include info_box_color('green', var(--green));
     @include info_box_color('sky-blue', var(--sky-blue));

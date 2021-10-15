@@ -8,6 +8,11 @@ class Admin extends Controller
 {
     public function index()
     {
-        echo 'admin';
+        helper('active_menu');
+
+        $data['title'] = 'Home . POSW';
+        $data['page'] = 'home';
+
+        return view('admin', $data);
     }
 }

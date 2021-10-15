@@ -1,0 +1,47 @@
+export default {
+  "name": "id",
+  "options": {
+    "months": [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember"
+    ],
+    "shortMonths": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "Mei",
+      "Jun",
+      "Jul",
+      "Agu",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Des"
+    ],
+    "days": ["Ahad", "Senin", "Selasa", "Rabu", "kamis", "Jumat", "Sabtu"],
+    "shortDays": ["Ahad", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
+    "toolbar": {
+      "exportToSVG": "Unduh SVG",
+      "exportToPNG": "Unduh PNG",
+      "exportToCSV": "Unduh CSV",
+      "menu": "Menu",
+      "selection": "Pilihan",
+      "selectionZoom": "Perbesar Pilihan",
+      "zoomIn": "Perbesar",
+      "zoomOut": "Perkecil",
+      "pan": "Geser",
+      "reset": "Atur Ulang Zoom"
+    }
+  }
+}
