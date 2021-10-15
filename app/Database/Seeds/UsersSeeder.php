@@ -13,7 +13,7 @@ class UsersSeeder extends Seeder
 
         $data = [
             [
-                'user_id' => generate_uuid(),
+                'user_id' => 'e09a58bd-f61a-4d63-8a03-d65d23b914f5',
                 'full_name' => 'Reza Sariful Fikri',
                 'username' => 'reza',
                 'level' => 'admin',
@@ -22,11 +22,20 @@ class UsersSeeder extends Seeder
                 'updated_at' => date('Y-m-d H:i:s')
             ],
             [
-                'user_id' => generate_uuid(),
+                'user_id' => '90b86b53-4bc8-436f-8919-c709d8026471',
                 'full_name' => 'Dian Pranata',
                 'username' => 'dian',
                 'level' => 'cashier',
                 'password' => password_hash('dian', PASSWORD_DEFAULT),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'user_id' => '8ca354cb-f0fc-47dd-8b5e-8d88e460c6c7',
+                'full_name' => 'Adelina Damayanti',
+                'username' => 'dea',
+                'level' => 'cashier',
+                'password' => password_hash('dea', PASSWORD_DEFAULT),
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]
