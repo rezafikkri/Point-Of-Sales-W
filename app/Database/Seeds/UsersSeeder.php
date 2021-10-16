@@ -8,7 +8,7 @@ class UsersSeeder extends Seeder
 {
     public function run()
     {
-        helper('generate_uuid');
+        $dateTime = date('Y-m-d H:i:s');
         $builder = $this->db->table('users');
 
         $data = [
@@ -18,26 +18,26 @@ class UsersSeeder extends Seeder
                 'username' => 'reza',
                 'level' => 'admin',
                 'password' => password_hash('reza', PASSWORD_DEFAULT),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'created_at' => $dateTime,
+                'updated_at' => $dateTime
             ],
             [
                 'user_id' => '90b86b53-4bc8-436f-8919-c709d8026471',
                 'full_name' => 'Dian Pranata',
                 'username' => 'dian',
-                'level' => 'cashier',
+                'level' => 'kasir',
                 'password' => password_hash('dian', PASSWORD_DEFAULT),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'created_at' => $dateTime,
+                'updated_at' => $dateTime
             ],
             [
                 'user_id' => '8ca354cb-f0fc-47dd-8b5e-8d88e460c6c7',
                 'full_name' => 'Adelina Damayanti',
                 'username' => 'dea',
-                'level' => 'cashier',
+                'level' => 'kasir',
                 'password' => password_hash('dea', PASSWORD_DEFAULT),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'created_at' => $dateTime,
+                'updated_at' => $dateTime
             ]
         ];
         $builder->insertBatch($data);
