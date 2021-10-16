@@ -150,9 +150,6 @@ tags
 
 # End of https://www.toptal.com/developers/gitignore/api/vim
 
-# Images
-public/dist/images/*noupload].jpg
-
 # Allow public/dist/
 !public/dist/
 
@@ -160,12 +157,9 @@ public/dist/images/*noupload].jpg
 diff
 
 # ignore product image uploaded
-public/dist/images/product_photo/*.jpg
-public/dist/images/product_photo/*.jpeg
+public/dist/images/product-photos/*.jpg
+public/dist/images/product-photos/*.jpeg
 
 # ignore transction backup json file and transaction export file
-writable/transaction_backup/*.json
-writable/transaction_exports/*.xlsx
-
-# ignore node modules
-node_modules/
+writable/transaction-backup/*.json
+writable/transaction-exports/*.xlsx
