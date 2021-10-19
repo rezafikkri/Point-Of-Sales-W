@@ -100,7 +100,7 @@ class ProductsSeeder extends Seeder
                 'product_price' => '20000'
             ],
             [
-                'product_price_id' => '204bb38c-ee3f-4bc2-a1aa-9251491692a1',
+                'product_price_id' => '51b5812c-e8ec-4215-9e41-c0e15139a9e6',
                 'product_id' => $productIds[4],
                 'product_magnitude' => '1 Gelas',
                 'product_price' => '20000'

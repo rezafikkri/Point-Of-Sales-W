@@ -8,6 +8,7 @@
     "scripts": {
         "dev": "php spark serve --port 8000",
         "css-compile": "sass --watch --style=compressed public/src/scss/posw.scss public/dist/css/posw.min.css",
-        "test": "./vendor/bin/phpunit --testdox --no-logging"
+        "test": "./vendor/bin/phpunit --testdox --no-logging",
+        "seed": "php spark db:seed POSWSeeder"
     }
 }
