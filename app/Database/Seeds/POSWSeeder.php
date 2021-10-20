@@ -11,5 +11,6 @@ class POSWSeeder extends Seeder
         $this->call('UsersSeeder');
         $this->call('ProductCategoriesSeeder');
         $this->call('ProductsSeeder');
+        $this->call('TransactionsSeeder');
     }
 }

@@ -15,7 +15,7 @@ class AddTransactions extends Migration
             ],
             'transaction_status' => [
                 'type' => 'VARCHAR',
-                'constraint' => 7
+                'constraint' => 8
             ],
             'customer_money' => [
                 'type' => 'NUMERIC',
