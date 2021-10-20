@@ -17,8 +17,8 @@ class CashierPermission implements FilterInterface
             return redirect()->to('/');
         }
 
-        // if signed in, but posw_user_level is not kasir
-        if($_SESSION['posw_user_level'] !== 'kasir') {
+        // if signed in, but posw_user_level is not cashier
+        if($_SESSION['posw_user_level'] !== 'cashier') {
             return redirect()->to('/sign_out');
         }
     }
