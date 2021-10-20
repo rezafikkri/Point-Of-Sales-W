@@ -51,7 +51,7 @@
                 <li>&copy; 2021 <a href="https://rezafikkri.github.io/" target="_blank" rel="noreferrer noopener">Reza Sariful Fikri</a>
             </li>
                 <li>
-                    <a href="https://github.com/rezafikkri/Point-Of-Sales-Warung/wiki" target="_blank" rel="noreferrer noopener">Bantuan</a>
+                    <a href="https://github.com/rezafikkri/Point-Of-Sales-W/wiki" target="_blank" rel="noreferrer noopener">Bantuan</a>
                 </li>
             </ul>
         </div>
