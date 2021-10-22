@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html data-base-url="<?= base_url(); ?>">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">

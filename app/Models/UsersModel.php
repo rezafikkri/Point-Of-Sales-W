@@ -32,6 +32,11 @@ class UsersModel extends Model
         return $this->select('user_id, full_name, level, last_sign_in')->orderBy('full_name', 'ASC')->get()->getResultArray();
     }
 
+    public function getTotal(): int
+    {
+        return $this->countAll();
+    }
+
     public function findUser(string $userId, string $column): ? array
     {
         return $this->select($column)->getWhere([$this->primaryKey => $userId])->getRowArray();

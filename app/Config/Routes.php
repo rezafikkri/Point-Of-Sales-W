@@ -33,9 +33,10 @@ $routes->setAutoRoute(false);
 // route since we don't have to scan directories.
 $routes->group('admin', function ($routes) {
     $routes->get('', 'Admin::index');
+    $routes->get('transactions-two-months-ago', 'Admin::getTransactionsTwoMonthsAgo');
 });
 
-$routes->get('/sign_out', 'SignOut::index');
+$routes->get('sign_out', 'SignOut::index');
 $routes->post('sign_in', 'SignIn::signIn');
 $routes->get('/', 'SignIn::index');
 
