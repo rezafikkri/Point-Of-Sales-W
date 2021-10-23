@@ -30,10 +30,10 @@
 
     <ul class="navbar__right navbar__right--collapse">
         <li><a href="/admin" class="<?= active_menu($page, 'navbar__link--active', ['home']); ?>">Home</a></li>
-        <li><a href="/admin/kategori_produk" class="<?= active_menu(
+        <li><a href="/admin/kategori-produk" class="<?= active_menu(
             $page,
             'navbar__link--active',
-            ['kategori_produk', 'buat_kategori_produk', 'perbaharui_kategori_produk']
+            ['kategori-produk', 'buat-kategori-produk', 'perbaharui-kategori-produk']
         ); ?>">Kategori Produk</a></li>
         <li><a href="/admin/produk" class="<?= active_menu(
             $page,

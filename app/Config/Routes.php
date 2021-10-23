@@ -34,6 +34,9 @@ $routes->setAutoRoute(false);
 $routes->group('admin', function ($routes) {
     $routes->get('', 'Admin::index');
     $routes->get('transactions-two-months-ago', 'Admin::getTransactionsTwoMonthsAgo');
+    $routes->get('kategori-produk', 'ProductCategories::index');
+    $routes->get('kategori-produk/membuat', 'ProductCategories::create');
+    $routes->post('kategori-produk/menyimpan', 'ProductCategories::store');
 });
 
 $routes->get('sign_out', 'SignOut::index');
