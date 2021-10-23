@@ -1,4 +1,4 @@
-import { show_password } from './module.js';
+import { showPassword } from './module.js';
 
 // show password
-document.querySelector('a#show-password').addEventListener('click', show_password);
+document.querySelector('a#show-password').addEventListener('click', showPassword);

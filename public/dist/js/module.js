@@ -1,5 +1,5 @@
 // show modal
-function show_modal(modal, modal_content)
+function showModal(modal, modalContent)
 {
     modal.classList.add('d-block');
     setTimeout(() => {
@@ -7,16 +7,16 @@ function show_modal(modal, modal_content)
     }, 50);
 
     setTimeout(() => {
-        modal_content.classList.add('modal__content--animate-show');
+        modalContent.classList.add('modal__content--animate-show');
     }, 200);
 }
 
 // hide modal
-function hide_modal(modal, modal_content)
+function hideModal(modal, modalContent)
 {
-    modal_content.classList.replace('modal__content--animate-show', 'modal__content--animate-hide');
+    modalContent.classList.replace('modal__content--animate-show', 'modal__content--animate-hide');
     setTimeout(() => {
-        modal_content.classList.remove('modal__content--animate-hide');
+        modalContent.classList.remove('modal__content--animate-hide');
         modal.classList.replace('modal--fade-in', 'modal--fade-out');
     }, 100);
 
@@ -28,21 +28,21 @@ function hide_modal(modal, modal_content)
 }
 
 // add form input magnitude and price
-function add_form_input_magnitude_price(target_append)
+function addFormInputMagnitudePrice(targetAppend)
 {
-    const new_form_magnitude_price = document.createElement('div');
-    new_form_magnitude_price.classList.add('mt-3');
-    new_form_magnitude_price.innerHTML = `<div class="input-group">
+    const formMagnitudePriceElement = document.createElement('div');
+    formMagnitudePriceElement.classList.add('mt-3');
+    formMagnitudePriceElement.innerHTML = `<div class="input-group">
         <input class="form-input" type="text" placeholder="Besaran..." name="product_magnitudes[]">
         <input class="form-input" type="number" placeholder="Harga..." name="product_prices[]">
         <a class="btn btn--gray-outline" id="remove-form-input-magnitude-price" href="#">Hapus</a>
     </div>`;
 
-    // append new form magnitude price to target_append
-    target_append.append(new_form_magnitude_price);
+    // append new form magnitude price to targetAppend
+    targetAppend.append(formMagnitudePriceElement);
 }
 
-function show_password(e)
+function showPassword(e)
 {
     e.preventDefault();
 
@@ -62,32 +62,32 @@ function show_password(e)
     }
 }
 
-function create_alert_node(alert_classes, message)
+function createAlertNode(alertClasses, message)
 {
-    const alert = document.createElement('div');
-    alert.classList.add('alert');
-    for (const ac of alert_classes) {
-        alert.classList.add(ac);
+    const alertElement = document.createElement('div');
+    alertElement.classList.add('alert');
+    for (const ac of alertClasses) {
+        alertElement.classList.add(ac);
     }
 
-    alert.innerHTML = `<span class="alert__icon"></span>
+    alertElement.innerHTML = `<span class="alert__icon"></span>
     <p>${message}</p>
     <a class="alert__close" href="#"></a>`;
 
-    return alert;
+    return alertElement;
 }
 
 // number formatter currency
-function number_formatter_to_currency(number)
+function numberFormatterToCurrency(number)
 {
     return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0});
 }
 
 export {
-    show_modal,
-    hide_modal,
-    add_form_input_magnitude_price,
-    show_password,
-    create_alert_node,
-    number_formatter_to_currency
+    showModal,
+    hideModal,
+    addFormInputMagnitudePrice,
+    showPassword,
+    createAlertNode,
+    numberFormatterToCurrency
 };
