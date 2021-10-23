@@ -18,16 +18,10 @@ class SignIn extends BaseController
             'username' => [
                 'label' => 'Username',
                 'rules' => 'required',
-                'errors' => $this->createIndoErrorMessages([
-                    'required'
-                ])
             ],
             'password' => [
                 'label' => 'Password',
                 'rules' => 'required',
-                'errors' => $this->createIndoErrorMessages([
-                    'required'
-                ])
             ]
         ])) {
             // set validation error messages to flash session
