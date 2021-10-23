@@ -10,10 +10,12 @@ function renderChart(transactionsTwoMonthsAgo)
             type: 'area',
             height: 300,
             toolbar: {
-                offsetY: -5,
                 tools: {
                     download: false
                 }
+            },
+            zoom: {
+                enabled: false
             }
         },
         colors: ['#7874f7'],
@@ -32,11 +34,9 @@ function renderChart(transactionsTwoMonthsAgo)
                 datetimeFormatter: {
                     year: 'yyyy',
                     month: 'MMM',
-                    day: 'dd MMM'
+                    day: 'dd MMM',
+                    hour: ''
                 }
-            },
-            tooltip: {
-                enabled: false
             }
         },
         yaxis: {
@@ -53,11 +53,6 @@ function renderChart(transactionsTwoMonthsAgo)
        },
        grid: {
            borderColor: '#e8e8e8',
-           xaxis: {
-               lines: {
-                   show: true,
-               },
-           },
        },
        tooltip: {
             style: {
