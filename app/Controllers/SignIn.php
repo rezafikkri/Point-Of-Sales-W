@@ -32,8 +32,8 @@ class SignIn extends BaseController
         $username = $this->request->getPost('username', FILTER_SANITIZE_STRING);
         $password = $this->request->getPost('password', FILTER_SANITIZE_STRING);
 
-        $userModel = new UsersModel;
-        $userSignIn = $userModel->getUserSignIn($username);
+        $usersModel = new UsersModel();
+        $userSignIn = $usersModel->getUserSignIn($username);
 
         // if username is exist
         if($userSignIn) {

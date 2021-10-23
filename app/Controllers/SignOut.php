@@ -14,8 +14,8 @@ class SignOut extends Controller
         // if has signed in
         if($session->has('posw_sign_in_status')) {
             // update last sign in
-            $model = new UsersModel;
-            $model->update($_SESSION['posw_user_id'], [
+            $usersModel = new UsersModel;
+            $usersModel->update($_SESSION['posw_user_id'], [
                 'last_sign_in' => date('Y-m-d H:i:s')
             ]);
 
