@@ -39,7 +39,7 @@ class Admin extends Controller
         $index = 0;
 
         foreach($transactionsTwoMonthsAgo as $key => $value) {
-            $newDay = substr($value['updated_at'], 8, 2);
+            $newDay = substr($value['edited_at'], 8, 2);
 
             if ($day == $newDay) {
                 $transactionsTwoMonthsAgoGrouped['amount'][$index] += 1;
@@ -52,7 +52,7 @@ class Admin extends Controller
                 $day = $newDay;
                 $transactionsTwoMonthsAgoGrouped['amount'][$index] = 1;
             }
-            $transactionsTwoMonthsAgoGrouped['updated_at'][$index] = strtotime($value['updated_at'])*1000;
+            $transactionsTwoMonthsAgoGrouped['edited_at'][$index] = strtotime($value['edited_at'])*1000;
         }
         return json_encode($transactionsTwoMonthsAgoGrouped);
     }

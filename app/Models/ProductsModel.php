@@ -15,7 +15,7 @@ class ProductsModel extends Model
         'product_photo',
         'product_status',
         'created_at',
-        'updated_at'
+        'edited_at'
     ];
     protected $useAutoIncrement = false;
 

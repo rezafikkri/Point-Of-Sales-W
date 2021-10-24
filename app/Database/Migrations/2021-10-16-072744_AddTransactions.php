@@ -25,7 +25,7 @@ class AddTransactions extends Migration
             'created_at' => [
                 'type' => 'TIMESTAMP'
             ],
-            'updated_at' => [
+            'edited_at' => [
                 'type' => 'TIMESTAMP'
             ]
         ]);

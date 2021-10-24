@@ -14,7 +14,7 @@ class TransactionsModel extends Model
         'transaction_status',
         'customer_money',
         'created_at',
-        'updated_at'
+        'edited_at'
     ];
     protected $useAutoIncrement = false;
 
@@ -44,8 +44,8 @@ class TransactionsModel extends Model
         $startDate = date('Y-m-d H:i:s', mktime(0, 0, 0, date('m')-1, 1, date('Y')));
         $endDate = date('Y-m-d H:i:s');
 
-        return $this->select('updated_at')
-                    ->getWhere(['updated_at >=' => $startDate, 'updated_at <=' => $endDate])
+        return $this->select('edited_at')
+                    ->getWhere(['edited_at >=' => $startDate, 'edited_at <=' => $endDate])
                     ->getResultArray();
     }
 

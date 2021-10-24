@@ -26,7 +26,7 @@ class ProductsSeeder extends Seeder
                 'product_photo' => 'Lemon Juice.jpg',
                 'product_status' => 'ada',
                 'created_at' => $dateTime,
-                'updated_at' => $dateTime
+                'edited_at' => $dateTime
             ],
             [
                 'product_id' => $productIds[1],
@@ -35,7 +35,7 @@ class ProductsSeeder extends Seeder
                 'product_photo' => 'Pomegranate juice.jpg',
                 'product_status' => 'tidak_ada',
                 'created_at' => $dateTime,
-                'updated_at' => $dateTime
+                'edited_at' => $dateTime
             ],
             [
                 'product_id' => $productIds[2],
@@ -44,7 +44,7 @@ class ProductsSeeder extends Seeder
                 'product_photo' => 'strawberry juice.jpg',
                 'product_status' => 'ada',
                 'created_at' => $dateTime,
-                'updated_at' => $dateTime
+                'edited_at' => $dateTime
             ],
             [
                 'product_id' => $productIds[3],
@@ -53,7 +53,7 @@ class ProductsSeeder extends Seeder
                 'product_photo' => 'orange juice.jpg',
                 'product_status' => 'ada',
                 'created_at' => $dateTime,
-                'updated_at' => $dateTime
+                'edited_at' => $dateTime
             ],
             [
                 'product_id' => $productIds[4],
@@ -62,7 +62,7 @@ class ProductsSeeder extends Seeder
                 'product_photo' => 'Milkshake.jpg',
                 'product_status' => 'ada',
                 'created_at' => $dateTime,
-                'updated_at' => $dateTime
+                'edited_at' => $dateTime
             ],
         ];
         $productBuilder->insertBatch($productData);

@@ -58,7 +58,7 @@ class ProductCategories extends BaseController
             'product_category_id' => generate_uuid(),
             'product_category_name' => $productCategoryName,
             'created_at' => $createdAt,
-            'updated_at' => $createdAt
+            'edited_at' => $createdAt
         ]);
         return redirect()->to('/admin/kategori-produk');
     }
@@ -100,7 +100,7 @@ class ProductCategories extends BaseController
          */
         $this->productCategoriesModel->update($productCategoryId, [
             'product_category_name' => $productCategoryName,
-            'updated_at' => date('Y-m-d H:i:s')
+            'edited_at' => date('Y-m-d H:i:s')
         ]);
 
         // make success messages

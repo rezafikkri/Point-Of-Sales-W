@@ -12,13 +12,13 @@ class ProductCategoriesModel extends Model
         'product_category_id',
         'product_category_name',
         'created_at',
-        'updated_at'
+        'edited_at'
     ];
     protected $useAutoIncrement = false;
 
     public function getAll(): array
     {
-        return $this->orderBy('updated_at', 'DESC')->findAll();
+        return $this->orderBy('edited_at', 'DESC')->findAll();
     }
 
     public function getOne(string $productCategoryId): ? array

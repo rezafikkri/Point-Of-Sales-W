@@ -14,13 +14,13 @@ class ProductCategoriesSeeder extends Seeder
                 'product_category_id' => 'd97e5f5d-9b1d-49a0-be4f-406148bfcea9',
                 'product_category_name' => 'Minuman',
                 'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'edited_at' => date('Y-m-d H:i:s')
             ],
             [
                 'product_category_id' => '4db8a04e-627d-4729-a355-f6dc2a21fc07',
                 'product_category_name' => 'Laptop',
                 'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'edited_at' => date('Y-m-d H:i:s')
             ]
         ];
         $builder->insertBatch($data);

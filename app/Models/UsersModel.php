@@ -16,7 +16,7 @@ class UsersModel extends Model
         'password',
         'last_sign_in',
         'created_at',
-        'updated_at'
+        'edited_at'
     ];
     protected $useAutoIncrement = false;
 

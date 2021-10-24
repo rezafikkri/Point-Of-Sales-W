@@ -43,7 +43,7 @@ class TransactionsSeeder extends Seeder
                     'transaction_status' => 'finished',
                     'customer_money' => 80000,
                     'created_at' => $dateTime,
-                    'updated_at' => $dateTime
+                    'edited_at' => $dateTime
                 ];
                 $dataTransactionDetail[] = [
                     'transaction_detail_id' => generate_uuid(),

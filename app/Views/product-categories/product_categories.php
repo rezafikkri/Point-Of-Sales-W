@@ -33,7 +33,7 @@ $this->extend('admin_layout');
                 if (count($productCategories) > 0) :
                 foreach($productCategories as $pc) :
                     $createdAt = Time::createFromFormat('Y-m-d H:i:s', $pc['created_at']);
-                    $updatedAt = Time::createFromFormat('Y-m-d H:i:s', $pc['updated_at']);
+                    $editedAt = Time::createFromFormat('Y-m-d H:i:s', $pc['edited_at']);
             ?>
                 <tr>
                     <td width="10"><a href="#" data-product-category-id="<?= $pc['product_category_id']; ?>" title="Hapus kategori produk" class="text-hover-red" id="remove-product-category"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg></a></td>
@@ -41,7 +41,7 @@ $this->extend('admin_layout');
 
                     <td><?= $pc['product_category_name']; ?></td>
                     <td><?= $createdAt->toLocalizedString('d MMM yyyy H:m'); ?></td>
-                    <td><?= $updatedAt->toLocalizedString('d MMM yyyy H:m'); ?></td>
+                    <td><?= $editedAt->toLocalizedString('d MMM yyyy H:m'); ?></td>
                 </tr>
             <?php endforeach; else : ?>
                 <tr>

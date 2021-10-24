@@ -23,7 +23,7 @@ function renderChart(transactionsTwoMonthsAgo)
             name: 'Transaksi',
             data: transactionsTwoMonthsAgo.amount
         }],
-        labels: transactionsTwoMonthsAgo.updated_at,
+        labels: transactionsTwoMonthsAgo.edited_at,
         xaxis: {
             type: 'datetime',
             labels: {

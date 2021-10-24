@@ -19,7 +19,7 @@ class UsersSeeder extends Seeder
                 'level' => 'admin',
                 'password' => password_hash('reza', PASSWORD_DEFAULT),
                 'created_at' => $dateTime,
-                'updated_at' => $dateTime
+                'edited_at' => $dateTime
             ],
             [
                 'user_id' => '90b86b53-4bc8-436f-8919-c709d8026471',
@@ -28,7 +28,7 @@ class UsersSeeder extends Seeder
                 'level' => 'cashier',
                 'password' => password_hash('dian', PASSWORD_DEFAULT),
                 'created_at' => $dateTime,
-                'updated_at' => $dateTime
+                'edited_at' => $dateTime
             ],
             [
                 'user_id' => '8ca354cb-f0fc-47dd-8b5e-8d88e460c6c7',
@@ -37,7 +37,7 @@ class UsersSeeder extends Seeder
                 'level' => 'cashier',
                 'password' => password_hash('dea', PASSWORD_DEFAULT),
                 'created_at' => $dateTime,
-                'updated_at' => $dateTime
+                'edited_at' => $dateTime
             ]
         ];
         $builder->insertBatch($data);
