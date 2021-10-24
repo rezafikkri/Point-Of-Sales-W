@@ -2,8 +2,7 @@
 
 namespace App\Filters;
 
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\{RequestInterface, ResponseInterface};
 use CodeIgniter\Filters\FilterInterface;
 
 class AdminPermission implements FilterInterface

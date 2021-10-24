@@ -3,9 +3,7 @@
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
-use App\Models\UsersModel;
-use App\Models\ProductsModel;
-use App\Models\TransactionsModel;
+use App\Models\{UsersModel, ProductsModel, TransactionsModel};
 
 class Admin extends Controller
 {

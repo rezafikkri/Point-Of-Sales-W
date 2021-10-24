@@ -3,10 +3,7 @@
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
-use CodeIgniter\HTTP\CLIRequest;
-use CodeIgniter\HTTP\IncomingRequest;
-use CodeIgniter\HTTP\RequestInterface;
-use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\HTTP\{CLIRequest, IncomingRequest, RequestInterface, ResponseInterface};
 use Psr\Log\LoggerInterface;
 
 /**
