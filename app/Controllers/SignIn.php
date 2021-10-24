@@ -40,14 +40,14 @@ class SignIn extends BaseController
             // if password is valid
             if(password_verify($password, $userSignIn['password'])) {
                 $this->session->set([
-                    'posw_sign_in_status' => true,
-                    'posw_user_id' => $userSignIn['user_id'],
-                    'posw_user_level' => $userSignIn['level'],
-                    'posw_user_full_name' => $userSignIn['full_name']
+                    'sign_in_status' => true,
+                    'sign_in_user_id' => $userSignIn['user_id'],
+                    'sign_in_user_level' => $userSignIn['level'],
+                    'sign_in_user_full_name' => $userSignIn['full_name']
                 ]);
 
                 // if user level is admin
-                if($_SESSION['posw_user_level'] === 'admin') {
+                if($_SESSION['sign_in_user_level'] === 'admin') {
                     return redirect()->to('/admin');
                 }
 

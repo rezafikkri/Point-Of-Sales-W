@@ -4,7 +4,7 @@
 <header class="header">
 <div class="container-xl">
     <h4 class="mb-0">Hi</h4>
-    <h5>, <?= $_SESSION['posw_user_full_name']; ?></h5>
+    <h5>, <?= $_SESSION['sign_in_user_full_name']; ?></h5>
 </div><!-- container-xl -->
 </header>
 
