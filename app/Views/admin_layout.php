@@ -33,7 +33,7 @@
         <li><a href="/admin/kategori-produk" class="<?= active_menu(
             $page,
             'navbar__link--active',
-            ['kategori-produk', 'buat-kategori-produk', 'perbaharui-kategori-produk']
+            ['kategori-produk', 'membuat-kategori-produk', 'edit-kategori-produk']
         ); ?>">Kategori Produk</a></li>
         <li><a href="/admin/produk" class="<?= active_menu(
             $page,

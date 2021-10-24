@@ -1,22 +1,18 @@
 <?= $this->extend('admin_layout'); ?>
 
 <?= $this->section('main'); ?>
-<header class="header header--product">
-<div class="container-xl d-flex flex-column flex-sm-row justify-content-between flex-wrap">
-    <h4 class="mb-4 mb-sm-0 me-2 flex-fill">Perbaharui Kategori Produk</h4>
-    <div class="d-flex flex-column flex-sm-row justify-content-start justify-content-sm-end align-items-start flex-fill">
-        <a href="/admin/kategori_produk" class="btn btn--gray-outline">Kembali</a>
-    </div><!-- d-flex -->
-</div><!-- container-xl -->
+<div class="container-xl">
+<header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-start">
+    <h4 class="mb-4 mb-sm-0 me-2">Edit Kategori Produk</h4>
+    <a href="/admin/kategori-produk" class="btn btn--gray-outline">Kembali</a>
 </header>
 
 <main class="main">
-<div class="container-xl">
     <div class="row">
     <div class="col-md-8">
-        <?= $_SESSION['form_success']['update_product_category'] ?? null; ?>
+        <?= $_SESSION['success']['update_product_category'] ?? null; ?>
         <div class="main__box">
-            <?= form_open('/admin/perbaharui_kategori_produk'); ?>
+            <?= form_open('/admin/kategori-produk/memperbaharui'); ?>
                 <input type="hidden" value="<?= $productCategoryId; ?>" name="product_category_id">
                 <div class="mb-3">
                     <label class="form-label" for="product_category_name">Nama Kategori</label>
@@ -29,6 +25,6 @@
         </div><!-- main__box -->
     </div>
     </div>
-</div>
 </main>
+</div>
 <?= $this->endSection(); ?>

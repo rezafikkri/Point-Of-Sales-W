@@ -21,7 +21,7 @@ class ProductCategoriesModel extends Model
         return $this->orderBy('updated_at', 'DESC')->findAll();
     }
 
-    public function findProductCategory(string $productCategoryId): ? array
+    public function getOne(string $productCategoryId): ? array
     {
         return $this->select('product_category_name')->getWhere(['product_category_id' => $productCategoryId])->getRowArray();
     }

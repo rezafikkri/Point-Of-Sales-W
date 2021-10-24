@@ -27,7 +27,7 @@ class ProductCategories extends BaseController
         helper(['active_menu', 'form']);
 
         $data['title'] = 'Membuat Kategori Produk . POSW';
-        $data['page'] = 'buat-kategori-produk';
+        $data['page'] = 'membuat-kategori-produk';
 
         return view('product-categories/create_product_category', $data);
     }
@@ -63,61 +63,54 @@ class ProductCategories extends BaseController
         return redirect()->to('/admin/kategori-produk');
     }
 
-    public function updateProductCategory(string $productCategoryId = null)
+    public function edit(string $productCategoryId)
     {
-        $method = $this->request->getMethod();
-
-        // if method = post and error not exists
-        if ($method === 'post' && $this->validate([
-            'product_category_name' => [
-                'label' => 'Nama Kategori Produk',
-                'rules' => 'required|max_length[20]',
-                'errors' => $this->createIndoErrorMessages([
-                    'required',
-                    'max_length'
-                ])
-            ]
-        ])) {
-            $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
-            $productCategoryName = $this->request->getPost('product_category_name', FILTER_SANITIZE_STRING);
-
-            if ($this->updateProductCategoryInDB($productCategoryId, $productCategoryName)) {
-                // make success messages
-                $this->session->setFlashData('success_messages', $this->addDelimiterMessages([
-                    'update_product_category' => 'Kategori produk telah diperbaharui.'
-                ]));
-            }
-            return redirect()->back();
-        }
-
-        // if method = post and error exists
-        if ($method === 'post' && $this->validator->hasError('product_category_name')) {
-            // set validation error messages to flash session
-            $this->session->setFlashData('error_messages', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->back()->withInput();
-        }
+        helper(['active_menu', 'form']);
 
         $productCategoryId = filter_var($productCategoryId, FILTER_SANITIZE_STRING);
 
-        $data['title'] = 'Perbaharui Kategori Produk . POSW';
-        $data['page'] = 'perbaharui_kategori_produk';
+        $data['title'] = 'Edit Kategori Produk . POSW';
+        $data['page'] = 'edit-kategori-produk';
         $data['productCategoryId'] = $productCategoryId;
-        $data['productCategoryDB'] = $this->model->findProductCategory($productCategoryId);
+        $data['productCategoryDB'] = $this->productCategoriesModel->getOne($productCategoryId);
 
-        return view('product-categories/update_product_category', $data);
+        return view('product-categories/edit_product_category', $data);
     }
 
-    private function updateProductCategoryInDB(string $productCategoryId, string $productCategoryName): bool
+    public function update()
     {
-        /*
+        if (!$this->validate([
+            'product_category_name' => [
+                'label' => 'Nama Kategori',
+                'rules' => 'required|max_length[20]'
+            ]
+        ])) {
+            // set validation error messages to flash session
+            $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
+            return redirect()->back();
+        }
+
+        $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
+        $productCategoryName = $this->request->getPost('product_category_name', FILTER_SANITIZE_STRING);
+
+        /**
          * in production and development,
          * if insert success, function update() will be return true.
          * in production, if fail will be return false
          */
-        return $this->model->update($productCategoryId, [
+        $this->productCategoriesModel->update($productCategoryId, [
             'product_category_name' => $productCategoryName,
             'updated_at' => date('Y-m-d H:i:s')
         ]);
+
+        // make success messages
+        $this->openDelimiterMessages = '<div class="alert alert--success mb-3"><span class="alert__icon"></span><p>';
+        $this->closeDelimiterMessages = '</p><a class="alert__close" href="#"></a></div>';
+        $this->session->setFlashData('success', $this->addDelimiterMessages([
+            'update_product_category' => 'Kategori produk telah diperbaharui.'
+        ]));
+
+        return redirect()->back();
     }
 
     public function removeProductCategoryInDB()

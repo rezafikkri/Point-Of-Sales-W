@@ -38,9 +38,9 @@ class BaseController extends Controller
     protected $helpers = [];
 
     // property for add delimiter messages
-    protected $openDelimiter = '<small class="form-message form-message--danger">';
-    protected $closeDelimiter = '</small>';
-    protected $ignore;
+    protected $openDelimiterMessages = '<small class="form-message form-message--danger">';
+    protected $closeDelimiterMessages = '</small>';
+    protected $ignoreMessages;
 
     /**
      * Constructor.
@@ -59,11 +59,11 @@ class BaseController extends Controller
         $newMessages = [];
 
         foreach ($messages as $key => $value) {
-            // if ignore not null and key exists in ignore array
-            if ($this->ignore && in_array($key, $this->ignore)) {
+            // if ignore messages not null and key exists in ignore array
+            if ($this->ignoreMessages && in_array($key, $this->ignoreMessages)) {
                 $newMessages[$key] = $value;
             } else {
-                $newMessages[$key] = $this->openDelimiter.$value.$this->closeDelimiter;
+                $newMessages[$key] = $this->openDelimiterMessages.$value.$this->closeDelimiterMessages;
             }
         }
 
