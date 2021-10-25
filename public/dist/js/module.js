@@ -62,7 +62,7 @@ function showPassword(e)
     }
 }
 
-function createAlertNode(alertClasses, message)
+function renderAlert(parentElement, referenceElement, message, alertClasses)
 {
     const alertElement = document.createElement('div');
     alertElement.classList.add('alert');
@@ -74,7 +74,7 @@ function createAlertNode(alertClasses, message)
     <p>${message}</p>
     <a class="alert__close" href="#"></a>`;
 
-    return alertElement;
+    parentElement.insertBefore(alertElement, referenceElement);
 }
 
 // number formatter currency
@@ -83,11 +83,25 @@ function numberFormatterToCurrency(number)
     return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0});
 }
 
+async function postData(url = '', data = '')
+{
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: data
+    });
+    return response.json();
+}
+
 export {
     showModal,
     hideModal,
     addFormInputMagnitudePrice,
     showPassword,
-    createAlertNode,
-    numberFormatterToCurrency
+    renderAlert,
+    numberFormatterToCurrency,
+    postData
 };

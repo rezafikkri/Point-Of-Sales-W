@@ -113,20 +113,25 @@ class ProductCategories extends BaseController
         return redirect()->back();
     }
 
-    public function removeProductCategoryInDB()
+    public function remove()
     {
-        $product_category_id = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
-        if($this->model->removeProductCategory($product_category_id) > 0) {
+        $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
+        /**
+         * in production and development,
+         * if insert success, function update() will be return true.
+         * in production, if fail will be return false
+         */
+        if ($this->productCategoriesModel->delete($productCategoryId)) {
             return json_encode([
                 'status' => 'success',
                 'csrf_value' => csrf_hash()
             ]);
         }
 
-        $error_message = 'Gagal menghapus kategori produk, cek apakah masih ada produk yang terhubung! <a href="https://github.com/rezafikkri/Point-Of-Sales-Warung/wiki/Kategori-Produk#gagal-menghapus-kategori" target="_blank" rel="noreferrer noopener">Pelajari lebih lanjut!</a>';
+        $errorMessage = 'Gagal menghapus kategori produk, cek apakah masih ada data produk yang terhubung!';
         return json_encode([
             'status' => 'fail',
-            'message' => $error_message,
+            'message' => $errorMessage,
             'csrf_value' => csrf_hash()
         ]);
     }

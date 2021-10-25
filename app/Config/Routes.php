@@ -39,6 +39,7 @@ $routes->group('admin', function ($routes) {
     $routes->post('kategori-produk/menyimpan', 'ProductCategories::store');
     $routes->get('kategori-produk/edit/(:segment)', 'ProductCategories::edit/$1');
     $routes->post('kategori-produk/memperbaharui', 'ProductCategories::update');
+    $routes->post('kategori-produk/menghapus', 'ProductCategories::remove');
 });
 
 $routes->get('sign_out', 'SignOut::index');
