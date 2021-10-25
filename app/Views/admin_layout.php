@@ -29,23 +29,11 @@
     </a>
 
     <ul class="navbar__right navbar__right--collapse">
-        <li><a href="/admin" class="<?= active_menu($page, 'navbar__link--active', ['home']); ?>">Home</a></li>
-        <li><a href="/admin/kategori-produk" class="<?= active_menu(
-            $page,
-            'navbar__link--active',
-            ['kategori-produk', 'membuat-kategori-produk', 'edit-kategori-produk']
-        ); ?>">Kategori Produk</a></li>
-        <li><a href="/admin/produk" class="<?= active_menu(
-            $page,
-            'navbar__link--active',
-            ['produk', 'buat_produk', 'perbaharui_produk']
-        ); ?>">Produk</a></li>
-        <li><a href="/admin/transaksi" class="<?= active_menu($page, 'navbar__link--active', ['transaksi']); ?>">Transaksi</a></li>
-        <li><a href="/admin/pengguna" class="<?= active_menu(
-            $page,
-            'navbar__link--active',
-            ['pengguna', 'buat_pengguna', 'perbaharui_pengguna']
-        ); ?>">Pengguna</a></li>
+        <li><a href="/admin" class="<?= active_menu('admin'); ?>">Home</a></li>
+        <li><a href="/admin/kategori-produk" class="<?= active_menu('kategori-produk'); ?>">Kategori Produk</a></li>
+        <li><a href="/admin/produk" class="<?= active_menu('produk'); ?>">Produk</a></li>
+        <li><a href="/admin/transaksi" class="<?= active_menu('transaksi'); ?>">Transaksi</a></li>
+        <li><a href="/admin/pengguna" class="<?= active_menu('pengguna'); ?>">Pengguna</a></li>
 
         <li class="dropdown"><a href="" class="dropdown-toggle" target=".dropdown-menu"><?= $_SESSION['sign_in_user_full_name']  ?></a>
             <ul class="dropdown-menu dropdown-menu--end d-none">

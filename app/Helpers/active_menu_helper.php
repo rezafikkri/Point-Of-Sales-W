@@ -1,16 +1,27 @@
 <?php
 
-/* This helper for help automatic generate active menu class, ex. for navbar menu have .navbar__link--active class
- * first parameter is user accessed page now, it get from uri segment
- * second parameter is active menu class
- * third parameter is array of menu name.
+/**
+ * This helper for help automatic generate active menu class for navbar menu
+ *
+ * $menuName is menu name for navbar menu
  */
-
-function active_menu(string $page, string $active_menu_class, array $menu_names): ? string
+function active_menu(string $menuName): ? string
 {
-    // if page found in menu names array
-    if(in_array($page, $menu_names)) {
-        return $active_menu_class;
+    $request = \Config\Services::request();
+
+    $activeMenuClass = 'navbar__link--active';
+    $segments = $request->uri->getSegments();
+
+    // $segment is determine menu name in now page
+    if (count($segments) > 1) {
+        $segment = $segments[1];
+    } else {
+        $segment = $segments[0];
+    }
+
+    // if $menuName = $segment
+    if ($menuName === $segment) {
+        return $activeMenuClass;
     }
     return null;
 }
