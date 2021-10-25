@@ -1,5 +1,6 @@
 import ApexCharts from '../plugins/apexcharts/apexcharts.esm.js'
 import id from '../plugins/apexcharts/locales/id.js';
+import { abbreviateNumber } from './module.js';
 
 function renderChart(transactionsTwoMonthsAgo)
 {
@@ -45,7 +46,7 @@ function renderChart(transactionsTwoMonthsAgo)
                     colors: '#78909c',
                     fontFamily: 'roboto-regular'
                 },
-                formatter: (val) => new Intl.NumberFormat('id').format(val)
+                formatter: (val) => abbreviateNumber(val)
             }
         },
         dataLabels: {

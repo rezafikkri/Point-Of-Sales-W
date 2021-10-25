@@ -96,6 +96,28 @@ async function postData(url = '', data = '')
     return response.json();
 }
 
+// format number like 100k
+function abbreviateNumber(number)
+{
+    // if number greater than 0 and smaller than 999
+    if (number >= 0 && number <= 999) return number;
+
+    const SISymbol = ['', 'k', 'M', 'G', 'T', 'P'];
+
+    // tier is determine SI Symbol
+    const tier = Math.floor(Math.log10(Math.abs(number)) / 3);
+
+    // get suffix and determine scale
+    const suffix = SISymbol[tier];
+    const scale = Math.pow(10, tier * 3);
+
+    // scale the number
+    const scaled = number / scale;
+
+    // format number and add suffix
+    return Math.abs(scaled.toFixed(1)) + suffix;
+}
+
 export {
     showModal,
     hideModal,
@@ -103,5 +125,6 @@ export {
     showPassword,
     renderAlert,
     numberFormatterToCurrency,
-    postData
+    postData,
+    abbreviateNumber
 };
