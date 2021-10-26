@@ -19,11 +19,11 @@ class ProductsModel extends Model
     ];
     protected $useAutoIncrement = false;
 
-    public function getProducts(int $limit): array
+    public function getAll(int $limit): array
     {
-        return $this->select('produk_id,nama_produk,nama_kategori_produk,status_produk,produk.waktu_buat')
-                    ->join('kategori_produk', 'kategori_produk.kategori_produk_id = produk.kategori_produk_id', 'INNER')
-                    ->orderBy('waktu_buat', 'DESC')->limit($limit)->get()->getResultArray();
+        return $this->select('product_id, product_name, product_category_name, product_status, products.created_at, products.edited_at')
+                    ->join('product_categories', 'product_categories.product_category_id = products.product_category_id', 'INNER')
+                    ->orderBy('edited_at', 'DESC')->limit($limit)->get()->getResultArray();
     }
 
     public function getTotal(): int
@@ -37,11 +37,6 @@ class ProductsModel extends Model
                     ->join('kategori_produk', 'kategori_produk.kategori_produk_id = produk.kategori_produk_id', 'INNER')
                     ->orderBy('waktu_buat', 'DESC')->limit($limit)
                     ->like('nama_produk',$match,'after')->get()->getResultArray();
-    }
-
-    public function countAllProduct(): int
-    {
-        return $this->select('produk_id')->get()->getNumRows();
     }
 
     public function countAllProductSearch(string $match): int
