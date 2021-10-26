@@ -29,7 +29,7 @@ class Admin extends Controller
         return view('admin', $data);
     }
 
-    public function getTransactionsTwoMonthsAgo()
+    public function showTransactionsTwoMonthsAgo()
     {
         $transactionsTwoMonthsAgo = $this->transactionsModel->getTwoMonthsAgo();
         $transactionsTwoMonthsAgoGrouped = [];

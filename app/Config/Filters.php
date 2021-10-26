@@ -39,7 +39,7 @@ class Filters extends BaseConfig
             'cashierPermission' => ['except' => ['sign_in', '/', 'sign_out', 'admin', 'admin/*']]
         ],
         'after' => [
-            'toolbar' => ['except' => ['admin/transactions-two-months-ago']],
+            'toolbar' => ['except' => ['admin/menampilkan-transaksi-dua-bulan-yang-lalu']],
             // 'honeypot',
         ],
     ];
