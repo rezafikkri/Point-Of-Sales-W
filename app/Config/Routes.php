@@ -33,7 +33,7 @@ $routes->setAutoRoute(false);
 // route since we don't have to scan directories.
 $routes->group('admin', function ($routes) {
     $routes->get('', 'Admin::index');
-    $routes->get('menampilkan-transaksi-dua-bulan-yang-lalu', 'Admin::showTransactionsTwoMonthsAgo');
+    $routes->get('tampilkan-transaksi-dua-bulan-yang-lalu', 'Admin::showTransactionsTwoMonthsAgo');
 
     $routes->get('kategori-produk', 'ProductCategories::index');
     $routes->get('kategori-produk/membuat', 'ProductCategories::create');

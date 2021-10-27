@@ -1,10 +1,10 @@
 import renderChart from './chart.js';
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async () => {
     const loadingElement = document.querySelector('#loading');
-    const baseUrl = this.querySelector('html').dataset.baseUrl;
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
 
-    const response = await fetch(`${baseUrl}/admin/menampilkan-transaksi-dua-bulan-yang-lalu`);
+    const response = await fetch(`${baseUrl}/admin/tampilkan-transaksi-dua-bulan-yang-lalu`);
     const transactionsTwoMonthsAgo = await response.json();
 
     renderChart(transactionsTwoMonthsAgo);
