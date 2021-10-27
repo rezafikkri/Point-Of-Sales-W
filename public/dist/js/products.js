@@ -3,7 +3,6 @@ import { renderAlert, numberFormatterToCurrency, postData } from './module.js';
 const tableElement = document.querySelector('table.table');
 const searchProductElement = document.querySelector('a#search-product');
 const resultStatusElement = document.querySelector('span#result-status');
-const baseUrl = document.querySelector('html').dataset.baseUrl;
 
 // show hide product detail
 tableElement.querySelector('tbody').addEventListener('click', async (e) => {
@@ -19,6 +18,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
             tableRowDetailElement.classList.toggle('table__row-detail--show');
         // else, is mean product detail not exists in table
         } else {
+            const baseUrl = document.querySelector('html').dataset.baseUrl;
             const productId = targetElement.dataset.productId;
 
             // show loading
