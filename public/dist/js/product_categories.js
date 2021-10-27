@@ -12,6 +12,7 @@ table.querySelector('tbody').addEventListener('click', async (e) => {
     if (target.getAttribute('id') === 'remove-product-category') {
         e.preventDefault();
 
+        const baseUrl = document.querySelector('html').dataset.baseUrl;
         const loadingElement = table.parentElement.nextElementSibling;
 
         // data for remove product category
@@ -24,7 +25,7 @@ table.querySelector('tbody').addEventListener('click', async (e) => {
 
         try {
             const responseJson = await postData(
-                '/admin/kategori-produk/menghapus',
+                `${baseUrl}/admin/kategori-produk/menghapus`,
                 `${csrfName}=${csrfValue}&product_category_id=${productCategoryId}`
             );
 
