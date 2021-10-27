@@ -23,7 +23,7 @@ $this->extend('admin_layout');
     </div><!-- d-flex -->
 </header>
 
-<main class="main">
+<main class="main mb-4">
     <div class="main__box">
 
     <div class="position-relative">
@@ -122,5 +122,5 @@ $this->extend('admin_layout');
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
-<script type="module" src="<?= base_url('dist/js/product.js'); ?>"></script>
+<script type="module" src="<?= base_url('dist/js/products.js'); ?>"></script>
 <?= $this->endSection(); ?>

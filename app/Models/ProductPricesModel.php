@@ -16,9 +16,12 @@ class ProductPricesModel extends Model
     ];
     protected $useAutoIncrement = false;
 
-    public function getProductPrices(string $product_id, string $column): array
+    public function getAll(string $productId, string $columns): array
     {
-        return $this->select($column)->getWhere(['product_id'=>$product_id])->getResultArray();
+        return $this->select($columns)
+                    ->getWhere([
+                        'product_id' => $productId
+                    ])->getResultArray();
     }
 
     public function removeProductPrice(string $product_price_id): int

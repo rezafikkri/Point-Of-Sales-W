@@ -31,15 +31,15 @@ class Products extends BaseController
         return view('products/products', $data);
     }
 
-    public function getDetails()
+    public function showDetails(string $productId)
     {
-        $product_id = $this->request->getPost('product_id', FILTER_SANITIZE_STRING);
-        $product_prices = $this->productPricesModel->getProductPrices($product_id, 'harga_produk, besaran_produk');
-        $product_photo = $this->productsModel->findProduct($product_id, 'foto_produk')['foto_produk']??null;
+        $productId = filter_var($productId, FILTER_SANITIZE_STRING);
+        $productPrices = $this->productPricesModel->getAll($productId, 'product_price, product_magnitude');
+        $productPhoto = $this->productsModel->getOne($productId, 'product_photo')['product_photo'] ?? '';
 
         return json_encode([
-            'product_prices' => $product_prices,
-            'product_photo' => $product_photo,
+            'product_prices' => $productPrices,
+            'product_photo' => $productPhoto,
             'csrf_value' => csrf_hash()
         ]);
     }

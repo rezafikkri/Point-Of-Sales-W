@@ -43,6 +43,7 @@ $routes->group('admin', function ($routes) {
     $routes->post('kategori-produk/menghapus', 'ProductCategories::remove');
 
     $routes->get('produk', 'Products::index');
+    $routes->get('produk/tampilkan-detail/(:segment)', 'Products::showDetails/$1');
 });
 
 $routes->get('sign_out', 'SignOut::index');

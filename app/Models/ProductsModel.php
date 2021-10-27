@@ -31,6 +31,14 @@ class ProductsModel extends Model
         return $this->countAll();
     }
 
+    public function getOne(string $productId, string $columns): ? array
+    {
+        return $this->select($columns)
+                    ->getWhere([
+                        'product_id' => $productId
+                    ])->getRowArray();
+    }
+
     public function getProductSearches(int $limit, string $match): array
     {
         return $this->select('produk_id,nama_produk,nama_kategori_produk,status_produk,produk.waktu_buat')
@@ -42,11 +50,6 @@ class ProductsModel extends Model
     public function countAllProductSearch(string $match): int
     {
         return $this->select('produk_id')->like('nama_produk',$match,'after')->get()->getNumRows();
-    }
-
-    public function findProduct(string $product_id, string $column): ? array
-    {
-        return $this->select($column)->getWhere(['produk_id'=>$product_id])->getRowArray();
     }
 
     public function removeProducts(array $product_ids): int

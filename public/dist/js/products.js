@@ -1,89 +1,76 @@
-import {create_alert_node, number_formatter_to_currency} from './module.posw.js';
+import { renderAlert, numberFormatterToCurrency, postData } from './module.js';
 
-const table = document.querySelector('table.table');
-const search_product = document.querySelector('a#search-product');
-const result_status = document.querySelector('span#result-status');
+const tableElement = document.querySelector('table.table');
+const searchProductElement = document.querySelector('a#search-product');
+const resultStatusElement = document.querySelector('span#result-status');
+const baseUrl = document.querySelector('html').dataset.baseUrl;
 
 // show hide product detail
-table.querySelector('tbody').addEventListener('click', e => {
-    let target = e.target;
-    if (target.getAttribute('id') !== 'show-product-detail') target = target.parentElement;
-    if (target.getAttribute('id') !== 'show-product-detail') target = target.parentElement;
-    if (target.getAttribute('id') === 'show-product-detail') {
+tableElement.querySelector('tbody').addEventListener('click', async (e) => {
+    let targetElement = e.target;
+    if (targetElement.getAttribute('id') !== 'show-product-detail') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') !== 'show-product-detail') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') === 'show-product-detail') {
         e.preventDefault();
 
         // if next element sibling exists and next element sibling is tr.table__row-detail, or is mean product detail exists in table
-        const table_row_detail = target.parentElement.parentElement.nextElementSibling;
-        if (table_row_detail !== null && table_row_detail.classList.contains('table__row-detail')) {
-            table_row_detail.classList.toggle('table__row-detail--show');
-
+        const tableRowDetailElement = targetElement.parentElement.parentElement.nextElementSibling;
+        if (tableRowDetailElement !== null && tableRowDetailElement.classList.contains('table__row-detail')) {
+            tableRowDetailElement.classList.toggle('table__row-detail--show');
         // else, is mean product detail not exists in table
         } else {
-            const product_id = target.dataset.productId;
-            const csrf_name = table.dataset.csrfName;
-            const csrf_value = table.dataset.csrfValue;
+            const productId = targetElement.dataset.productId;
 
-            // loading
-            table.parentElement.nextElementSibling.classList.remove('d-none');
+            // show loading
+            tableElement.parentElement.nextElementSibling.classList.remove('d-none');
             // disabled button search
-            search_product.classList.add('btn--disabled');
+            searchProductElement.classList.add('btn--disabled');
 
-            fetch('/admin/tampil_produk_detail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: `${csrf_name}=${csrf_value}&product_id=${product_id}`
-            })
-            .finally(() => {
-                // loading
-                table.parentElement.nextElementSibling.classList.add('d-none');
-                // enabled button search
-                search_product.classList.remove('btn--disabled');
-            })
-            .then(response => {
-                return response.json();
-            })
-            .then(json => {
+            try {
+                const response = await fetch(`${baseUrl}/admin/produk/tampilkan-detail/${productId}`);
+                const responseJson = await response.json();
+
                 // set new csrf hash to table tag
-                if (json.csrf_value !== undefined) {
-                    table.dataset.csrfValue = json.csrf_value;
+                if (responseJson.csrf_value !== undefined) {
+                    tableElement.dataset.csrfValue = responseJson.csrf_value;
                 }
 
                 // if product price exists
-                if (json.product_prices.length > 0) {
-                    const base_url = document.querySelector('main.main').dataset.baseUrl;
+                if (responseJson.product_prices.length > 0) {
                     let li = '';
-                    json.product_prices.forEach(val => {
+                    responseJson.product_prices.forEach(val => {
                         li += `<li><span class="table__title">Harga Produk</span>
-                            <span class="table__information">Besaran :</span><span class="table__data">${val.besaran_produk}</span>
+                            <span class="table__information">Besaran :</span><span class="table__data">${val.product_magnitude}</span>
                             <span class="table__information">Harga :</span><span class="table__data">
-                                ${number_formatter_to_currency(parseInt(val.harga_produk))}
+                                ${numberFormatterToCurrency(parseInt(val.product_price))}
                             </span></li>`;
                     });
-                    const tr = document.createElement('tr');
-                    tr.classList.add('table__row-detail');
-                    tr.classList.add('table__row-detail--show');
-                    tr.innerHTML = `<td colspan="5"><ul>${li}</ul></td>
-                        <td colspan="2"><img src="${base_url}/dist/images/product_photo/${json.product_photo}"></td>`;
-                    target.parentElement.parentElement.after(tr);
+                    const trElement = document.createElement('tr');
+                    trElement.classList.add('table__row-detail');
+                    trElement.classList.add('table__row-detail--show');
+                    trElement.innerHTML = `<td colspan="6"><ul>${li}</ul></td>
+                        <td colspan="2"><img src="${baseUrl}/dist/images/product-photos/${responseJson.product_photo}"></td>`;
+                    targetElement.parentElement.parentElement.after(trElement);
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error(error);
-            });
+            }
+
+            // hide loading
+            tableElement.parentElement.nextElementSibling.classList.add('d-none');
+            // enabled button search
+            searchProductElement.classList.remove('btn--disabled');
         }
     }
 });
 
 // search product
-search_product.addEventListener('click', e => {
+searchProductElement.addEventListener('click', e => {
     e.preventDefault();
 
     const keyword = document.querySelector('input[name="product_name_search"]').value;
-    const csrf_name = table.dataset.csrfName;
-    const csrf_value = table.dataset.csrfValue;
+    const csrf_name = tableElement.dataset.csrfName;
+    const csrf_value = tableElement.dataset.csrfValue;
 
     // if empty keyword
     if (keyword.trim() === '') {
@@ -91,9 +78,9 @@ search_product.addEventListener('click', e => {
     }
 
     // loading
-    table.parentElement.nextElementSibling.classList.remove('d-none');
+    tableElement.parentElement.nextElementSibling.classList.remove('d-none');
     // disabled button search
-    search_product.classList.add('btn--disabled');
+    searchProductElement.classList.add('btn--disabled');
 
     fetch('/admin/cari_produk', {
         method: 'POST',
@@ -105,9 +92,9 @@ search_product.addEventListener('click', e => {
     })
     .finally(() => {
         // loading
-        table.parentElement.nextElementSibling.classList.add('d-none');
+        tableElement.parentElement.nextElementSibling.classList.add('d-none');
         // enabled button search
-        search_product.classList.remove('btn--disabled');
+        searchProductElement.classList.remove('btn--disabled');
     })
     .then(response => {
         return response.json();
@@ -115,7 +102,7 @@ search_product.addEventListener('click', e => {
     .then(json => {
         // set new csrf hash to table tag
         if (json.csrf_value !== undefined) {
-            table.dataset.csrfValue = json.csrf_value;
+            tableElement.dataset.csrfValue = json.csrf_value;
         }
 
         // if product exists
@@ -147,19 +134,19 @@ search_product.addEventListener('click', e => {
                 tr += `<td>${p.indo_create_time}</td></tr>`;
             });
 
-            table.querySelector('tbody').innerHTML = tr;
+            tableElement.querySelector('tbody').innerHTML = tr;
 
             // show result status
             result_status.innerText = `1 - ${json.products_db.length} dari ${json.product_search_total} Total produk hasil pencarian`;
 
             // add dataset type show and dataset keyword
-            table.dataset.typeShow = 'search';
-            table.dataset.keyword = keyword;
+            tableElement.dataset.typeShow = 'search';
+            tableElement.dataset.keyword = keyword;
         }
         // if product not exists
         else {
             // inner html message
-            table.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="7">Produk tidak ada.</td></tr>`;
+            tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="7">Produk tidak ada.</td></tr>`;
 
             // show result status
             result_status.innerText = '0 Total produk hasil pencarian';
@@ -174,7 +161,7 @@ search_product.addEventListener('click', e => {
             span.classList.add('mt-3');
             span.setAttribute('id', 'limit-message');
             span.innerHTML = `Hanya ${json.product_limit} Produk terbaru yang ditampilkan, Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!`;
-            table.after(span);
+            tableElement.after(span);
         }
         // else if product search total != product limit and limit message exists
         else if (json.products_db.length !== json.product_limit && limit_message !== null) {
@@ -199,8 +186,8 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
     // generate data
     let data = '';
 
-    const csrf_name = table.dataset.csrfName;
-    const csrf_value = table.dataset.csrfValue;
+    const csrf_name = tableElement.dataset.csrfName;
+    const csrf_value = tableElement.dataset.csrfValue;
     data += `${csrf_name}=${csrf_value}`;
 
     let product_ids = '';
@@ -219,14 +206,14 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
     data += `&smallest_create_time=${all_checkboxs[all_checkboxs.length-1].dataset.createTime}`;
 
     // if dataset type-show and dataset keyword exists in table tag
-    if (table.dataset.typeShow !== undefined && table.dataset.keyword !== undefined) {
-        data += `&keyword=${table.dataset.keyword}`;
+    if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.keyword !== undefined) {
+        data += `&keyword=${tableElement.dataset.keyword}`;
     }
 
     // loading
-    table.parentElement.nextElementSibling.classList.remove('d-none');
+    tableElement.parentElement.nextElementSibling.classList.remove('d-none');
     // disabled button search
-    search_product.classList.add('btn--disabled');
+    searchProductElement.classList.add('btn--disabled');
 
     fetch('/admin/hapus_produk', {
         method: 'POST',
@@ -238,9 +225,9 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
     })
     .finally(() => {
         // loading
-        table.parentElement.nextElementSibling.classList.add('d-none');
+        tableElement.parentElement.nextElementSibling.classList.add('d-none');
         // enabled button search
-        search_product.classList.remove('btn--disabled');
+        searchProductElement.classList.remove('btn--disabled');
     })
     .then(response => {
         return response.json();
@@ -248,7 +235,7 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
     .then(json => {
         // set new csrf hash to table tag
         if (json.csrf_value !== undefined) {
-            table.dataset.csrfValue = json.csrf_value;
+            tableElement.dataset.csrfValue = json.csrf_value;
         }
 
         // if remove product success
@@ -296,18 +283,18 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
                     // inner td to tr
                     tr.innerHTML = td;
                     // append tr to tbody
-                    table.querySelector('tbody').append(tr);
+                    tableElement.querySelector('tbody').append(tr);
                 });
             }
 
-            const count_product_in_table = table.querySelectorAll('tbody tr').length;
+            const count_product_in_table = tableElement.querySelectorAll('tbody tr').length;
             // if product total = 0
             if (json.product_total === 0) {
                 // inner html message
-                table.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="6">Produk tidak ada.</td></tr>`;
+                tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="6">Produk tidak ada.</td></tr>`;
 
                 // if dataset type-show and dataset keyword exists in table tag
-                if (table.dataset.typeShow !== undefined && table.dataset.keyword !== undefined) {
+                if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.keyword !== undefined) {
                     // show result status
                     result_status.innerText = '0 Total produk hasil pencarian';
                 } else {
@@ -317,7 +304,7 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
 
             } else {
                 // if dataset type-show and dataset keyword exists in table tag
-                if (table.dataset.typeShow !== undefined && table.dataset.keyword !== undefined) {
+                if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.keyword !== undefined) {
                     // show result status
                     result_status.innerText = `1 - ${count_product_in_table} dari ${json.product_total} Total produk hasil pencarian`;
                 } else {
