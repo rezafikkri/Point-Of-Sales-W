@@ -15,7 +15,7 @@
                 <div class="mb-3">
                     <label class="form-label" for="product-category-name">Nama Kategori</label>
                     <input class="form-input" id="product-category-name" type="text" name="product_category_name" value="<?= old('product_category_name'); ?>">
-                    <?= $_SESSION['errors']['product_category_name']??null; ?>
+                    <?= $_SESSION['errors']['product_category_name'] ?? null; ?>
                 </div>
                <button class="btn btn--blue" type="submit">Simpan</button>
             </form>

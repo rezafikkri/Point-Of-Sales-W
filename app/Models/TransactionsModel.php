@@ -79,7 +79,7 @@ class TransactionsModel extends Model
     {
         return $this->select('transaksi_id')
                     ->getWhere(['status_transaksi' => 'belum', 'pengguna_id' => $_SESSION['posw_user_id']])
-                    ->getRowArray()['transaksi_id']??null;
+                    ->getRowArray()['transaksi_id'] ?? null;
     }
 
     public function getTransactionsThreeDaysAgo(string $timestamp_three_days_ago): array
