@@ -8,9 +8,9 @@ $this->extend('admin_layout');
 
 <?= $this->section('main'); ?>
 <div class="container-xl">
-<header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-start">
+<header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Kategori Produk</h4>
-    <a href="/admin/kategori-produk/membuat" class="btn btn--blue">Membuat Kategori</a>
+    <a href="/admin/kategori-produk/membuat" class="btn btn--blue text-center">Membuat Kategori</a>
 </header>
 
 <main class="main">
