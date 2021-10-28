@@ -27,18 +27,4 @@ class ProductCategoriesModel extends Model
     {
         return $this->select('product_category_name')->getWhere(['product_category_id' => $productCategoryId])->getRowArray();
     }
-
-    public function removeProductCategory(string $product_category_id): int
-    {
-        try {
-            $this->delete($product_category_id);
-            return $this->db->affectedRows();
-        } catch(\ErrorException $e) {
-            return 0;
-        }
-    }
-
-    public function getProductCategoriesForFormSelect(): array
-    {
-    }
 }
