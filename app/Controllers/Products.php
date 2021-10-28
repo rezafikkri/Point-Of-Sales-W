@@ -7,7 +7,6 @@ use CodeIgniter\HTTP\Files\UploadedFile;
 
 class Products extends BaseController
 {
-    protected $helpers = ['form', 'active_menu', 'check_password_sign_in_user', 'generate_uuid'];
     private const PRODUCT_LIMIT = 50;
 
     public function __construct()
@@ -44,112 +43,107 @@ class Products extends BaseController
         ]);
     }
 
-    public function createProduct()
+    public function create()
     {
-        $data['category_products_db'] = $this->productCategoriesModel->getCategoryProductsForFormSelect();
-        $data['title'] = 'Buat Produk . POSW';
-        $data['page'] = 'buat_produk';
+        helper(['active_menu', 'form']);
 
-        return view('product/create_product', $data);
+        $data['productCategories'] = $this->productCategoriesModel->getAll('product_category_id, product_category_name');
+        $data['title'] = 'Membuat Produk . POSW';
+
+        return view('products/create_product', $data);
     }
 
-    private function generateDataInsertBatchProductPrice(string $product_id, array $product_magnitudes, array $product_prices): array
+    private function generateDataInsertBatchProductPrice(string $productId, array $productMagnitudes, array $productPrices): array
     {
-        $data_insert = [];
-        $count_product_magnitude = count($product_magnitudes);
-        for ($i = 0; $i < $count_product_magnitude; $i++) {
-            $data_insert[] = [
-                'harga_produk_id' => generate_uuid(),
-                'produk_id' => $product_id,
-                'besaran_produk' => filter_var($product_magnitudes[$i], FILTER_SANITIZE_STRING),
-                'harga_produk' => filter_var($product_prices[$i], FILTER_SANITIZE_STRING)
+        $dataInsert = [];
+        $countProductMagnitude = count($productMagnitudes);
+        for ($i = 0; $i < $countProductMagnitude; $i++) {
+            $dataInsert[] = [
+                'product_price_id' => generate_uuid(),
+                'product_id' => $productId,
+                'product_magnitude' => filter_var($productMagnitudes[$i], FILTER_SANITIZE_STRING),
+                'product_price' => filter_var($productPrices[$i], FILTER_SANITIZE_STRING)
             ];
         }
-        return $data_insert;
+        return $dataInsert;
     }
 
-    public function saveProductToDB()
+    public function store()
     {
         if (!$this->validate([
-            'category_product' => [
+            'product_category' => [
                 'label' => 'Kategori produk',
                 'rules' => 'required',
-                'errors' => $this->generateIndoErrorMessages(['required'])
             ],
             'product_name' => [
                 'label' => 'Nama produk',
-                'rules' => 'required|max_length[50]|is_unique[produk.nama_produk]',
-                'errors' => $this->generateIndoErrorMessages(['required','max_length','is_unique'])
+                'rules' => 'required|max_length[50]|is_unique[products.product_name]',
             ],
             'product_status' => [
                 'label' => 'Status Produk',
-                'rules' => 'in_list[ada,tidak_ada]',
-                'errors' => $this->generateIndoErrorMessages(['in_list'])
+                'rules' => 'in_list[ada, tidak_ada]',
             ],
             'product_photo' => 'product_photo',
             'product_magnitudes' => 'product_magnitude',
             'product_prices' => 'product_price'
         ])) {
             // set validation errors message to flash session
-            $this->session->setFlashData('form_errors', $this->setDelimiterMessages(
-                '<small class="form-message form-message--danger">',
-                '</small>',
-                $this->validator->getErrors(),
-                ['product_magnitudes', 'product_prices']
-            ));
-
+            $this->ignoreMessages = ['product_magnitudes', 'product_prices'];
+            $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
             return redirect()->back()->withInput();
         }
 
+        helper('generate_uuid');
+
         // genearate new random name for product photo
-        $product_photo_file = $this->request->getFile('product_photo');
-        $product_photo_name = $product_photo_file->getRandomName();
+        $productPhotoFile = $this->request->getFile('product_photo');
+        $productPhotoName = $productPhotoFile->getRandomName();
+
+        $createdAt = date('Y-m-d H:i:s');
+        $productCategoryId = $this->request->getPost('product_category', FILTER_SANITIZE_STRING);
+        $productName = $this->request->getPost('product_name', FILTER_SANITIZE_STRING);
+        $productStatus = $this->request->getPost('product_status', FILTER_SANITIZE_STRING);
 
         try {
-            $this->productsModel->db->transBegin();
+            $this->productsModel->transStart();
 
             // insert product
-            $this->productsModel->insertReturning([
-                'produk_id' => generate_uuid(),
-                'kategori_produk_id' => $this->request->getPost('category_product', FILTER_SANITIZE_STRING),
-                'nama_produk' => $this->request->getPost('product_name', FILTER_SANITIZE_STRING),
-                'foto_produk' => $product_photo_name,
-                'status_produk' => $this->request->getPost('product_status', FILTER_SANITIZE_STRING),
-                'waktu_buat' => date('Y-m-d H:i:s')
-            ], 'produk_id');
+            $productId = $this->productsModel->insert([
+                'product_id' => generate_uuid(),
+                'product_category_id' => $productCategoryId,
+                'product_name' => $productName,
+                'product_photo' => $productPhotoName,
+                'product_status' => $productStatus,
+                'created_at' => $createdAt,
+                'edited_at' => $createdAt
+            ]);
 
-            // insert product price
-            $produk_id = $this->productsModel->getInsertReturned();
-            $data_product_price = $this->generateDataInsertBatchProductPrice(
-                $produk_id,
+            /**
+             * in production and development,
+             * if insert success, function insertBatch() will be return number of row inserted.
+             * in production, if fail will be show oops page
+             */
+            $dataProductPrice = $this->generateDataInsertBatchProductPrice(
+                $productId,
                 $this->request->getPost('product_magnitudes'),
                 $this->request->getPost('product_prices')
             );
-            $this->productPricesModel->insertBatch($data_product_price);
+            $this->productPricesModel->insertBatch($dataProductPrice);
 
-            $this->productsModel->transCommit();
-            $process = true;
+            $this->productsModel->transComplete();
 
-        } catch (\ErrorException $e) {
-            $this->productsModel->transRollback();
-            $process = false;
-        }
-
-        // if insert product and insert product price success
-        if ($process === true) {
             // move product photo
-            $product_photo_file->move('dist/images/product_photo', $product_photo_name);
-
+            $productPhotoFile->move('dist/images/product-photos', $productPhotoName);
             return redirect()->to('/admin/produk');
+        } catch (\ErrorException $error) {
+            // make error message
+            $this->openDelimiterMessages = '<div class="alert alert--warning mb-3"><span class="alert__icon"></span><p>';
+            $this->closeDelimiterMessages = '</p><a class="alert__close" href="#"></a></div>';
+            $this->session->setFlashData('errors', $this->addDelimiterMessages([
+                'create_product' => 'Produk gagal dibuat. Silahkan coba kembali!'
+            ]));
+            return redirect()->back()->withInput();
         }
-
-        // make error message
-        $this->session->setFlashData('form_errors', $this->setDelimiterMessages(
-            '<div class="alert alert--warning mb-3"><span class="alert__icon"></span><p>',
-            '</p><a class="alert__close" href="#"></a></div>',
-            ['create_product' => 'Produk gagal dibuat. Silahkan coba kembali!']
-        ));
-        return redirect()->back()->withInput();
     }
 
     public function showProductSearches()

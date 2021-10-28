@@ -17,7 +17,7 @@ class ProductCategories extends BaseController
 
         $data['title'] = 'Kategori Produk . POSW';
         $data['page'] = 'kategori-produk';
-        $data['productCategories'] = $this->productCategoriesModel->getAll();
+        $data['productCategories'] = $this->productCategoriesModel->getAll('*');
 
         return view('product-categories/product_categories', $data);
     }

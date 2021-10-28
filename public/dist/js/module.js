@@ -28,7 +28,7 @@ function hideModal(modal, modalContent)
 }
 
 // add form input magnitude and price
-function addFormInputMagnitudePrice(targetAppend)
+function addFormInputMagnitudePrice(targetElement)
 {
     const formMagnitudePriceElement = document.createElement('div');
     formMagnitudePriceElement.classList.add('mt-3');
@@ -38,8 +38,8 @@ function addFormInputMagnitudePrice(targetAppend)
         <a class="btn btn--gray-outline" id="remove-form-input-magnitude-price" href="#">Hapus</a>
     </div>`;
 
-    // append new form magnitude price to targetAppend
-    targetAppend.append(formMagnitudePriceElement);
+    // append new form magnitude price to targetElement
+    targetElement.append(formMagnitudePriceElement);
 }
 
 function showPassword(e)

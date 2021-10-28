@@ -19,7 +19,7 @@ $this->extend('admin_layout');
            </a>
        </div><!-- input-group -->
 
-       <a href="/admin/buat_produk" class="btn btn--blue text-center">Buat Produk</a>
+       <a href="/admin/produk/membuat" class="btn btn--blue text-center">Buat Produk</a>
     </div><!-- d-flex -->
 </header>
 

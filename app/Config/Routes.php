@@ -44,6 +44,8 @@ $routes->group('admin', function ($routes) {
 
     $routes->get('produk', 'Products::index');
     $routes->get('produk/tampilkan-detail/(:segment)', 'Products::showDetails/$1');
+    $routes->get('produk/membuat', 'Products::create');
+    $routes->post('produk/menyimpan', 'Products::store');
 });
 
 $routes->get('sign_out', 'SignOut::index');

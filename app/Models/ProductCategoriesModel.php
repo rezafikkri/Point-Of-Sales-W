@@ -16,9 +16,11 @@ class ProductCategoriesModel extends Model
     ];
     protected $useAutoIncrement = false;
 
-    public function getAll(): array
+    public function getAll(string $columns): array
     {
-        return $this->orderBy('edited_at', 'DESC')->findAll();
+        return $this->select($columns)
+                    ->orderBy('edited_at', 'DESC')
+                    ->get()->getResultArray();
     }
 
     public function getOne(string $productCategoryId): ? array
@@ -38,6 +40,5 @@ class ProductCategoriesModel extends Model
 
     public function getProductCategoriesForFormSelect(): array
     {
-        return $this->select('kategori_produk_id, nama_kategori_produk')->get()->getResultArray();
     }
 }
