@@ -23,7 +23,7 @@ class ProductCategoriesModel extends Model
                     ->get()->getResultArray();
     }
 
-    public function getOne(string $productCategoryId): ? array
+    public function getOne(string $productCategoryId): ?array
     {
         return $this->select('product_category_name')->getWhere(['product_category_id' => $productCategoryId])->getRowArray();
     }

@@ -9,11 +9,13 @@ class HasSignedInTest extends CIUnitTestCase
 {
     use FilterTestTrait;
 
-    public function testHasSignedInFilterAppliedToSignInRoute():void {
+    public function testHasSignedInFilterAppliedToSignInRoute(): void
+    {
         $this->assertFilter('sign_in', 'before', 'hasSignedIn');
     }
 
-    public function testHasSignedInAccessRedirects():void {
+    public function testHasSignedInAccessRedirects(): void
+    {
         // set session for has signed in simulation
         $_SESSION['posw_sign_in_status'] = true;
         $_SESSION['posw_user_level'] = 'admin';

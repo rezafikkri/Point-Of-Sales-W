@@ -61,12 +61,12 @@ $this->extend('admin_layout');
                 // if exists product
                 if ($countProducts > 0) :
                     $i = 1;
-                foreach($products as $p) :
+                foreach ($products as $p) :
                     $createdAt = Time::createFromFormat('Y-m-d H:i:s', $p['created_at']);
                     $editedAt = Time::createFromFormat('Y-m-d H:i:s', $p['edited_at']);
 
                 // if $i is prime number
-                if (($i%2) !== 0) :
+                if (($i%2) != 0) :
             ?>
                 <tr class="table__row-odd">
             <?php else : ?>
@@ -84,7 +84,7 @@ $this->extend('admin_layout');
                     <td><?= $p['product_name']; ?></td>
                     <td><?= $p['product_category_name']; ?></td>
 
-                    <?php if ($p['product_status'] === 'ada') : ?>
+                    <?php if ($p['product_status'] == 'ada') : ?>
                         <td><span class="text-green">Ada</span></td>
                     <?php else : ?>
                         <td><span class="text-red">Tidak Ada</span></td>
@@ -103,7 +103,7 @@ $this->extend('admin_layout');
 
     <?php
         // if product show total = product limit
-        if ($countProducts === $productLimit) :
+        if ($countProducts == $productLimit) :
     ?>
         <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit; ?> Produk terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>

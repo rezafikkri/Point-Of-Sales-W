@@ -20,7 +20,7 @@ class UsersModel extends Model
     ];
     protected $useAutoIncrement = false;
 
-    public function getUserSignIn(string $username): ? array
+    public function getUserSignIn(string $username): ?array
     {
         return $this->select('full_name, level, password, user_id')->getWhere([
             'username' => $username
@@ -37,7 +37,7 @@ class UsersModel extends Model
         return $this->countAll();
     }
 
-    public function findUser(string $userId, string $column): ? array
+    public function findUser(string $userId, string $column): ?array
     {
         return $this->select($column)->getWhere([$this->primaryKey => $userId])->getRowArray();
     }

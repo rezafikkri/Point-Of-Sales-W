@@ -31,7 +31,7 @@ $this->extend('admin_layout');
             <?php
                 // if exists product categories
                 if (count($productCategories) > 0) :
-                foreach($productCategories as $pc) :
+                foreach ($productCategories as $pc) :
                     $createdAt = Time::createFromFormat('Y-m-d H:i:s', $pc['created_at']);
                     $editedAt = Time::createFromFormat('Y-m-d H:i:s', $pc['edited_at']);
             ?>

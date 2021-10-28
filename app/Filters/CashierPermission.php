@@ -12,12 +12,12 @@ class CashierPermission implements FilterInterface
         $session = session();
 
         // if unsigned in
-        if(!$session->has('sign_in_status')) {
+        if (!$session->has('sign_in_status')) {
             return redirect()->to('/');
         }
 
         // if signed in, but sign_in_user_level is not cashier
-        if($_SESSION['sign_in_user_level'] !== 'cashier') {
+        if ($_SESSION['sign_in_user_level'] != 'cashier') {
             return redirect()->to('/sign_out');
         }
     }

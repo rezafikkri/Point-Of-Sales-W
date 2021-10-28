@@ -9,11 +9,13 @@ class CashierPermissionTest extends CIUnitTestCase
 {
     use FilterTestTrait;
 
-    public function testCashierPermissionFilterAppliedToCashierRoute():void {
+    public function testCashierPermissionFilterAppliedToCashierRoute(): void
+    {
         $this->assertFilter('kasir', 'before', 'cashierPermission');
     }
 
-    public function testUnsignedInAccessRedirects():void {
+    public function testUnsignedInAccessRedirects(): void
+    {
         $caller = $this->getFilterCaller('cashierPermission', 'before');
         $result = $caller();
 

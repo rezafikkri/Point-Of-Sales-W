@@ -5,7 +5,7 @@
  *
  * $menuName is menu name for navbar menu
  */
-function active_menu(string $menuName): ? string
+function active_menu(string $menuName): ?string
 {
     $request = \Config\Services::request();
 
@@ -20,7 +20,7 @@ function active_menu(string $menuName): ? string
     }
 
     // if $menuName = $segment
-    if ($menuName === $segment) {
+    if ($menuName == $segment) {
         return $activeMenuClass;
     }
     return null;

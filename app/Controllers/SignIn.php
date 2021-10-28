@@ -47,7 +47,7 @@ class SignIn extends BaseController
                 ]);
 
                 // if user level is admin
-                if($_SESSION['sign_in_user_level'] === 'admin') {
+                if($_SESSION['sign_in_user_level'] == 'admin') {
                     return redirect()->to('/admin');
                 }
 

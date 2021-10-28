@@ -12,9 +12,9 @@ class HasSignedIn implements FilterInterface
         $session = session();
 
         // if has signed in
-        if($session->has('sign_in_status')) {
+        if ($session->has('sign_in_status')) {
             // if sign_in_user_level is admin
-            if($_SESSION['sign_in_user_level'] === 'admin') {
+            if ($_SESSION['sign_in_user_level'] == 'admin') {
                 return redirect()->to('/admin');
             }
 

@@ -40,7 +40,8 @@ class TransactionsModel extends Model
                     ->get()->getResultArray();
     }
 
-    public function getTwoMonthsAgo(): array {
+    public function getTwoMonthsAgo(): array
+    {
         $startDate = date('Y-m-d H:i:s', mktime(0, 0, 0, date('m')-1, 1, date('Y')));
         $endDate = date('Y-m-d H:i:s');
 
@@ -75,7 +76,7 @@ class TransactionsModel extends Model
                     ->get()->getNumRows();
     }
 
-    public function getNotTransactionYetId(): ? string
+    public function getNotTransactionYetId(): ?string
     {
         return $this->select('transaksi_id')
                     ->getWhere(['status_transaksi' => 'belum', 'pengguna_id' => $_SESSION['posw_user_id']])
@@ -90,7 +91,7 @@ class TransactionsModel extends Model
                     ->getResultArray();
     }
 
-    public function findTransaction(string $transaction_id, string $column): ? array
+    public function findTransaction(string $transaction_id, string $column): ?array
     {
         return $this->select($column)
                     ->getWhere(['transaksi_id' => $transaction_id])

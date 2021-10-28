@@ -9,11 +9,13 @@ class AdminPermissionTest extends CIUnitTestCase
 {
     use FilterTestTrait;
 
-    public function testAdminPermissionFilterAppliedToAdminRoute():void {
+    public function testAdminPermissionFilterAppliedToAdminRoute(): void
+    {
         $this->assertFilter('admin', 'before', 'adminPermission');
     }
 
-    public function testUnsignedInAccessRedirects():void {
+    public function testUnsignedInAccessRedirects(): void
+    {
         $caller = $this->getFilterCaller('adminPermission', 'before');
         $result = $caller();
 

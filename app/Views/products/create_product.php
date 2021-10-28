@@ -16,9 +16,9 @@
                 <div class="mb-3">
                     <label class="form-label" for="category-product">Kategori Produk</label>
                     <select class="form-select" name="product_category" id="category-product">
-                    <?php foreach($productCategories as $pc) : ?>
+                    <?php foreach ($productCategories as $pc) : ?>
                         <option value="<?= $pc['product_category_id']; ?>"
-                        <?= $pc['product_category_id'] === old('product_category') ? 'selected' : ''; ?>>
+                        <?= $pc['product_category_id'] == old('product_category') ? 'selected' : ''; ?>>
                             <?= $pc['product_category_name']; ?>
                         </option>
                     <?php endforeach; ?>
@@ -44,7 +44,7 @@
                     <select class="form-select" name="product_status" id="product-status">
                     <?php
                         $productStatuses = ['ada' => 'Ada', 'tidak_ada' => 'Tidak Ada'];
-                        foreach($productStatuses as $key => $value) :
+                        foreach ($productStatuses as $key => $value) :
                     ?>
                         <option value="<?= $key; ?>"
                         <?= $key === old('product_status') ? 'selected' : ''; ?>>

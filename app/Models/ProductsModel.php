@@ -31,7 +31,7 @@ class ProductsModel extends Model
         return $this->countAll();
     }
 
-    public function getOne(string $productId, string $columns): ? array
+    public function getOne(string $productId, string $columns): ?array
     {
         return $this->select($columns)
                     ->getWhere([
