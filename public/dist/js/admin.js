@@ -5,9 +5,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const baseUrl = document.querySelector('html').dataset.baseUrl;
 
     const response = await fetch(`${baseUrl}/admin/tampilkan-transaksi-dua-bulan-yang-lalu`);
-    const transactionsTwoMonthsAgo = await response.json();
+    const responseJson = await response.json();
 
-    renderChart(transactionsTwoMonthsAgo);
+    renderChart(responseJson);
 
     // hide loading
     loadingElement.classList.add('d-none');

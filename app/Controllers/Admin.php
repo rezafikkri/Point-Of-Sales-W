@@ -14,17 +14,16 @@ class Admin extends Controller
 
     public function index()
     {
-        helper('active_menu');
-        helper('number');
+        helper(['active_menu', 'number']);
 
         $usersModel = new UsersModel();
         $productsModel = new ProductsModel();
 
         $data['title'] = 'Home . POSW';
         $data['page'] = 'home';
-        $data['totalUsers'] = $usersModel->getTotal();
-        $data['totalProducts'] = $productsModel->getTotal();
-        $data['totalTransactions'] = $this->transactionsModel->getTotal();
+        $data['totalUser'] = $usersModel->getTotal();
+        $data['totalProduct'] = $productsModel->getTotal();
+        $data['totalTransaction'] = $this->transactionsModel->getTotal();
 
         return view('admin', $data);
     }
@@ -38,7 +37,7 @@ class Admin extends Controller
         // last index in transactions grouped
         $index = 0;
 
-        foreach($transactionsTwoMonthsAgo as $key => $value) {
+        foreach ($transactionsTwoMonthsAgo as $key => $value) {
             $newDay = substr($value['edited_at'], 8, 2);
 
             if ($day == $newDay) {
