@@ -1,6 +1,6 @@
 import { renderAlert, numberFormatterToCurrency, postData } from './module.js';
 
-const tableElement = document.querySelector('table.table');
+const tableElement = document.querySelector('#table');
 const productSearchElement = document.querySelector('a#search-product');
 
 // show hide product detail
@@ -67,8 +67,8 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
 productSearchElement.addEventListener('click', async (e) => {
     e.preventDefault();
 
+    const loadingElement = document.querySelector('#loading');
     const baseUrl = document.querySelector('html').dataset.baseUrl;
-    const resultStatusElement = document.querySelector('span#result-status');
     const keyword = document.querySelector('input[name="product_name_search"]').value;
 
     // if empty keyword
@@ -76,19 +76,13 @@ productSearchElement.addEventListener('click', async (e) => {
         return false;
     }
 
-    // show loading
-    tableElement.parentElement.nextElementSibling.classList.remove('d-none');
-    // disabled button search
+    // show loading and disable search button
+    loadingElement.classList.remove('d-none');
     productSearchElement.classList.add('btn--disabled');
 
     try {
         const response = await fetch(`${baseUrl}/admin/produk/mencari/${keyword}`);
         const responseJson = await response.json();
-
-        // set new csrf hash to table tag
-        if (responseJson.csrf_value != undefined) {
-            tableElement.dataset.csrfValue = responseJson.csrf_value;
-        }
 
         // if product exists
         if (responseJson.products.length > 0) {
@@ -126,6 +120,7 @@ productSearchElement.addEventListener('click', async (e) => {
 
             tableElement.querySelector('tbody').innerHTML = tr;
 
+            const resultStatusElement = document.querySelector('span#result-status');
             // show result status
             resultStatusElement.innerText = `1 - ${responseJson.products.length} dari ${responseJson.total_product} Total produk hasil pencarian`;
 
@@ -144,14 +139,14 @@ productSearchElement.addEventListener('click', async (e) => {
             resultStatusElement.innerText = '0 Total produk hasil pencarian';
         }
 
-        const messageLimitElement = document.querySelector('span#message-limit');
+        const limitMessageElement = document.querySelector('#limit-message');
         // add limit message if total product search = product limit && limit message not exists
-        if (responseJson.products.length == responseJson.product_limit && messageLimitElement == null) {
+        if (responseJson.products.length == responseJson.product_limit && limitMessageElement == null) {
             const spanElement = document.createElement('span');
             spanElement.classList.add('text-muted');
             spanElement.classList.add('d-block');
             spanElement.classList.add('mt-3');
-            spanElement.setAttribute('id', 'message-limit');
+            spanElement.setAttribute('id', 'limit-message');
             spanElement.innerHTML = `
                 Hanya ${responseJson.product_limit} Produk terbaru yang ditampilkan,
                 Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!
@@ -159,16 +154,15 @@ productSearchElement.addEventListener('click', async (e) => {
             tableElement.after(spanElement);
         }
         // else if total product search != product limit and limit message exists
-        else if (responseJson.products.length != responseJson.product_limit && messageLimitElement != null) {
-            messageLimitElement.remove();
+        else if (responseJson.products.length != responseJson.product_limit && limitMessageElement != null) {
+            limitMessageElement.remove();
         }
     } catch (error) {
         console.error(error);
     }
 
-    // hide loading
-    tableElement.parentElement.nextElementSibling.classList.add('d-none');
-    // enabled button search
+    // hide loading and disable search button
+    loadingElement.classList.add('d-none');
     productSearchElement.classList.remove('btn--disabled');
 });
 
@@ -313,7 +307,7 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
             }
 
             // if total product in table < product limit and limit message exists
-            const limit_message = document.querySelector('span#message-limit');
+            const limit_message = document.querySelector('span#limit-message');
             if (count_product_in_table < json.product_limit && limit_message !== null) {
                 limit_message.remove();
             }

@@ -24,11 +24,9 @@ $this->extend('admin_layout');
 </header>
 
 <main class="main mb-5">
-    <div class="main__box">
+    <div class="main__box position-relative">
 
-    <div class="position-relative">
-    <div class="table-responsive">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3" id="main-header">
             <div class="flex-fill">
                 <a href="#" id="remove-product" class="btn btn--red-outline" title="Hapus produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg></a>
             </div>
@@ -45,7 +43,9 @@ $this->extend('admin_layout');
             <?php endif; ?>
             </div>
         </div><!-- d-flex -->
-        <table class="table table--manual-striped min-width-711" data-csrf-name="<?= csrf_token(); ?>" data-csrf-value="<?= csrf_hash(); ?>">
+
+        <div class="table-responsive" id="table" data-csrf-name="<?= csrf_token(); ?>" data-csrf-value="<?= csrf_hash(); ?>">
+        <table class="table table--manual-striped min-width-711">
             <thead>
                 <tr>
                     <th class="text-center" colspan="3">Aksi</th>
@@ -100,22 +100,22 @@ $this->extend('admin_layout');
             <?php endif; ?>
             </tbody>
         </table>
+        </div><!-- table-reponsive -->
 
     <?php
         // if product show total = product limit
         if ($countProducts == $productLimit) :
     ?>
-        <span id="message-limit" class="text-muted d-block mt-3">Hanya <?= $productLimit; ?> Produk terbaru yang ditampilkan, Pakai fitur
+        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit; ?> Produk terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>
     <?php endif; ?>
-    </div><!-- table-reponsive -->
 
-    <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none">
-        <div class="loading mt-5">
-            <div></div>
+        <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none" id="loading">
+            <div class="loading mt-5">
+                <div></div>
+            </div>
         </div>
-    </div>
-    </div><!-- position-relative -->
+
     </div><!-- main__box -->
 </main>
 </div>

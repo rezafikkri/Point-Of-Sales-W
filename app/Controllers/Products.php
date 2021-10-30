@@ -156,13 +156,12 @@ class Products extends BaseController
         $products = $this->productsModel->search(static::PRODUCT_LIMIT, $keyword);
 
         // convert timestamp
-        $countProduct = count($products);
-        for ($i = 0; $i < $countProduct; $i++) {
-            $createdAt = Time::createFromFormat('Y-m-d H:i:s', $products[$i]['created_at']);
-            $editedAt = Time::createFromFormat('Y-m-d H:i:s', $products[$i]['edited_at']);
+        foreach ($products as $key => $value) {
+            $createdAt = Time::createFromFormat('Y-m-d H:i:s', $value['created_at']);
+            $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
 
-            $products[$i]['created_at'] = $createdAt->toLocalizedString('dd MMM yyyy HH:mm');
-            $products[$i]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM yyyy HH:mm');
+            $products[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM yyyy HH:mm');
+            $products[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM yyyy HH:mm');
         }
 
         return json_encode([
