@@ -14,11 +14,10 @@ $this->extend('admin_layout');
 </header>
 
 <main class="main">
-    <div class="main__box">
+    <div class="main__box position-relative">
 
-    <div class="position-relative">
-    <div class="table-responsive">
-        <table class="table table--auto-striped min-width-711" data-csrf-name="<?= csrf_token(); ?>" data-csrf-value="<?= csrf_hash(); ?>">
+        <div class="table-responsive" id="table" data-csrf-name="<?= csrf_token(); ?>" data-csrf-value="<?= csrf_hash(); ?>">
+        <table class="table table--auto-striped min-width-711">
             <thead>
                 <tr>
                     <th colspan="2" class="text-center">Aksi</th>
@@ -50,14 +49,13 @@ $this->extend('admin_layout');
             <?php endif; ?>
             </tbody>
         </table>
-    </div><!-- table-responsive -->
+        </div><!-- table-responsive -->
 
-    <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none">
-        <div class="loading mt-5">
-            <div></div>
+        <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none" id="loading">
+            <div class="loading mt-5">
+                <div></div>
+            </div>
         </div>
-    </div>
-    </div><!-- position-relative -->
 
     </div><!-- main__box -->
 </main>

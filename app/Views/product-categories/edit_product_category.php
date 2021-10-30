@@ -10,7 +10,7 @@
 <main class="main">
     <div class="row">
     <div class="col-md-8">
-        <?= $_SESSION['success']['update_product_category'] ?? null; ?>
+        <?= $_SESSION['success']['edit_product_category'] ?? null; ?>
         <div class="main__box">
             <?= form_open('/admin/kategori-produk/memperbaharui'); ?>
                 <input type="hidden" value="<?= $productCategoryId; ?>" name="product_category_id">
