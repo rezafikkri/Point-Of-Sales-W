@@ -1,8 +1,7 @@
 import { renderAlert, numberFormatterToCurrency, postData } from './module.js';
 
 const tableElement = document.querySelector('table.table');
-const searchProductElement = document.querySelector('a#search-product');
-const resultStatusElement = document.querySelector('span#result-status');
+const productSearchElement = document.querySelector('a#search-product');
 
 // show hide product detail
 tableElement.querySelector('tbody').addEventListener('click', async (e) => {
@@ -24,14 +23,14 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
             // show loading
             tableElement.parentElement.nextElementSibling.classList.remove('d-none');
             // disabled button search
-            searchProductElement.classList.add('btn--disabled');
+            productSearchElement.classList.add('btn--disabled');
 
             try {
                 const response = await fetch(`${baseUrl}/admin/produk/tampilkan-detail/${productId}`);
                 const responseJson = await response.json();
 
                 // set new csrf hash to table tag
-                if (responseJson.csrf_value !== undefined) {
+                if (responseJson.csrf_value != undefined) {
                     tableElement.dataset.csrfValue = responseJson.csrf_value;
                 }
 
@@ -59,118 +58,118 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
             // hide loading
             tableElement.parentElement.nextElementSibling.classList.add('d-none');
             // enabled button search
-            searchProductElement.classList.remove('btn--disabled');
+            productSearchElement.classList.remove('btn--disabled');
         }
     }
 });
 
 // search product
-searchProductElement.addEventListener('click', e => {
+productSearchElement.addEventListener('click', async (e) => {
     e.preventDefault();
 
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
+    const resultStatusElement = document.querySelector('span#result-status');
     const keyword = document.querySelector('input[name="product_name_search"]').value;
-    const csrf_name = tableElement.dataset.csrfName;
-    const csrf_value = tableElement.dataset.csrfValue;
 
     // if empty keyword
-    if (keyword.trim() === '') {
+    if (keyword.trim() == '') {
         return false;
     }
 
-    // loading
+    // show loading
     tableElement.parentElement.nextElementSibling.classList.remove('d-none');
     // disabled button search
-    searchProductElement.classList.add('btn--disabled');
+    productSearchElement.classList.add('btn--disabled');
 
-    fetch('/admin/cari_produk', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `keyword=${keyword}&${csrf_name}=${csrf_value}`
-    })
-    .finally(() => {
-        // loading
-        tableElement.parentElement.nextElementSibling.classList.add('d-none');
-        // enabled button search
-        searchProductElement.classList.remove('btn--disabled');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
+    try {
+        const response = await fetch(`${baseUrl}/admin/produk/mencari/${keyword}`);
+        const responseJson = await response.json();
+
         // set new csrf hash to table tag
-        if (json.csrf_value !== undefined) {
-            tableElement.dataset.csrfValue = json.csrf_value;
+        if (responseJson.csrf_value != undefined) {
+            tableElement.dataset.csrfValue = responseJson.csrf_value;
         }
 
         // if product exists
-        if (json.products_db.length > 0) {
+        if (responseJson.products.length > 0) {
             let tr = '';
-
-            json.products_db.forEach((p, i) => {
+            responseJson.products.forEach((p, i) => {
                 // if i is odd number
                 if ((i+1)%2 !== 0) {
                     tr += '<tr class="table__row-odd">';
                 } else {
                     tr += '<tr>';
                 }
-                tr += `<td width="10">
+                tr += `
+                    <td width="10">
                         <div class="form-check">
-                            <input type="checkbox" name="product_id" data-create-time="${p.waktu_buat}" class="form-check-input" value="${p.produk_id}">
+                            <input type="checkbox" name="product_id" data-edited-at="${p.edited_at}"
+                            class="form-check-input" value="${p.product_id}">
                         </div>
                     </td>
-                    <td width="10"><a href="/admin/perbaharui_produk/${p.produk_id}" title="Ubah Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
-                    <td width="10"><a href="#" id="show-product-detail" data-product-id="${p.produk_id}" title="Lihat detail produk"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
+                    <td width="10"><a href="/admin/perbaharui_produk/${p.product_id}" title="Ubah Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
+                    <td width="10"><a href="#" id="show-product-detail" data-product-id="${p.product_id}" title="Lihat detail produk"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
-                    <td>${p.nama_produk}</td>
-                    <td>${p.nama_kategori_produk}</td>`;
-                if (p.status_produk === 'ada') {
-                     tr += `<td><span class="text-green">Ada</span></td>`;
+                    <td>${p.product_name}</td>
+                    <td>${p.product_category_name}</td>
+                `;
+                if (p.product_status == 'ada') {
+                     tr += '<td><span class="text-green">Ada</span></td>';
                 } else {
-                     tr += `<td><span class="text-red">Tidak Ada</span></td>`;
+                     tr += '<td><span class="text-red">Tidak Ada</span></td>';
                 }
-                tr += `<td>${p.indo_create_time}</td></tr>`;
+                tr += `
+                    <td>${p.created_at}</td>
+                    <td>${p.indo_edited_at}</td></tr>
+                `;
             });
 
             tableElement.querySelector('tbody').innerHTML = tr;
 
             // show result status
-            result_status.innerText = `1 - ${json.products_db.length} dari ${json.product_search_total} Total produk hasil pencarian`;
+            resultStatusElement.innerText = `1 - ${responseJson.products.length} dari ${responseJson.total_product} Total produk hasil pencarian`;
 
-            // add dataset type show and dataset keyword
-            tableElement.dataset.typeShow = 'search';
+            /**
+             * add dataset show-type and dataset keyword
+             * showType used for show longer product when remove product
+             */
+            tableElement.dataset.showType = 'search';
             tableElement.dataset.keyword = keyword;
         }
         // if product not exists
         else {
             // inner html message
-            tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="7">Produk tidak ada.</td></tr>`;
-
+            tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="8">Produk tidak ada.</td></tr>`;
             // show result status
-            result_status.innerText = '0 Total produk hasil pencarian';
+            resultStatusElement.innerText = '0 Total produk hasil pencarian';
         }
 
-        const limit_message = document.querySelector('span#limit-message');
-        // add limit message if product search total = product limit && limit message not exists
-        if (json.products_db.length === json.product_limit && limit_message === null) {
-            const span = document.createElement('span');
-            span.classList.add('text-muted');
-            span.classList.add('d-block');
-            span.classList.add('mt-3');
-            span.setAttribute('id', 'limit-message');
-            span.innerHTML = `Hanya ${json.product_limit} Produk terbaru yang ditampilkan, Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!`;
-            tableElement.after(span);
+        const messageLimitElement = document.querySelector('span#message-limit');
+        // add limit message if total product search = product limit && limit message not exists
+        if (responseJson.products.length == responseJson.product_limit && messageLimitElement == null) {
+            const spanElement = document.createElement('span');
+            spanElement.classList.add('text-muted');
+            spanElement.classList.add('d-block');
+            spanElement.classList.add('mt-3');
+            spanElement.setAttribute('id', 'message-limit');
+            spanElement.innerHTML = `
+                Hanya ${responseJson.product_limit} Produk terbaru yang ditampilkan,
+                Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!
+            `;
+            tableElement.after(spanElement);
         }
-        // else if product search total != product limit and limit message exists
-        else if (json.products_db.length !== json.product_limit && limit_message !== null) {
-            limit_message.remove();
+        // else if total product search != product limit and limit message exists
+        else if (responseJson.products.length != responseJson.product_limit && messageLimitElement != null) {
+            messageLimitElement.remove();
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error(error);
-    });
+    }
+
+    // hide loading
+    tableElement.parentElement.nextElementSibling.classList.add('d-none');
+    // enabled button search
+    productSearchElement.classList.remove('btn--disabled');
 });
 
 // remove product and automatic remove product price
@@ -205,15 +204,15 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
     const all_checkboxs = document.querySelectorAll('input[type="checkbox"][name="product_id"]');
     data += `&smallest_create_time=${all_checkboxs[all_checkboxs.length-1].dataset.createTime}`;
 
-    // if dataset type-show and dataset keyword exists in table tag
-    if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.keyword !== undefined) {
+    // if dataset show-type and dataset keyword exists in table tag
+    if (tableElement.dataset.showType !== undefined && tableElement.dataset.keyword !== undefined) {
         data += `&keyword=${tableElement.dataset.keyword}`;
     }
 
     // loading
     tableElement.parentElement.nextElementSibling.classList.remove('d-none');
     // disabled button search
-    searchProductElement.classList.add('btn--disabled');
+    productSearchElement.classList.add('btn--disabled');
 
     fetch('/admin/hapus_produk', {
         method: 'POST',
@@ -227,7 +226,7 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
         // loading
         tableElement.parentElement.nextElementSibling.classList.add('d-none');
         // enabled button search
-        searchProductElement.classList.remove('btn--disabled');
+        productSearchElement.classList.remove('btn--disabled');
     })
     .then(response => {
         return response.json();
@@ -293,28 +292,28 @@ document.querySelector('a#remove-product').addEventListener('click', e => {
                 // inner html message
                 tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="6">Produk tidak ada.</td></tr>`;
 
-                // if dataset type-show and dataset keyword exists in table tag
-                if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.keyword !== undefined) {
+                // if dataset show-type and dataset keyword exists in table tag
+                if (tableElement.dataset.showType !== undefined && tableElement.dataset.keyword !== undefined) {
                     // show result status
-                    result_status.innerText = '0 Total produk hasil pencarian';
+                    resultStatusElement.innerText = '0 Total produk hasil pencarian';
                 } else {
                     // show result status
-                    result_status.innerText = '0 Total produk';
+                    resultStatusElement.innerText = '0 Total produk';
                 }
 
             } else {
-                // if dataset type-show and dataset keyword exists in table tag
-                if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.keyword !== undefined) {
+                // if dataset show-type and dataset keyword exists in table tag
+                if (tableElement.dataset.showType !== undefined && tableElement.dataset.keyword !== undefined) {
                     // show result status
-                    result_status.innerText = `1 - ${count_product_in_table} dari ${json.product_total} Total produk hasil pencarian`;
+                    resultStatusElement.innerText = `1 - ${count_product_in_table} dari ${json.product_total} Total produk hasil pencarian`;
                 } else {
                     // show result status
-                    result_status.innerText = `1 - ${count_product_in_table} dari ${json.product_total} Total produk`;
+                    resultStatusElement.innerText = `1 - ${count_product_in_table} dari ${json.product_total} Total produk`;
                 }
             }
 
             // if total product in table < product limit and limit message exists
-            const limit_message = document.querySelector('span#limit-message');
+            const limit_message = document.querySelector('span#message-limit');
             if (count_product_in_table < json.product_limit && limit_message !== null) {
                 limit_message.remove();
             }

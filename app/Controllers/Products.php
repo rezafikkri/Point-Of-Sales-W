@@ -4,10 +4,11 @@ namespace App\Controllers;
 
 use App\Models\{ProductCategoriesModel, ProductsModel, ProductPricesModel};
 use CodeIgniter\HTTP\Files\UploadedFile;
+use CodeIgniter\I18n\Time;
 
 class Products extends BaseController
 {
-    private const PRODUCT_LIMIT = 50;
+    private const PRODUCT_LIMIT = 5;
 
     public function __construct()
     {
@@ -146,25 +147,27 @@ class Products extends BaseController
         }
     }
 
-    public function showProductSearches()
+    public function search(string $keyword)
     {
-        $keyword = $this->request->getPost('keyword', FILTER_SANITIZE_STRING);
+        $keyword = filter_var($keyword, FILTER_SANITIZE_STRING);
 
-        // get product search total
-        $product_search_total = $this->productsModel->countAllProductSearch($keyword);
-
-        // get product searches
-        $products_db = $this->productsModel->getProductSearches(static::PRODUCT_LIMIT, $keyword);
+        // get total product search
+        $totalProduct = $this->productsModel->getTotalSearch($keyword);
+        $products = $this->productsModel->search(static::PRODUCT_LIMIT, $keyword);
 
         // convert timestamp
-        $count_products_db = count($products_db);
-        for ($i = 0; $i < $count_products_db; $i++) {
-            $products_db[$i]['indo_create_time'] = $this->indo_time->toIndoLocalizedString($products_db[$i]['waktu_buat']);
+        $countProduct = count($products);
+        for ($i = 0; $i < $countProduct; $i++) {
+            $createdAt = Time::createFromFormat('Y-m-d H:i:s', $products[$i]['created_at']);
+            $editedAt = Time::createFromFormat('Y-m-d H:i:s', $products[$i]['edited_at']);
+
+            $products[$i]['created_at'] = $createdAt->toLocalizedString('dd MMM yyyy HH:mm');
+            $products[$i]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM yyyy HH:mm');
         }
 
         return json_encode([
-            'products_db' => $products_db,
-            'product_search_total' => $product_search_total,
+            'products' => $products,
+            'total_product' => $totalProduct,
             'product_limit' => static::PRODUCT_LIMIT,
             'csrf_value' => csrf_hash()
         ]);

@@ -39,17 +39,19 @@ class ProductsModel extends Model
                     ])->getRowArray();
     }
 
-    public function getProductSearches(int $limit, string $match): array
+    public function search(int $limit, string $keyword): array
     {
-        return $this->select('produk_id,nama_produk,nama_kategori_produk,status_produk,produk.waktu_buat')
-                    ->join('kategori_produk', 'kategori_produk.kategori_produk_id = produk.kategori_produk_id', 'INNER')
-                    ->orderBy('waktu_buat', 'DESC')->limit($limit)
-                    ->like('nama_produk',$match,'after')->get()->getResultArray();
+        return $this->select('product_id, product_name, product_category_name, product_status, products.created_at, products.edited_at')
+                    ->join('product_categories', 'product_categories.product_category_id = products.product_category_id', 'INNER')
+                    ->orderBy('edited_at', 'DESC')->limit($limit)
+                    ->like('product_name', $keyword)->get()->getResultArray();
     }
 
-    public function countAllProductSearch(string $match): int
+    public function getTotalSearch(string $keyword): int
     {
-        return $this->select('produk_id')->like('nama_produk',$match,'after')->get()->getNumRows();
+        return $this->select('product_id')
+                    ->like('product_name', $keyword)
+                    ->countAllResults();
     }
 
     public function removeProducts(array $product_ids): int
