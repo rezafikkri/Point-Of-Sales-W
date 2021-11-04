@@ -81,6 +81,8 @@ productSearchElement.addEventListener('click', async (e) => {
     productSearchElement.classList.add('btn--disabled');
 
     try {
+        const resultStatusElement = document.querySelector('span#result-status');
+
         const response = await fetch(`${baseUrl}/admin/produk/mencari/${keyword}`);
         const responseJson = await response.json();
 
@@ -120,7 +122,6 @@ productSearchElement.addEventListener('click', async (e) => {
 
             tableElement.querySelector('tbody').innerHTML = tr;
 
-            const resultStatusElement = document.querySelector('span#result-status');
             // show result status
             resultStatusElement.innerText = `1 - ${responseJson.products.length} dari ${responseJson.total_product} Total produk hasil pencarian`;
 
