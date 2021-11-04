@@ -35,8 +35,8 @@ class BaseController extends Controller
     protected $helpers = [];
 
     // property for add delimiter messages
-    protected $openDelimiterMessages = '<small class="form-message form-message--danger">';
-    protected $closeDelimiterMessages = '</small>';
+    protected $openDelimiterMessage = '<small class="form-message form-message--danger">';
+    protected $closeDelimiterMessage = '</small>';
     protected $ignoreMessages;
 
     /**
@@ -60,7 +60,7 @@ class BaseController extends Controller
             if ($this->ignoreMessages && in_array($key, $this->ignoreMessages)) {
                 $newMessages[$key] = $value;
             } else {
-                $newMessages[$key] = $this->openDelimiterMessages.$value.$this->closeDelimiterMessages;
+                $newMessages[$key] = $this->openDelimiterMessage.$value.$this->closeDelimiterMessage;
             }
         }
 

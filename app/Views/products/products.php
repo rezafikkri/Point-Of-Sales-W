@@ -32,12 +32,12 @@ $this->extend('admin_layout');
             </div>
             <div>
             <?php
-                $countProducts = count($products);
+                $countProduct = count($products);
 
                 // if exists product
-                if ($countProducts > 0) :
+                if ($countProduct > 0) :
             ?>
-                <span class="text-muted me-1" id="result-status">1 - <?= $countProducts;  ?> dari <?= $productTotal; ?> Total produk</span>
+                <span class="text-muted me-1" id="result-status">1 - <?= $countProduct;  ?> dari <?= $totalProduct; ?> Total produk</span>
             <?php else : ?>
                 <span class="text-muted me-1" id="result-status">0 Total produk</span>
             <?php endif; ?>
@@ -59,7 +59,7 @@ $this->extend('admin_layout');
             <tbody>
             <?php
                 // if exists product
-                if ($countProducts > 0) :
+                if ($countProduct > 0) :
                     $i = 1;
                 foreach ($products as $p) :
                     $createdAt = Time::createFromFormat('Y-m-d H:i:s', $p['created_at']);
@@ -103,8 +103,8 @@ $this->extend('admin_layout');
         </div><!-- table-reponsive -->
 
     <?php
-        // if product show total = product limit
-        if ($countProducts == $productLimit) :
+        // if total product show = product limit
+        if ($countProduct == $productLimit) :
     ?>
         <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit; ?> Produk terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>

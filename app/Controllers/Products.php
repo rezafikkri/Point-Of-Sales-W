@@ -14,7 +14,7 @@ class Products extends BaseController
     {
         $this->productCategoriesModel = new ProductCategoriesModel();
         $this->productsModel = new ProductsModel();
-        $this->productPricesModel = new ProductPricesModel();
+        $this->productPricesModel = new ProductPricesModel();        
     }
 
     public function index()
@@ -24,7 +24,7 @@ class Products extends BaseController
         $data['title'] = 'Produk . POSW';
         $data['page'] = 'produk';
 
-        $data['productTotal'] = $this->productsModel->getTotal();
+        $data['totalProduct'] = $this->productsModel->getTotal();
         $data['products'] = $this->productsModel->getAll(static::PRODUCT_LIMIT);
         $data['productLimit'] = static::PRODUCT_LIMIT;
 
@@ -124,12 +124,12 @@ class Products extends BaseController
              * if insert success, function insertBatch() will be return number of row inserted.
              * in production, if fail will be show oops page
              */
-            $dataProductPrice = $this->generateDataInsertBatchProductPrice(
+            $productPriceData = $this->generateDataInsertBatchProductPrice(
                 $productId,
                 $this->request->getPost('product_magnitudes'),
                 $this->request->getPost('product_prices')
             );
-            $this->productPricesModel->insertBatch($dataProductPrice);
+            $this->productPricesModel->insertBatch($productPriceData);
 
             $this->productsModel->transComplete();
 
@@ -138,8 +138,8 @@ class Products extends BaseController
             return redirect()->to('/admin/produk');
         } catch (\ErrorException $error) {
             // make error message
-            $this->openDelimiterMessages = '<div class="alert alert--warning mb-3"><span class="alert__icon"></span><p>';
-            $this->closeDelimiterMessages = '</p><a class="alert__close" href="#"></a></div>';
+            $this->openDelimiterMessage = '<div class="alert alert--warning mb-3"><span class="alert__icon"></span><p>';
+            $this->closeDelimiterMessage = '</p><a class="alert__close" href="#"></a></div>';
             $this->session->setFlashData('errors', $this->addDelimiterMessages([
                 'create_product' => 'Produk gagal dibuat. Silahkan coba kembali!'
             ]));
