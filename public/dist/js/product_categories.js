@@ -44,7 +44,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
                 const message = `
                     ${responseJson.message}
                     <a href="https://github.com/rezafikkri/Point-Of-Sales-W/wiki/Kategori-Produk#gagal-menghapus-kategori-produk"
-                    target="_blank" rel="noreferrer noopener">Pelajari lebih lanjut!</a>
+                    target="_blank" rel="noreferrer noopener">Pelajari lebih lanjut.</a>
                 `;
                 renderAlert(parentElement, referenceElement, message, [
                     'alert--warning',
