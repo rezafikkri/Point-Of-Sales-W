@@ -22,8 +22,8 @@ $this->extend('admin_layout');
                 <tr>
                     <th colspan="2" class="text-center">Aksi</th>
                     <th>Nama Kategori</th>
-                    <th width="150">Dibuat</th>
-                    <th width="150">Diedit</th>
+                    <th width="160">Dibuat</th>
+                    <th width="160">Diedit</th>
                 </tr>
             </thead>
             <tbody>

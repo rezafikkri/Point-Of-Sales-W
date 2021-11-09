@@ -52,8 +52,8 @@ $this->extend('admin_layout');
                     <th>Nama Produk</th>
                     <th width="100">Kategori</th>
                     <th width="100">Status</th>
-                    <th width="150">Dibuat</th>
-                    <th width="150">Diedit</th>
+                    <th width="160">Dibuat</th>
+                    <th width="160">Diedit</th>
                 </tr>
             </thead>
             <tbody>
