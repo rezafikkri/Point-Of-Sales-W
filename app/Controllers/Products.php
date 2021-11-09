@@ -105,38 +105,39 @@ class Products extends BaseController
         $productName = $this->request->getPost('product_name', FILTER_SANITIZE_STRING);
         $productStatus = $this->request->getPost('product_status', FILTER_SANITIZE_STRING);
 
-        try {
-            $this->productsModel->transStart();
+        $this->productsModel->transStart();
 
-            // insert product
-            $productId = $this->productsModel->insert([
-                'product_id' => generate_uuid(),
-                'product_category_id' => $productCategoryId,
-                'product_name' => $productName,
-                'product_photo' => $productPhotoName,
-                'product_status' => $productStatus,
-                'created_at' => $createdAt,
-                'edited_at' => $createdAt
-            ]);
+        // insert product
+        $productId = $this->productsModel->insert([
+            'product_id' => generate_uuid(),
+            'product_category_id' => $productCategoryId,
+            'product_name' => $productName,
+            'product_photo' => $productPhotoName,
+            'product_status' => $productStatus,
+            'created_at' => $createdAt,
+            'edited_at' => $createdAt
+        ]);
 
-            /**
-             * in production and development,
-             * if insert success, function insertBatch() will be return number of row inserted.
-             * in production, if fail will be show oops page
-             */
-            $productPriceData = $this->generateDataInsertBatchProductPrice(
-                $productId,
-                $this->request->getPost('product_magnitudes'),
-                $this->request->getPost('product_prices')
-            );
-            $this->productPricesModel->insertBatch($productPriceData);
+        /**
+         * in production and development,
+         * if insert success, function insertBatch() will be return number of row inserted.
+         * in production, if fail will be show oops page
+         */
+        $productPriceData = $this->generateDataInsertBatchProductPrice(
+            $productId,
+            $this->request->getPost('product_magnitudes'),
+            $this->request->getPost('product_prices')
+        );
+        $insertBatchProductPrice = $this->productPricesModel->insertBatch($productPriceData);
 
-            $this->productsModel->transComplete();
+        $this->productsModel->transComplete();
 
+        // if success create product 
+        if ($productId == true && $insertBatchProductPrice == true) {
             // move product photo
             $productPhotoFile->move('dist/images/product-photos', $productPhotoName);
             return redirect()->to('/admin/produk');
-        } catch (\ErrorException $error) {
+        } else {
             // make error message
             $this->openDelimiterMessage = '<div class="alert alert--warning mb-3"><span class="alert__icon"></span><p>';
             $this->closeDelimiterMessage = '</p><a class="alert__close" href="#"></a></div>';
