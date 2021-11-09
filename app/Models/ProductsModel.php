@@ -31,12 +31,11 @@ class ProductsModel extends Model
         return $this->countAll();
     }
 
-    public function getOne(string $productId, string $columns): ?array
+    public function getOne(string $productId): ?array
     {
-        return $this->select($columns)
-                    ->getWhere([
-                        'product_id' => $productId
-                    ])->getRowArray();
+        return $this->select('product_category_id, product_name, product_status, product_photo')->getWhere([
+            'product_id' => $productId
+        ])->getRowArray();
     }
 
     public function search(int $limit, string $keyword): array

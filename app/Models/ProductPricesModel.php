@@ -15,7 +15,7 @@ class ProductPricesModel extends Model
         'product_price'
     ];
     protected $useAutoIncrement = false;
-
+    
     public function getAll(string $productId, string $columns): array
     {
         return $this->select($columns)
@@ -23,14 +23,62 @@ class ProductPricesModel extends Model
                         'product_id' => $productId
                     ])->getResultArray();
     }
-
-    public function removeProductPrice(string $product_price_id): int
+    
+    private function generateUpsertBatchQuery(array $data): string
     {
-        try {
-            $this->delete($product_price_id);
-            return $this->db->affectedRows();
-        } catch (\ErrorException $e) {
-            return 0;
+        // $columns contains columns for upsertBatch query
+        $columns = '';
+        // $values contains values for upsertBatch query
+        $values = '';
+        // Contains do update clause for upsertBatch query if happen conflict
+        $doUpdate = 'DO UPDATE SET ';
+
+        // generate columns, do update and values
+        $columns .= '(';
+        $values .= '(';
+        foreach ($data[0] as $key => $value) {
+            $columns .= $key . ',';
+            $doUpdate .= "$key = EXCLUDED.$key,";
+            $values .= $this->escape($value) . ',';
         }
+        $columns = rtrim($columns, ',');
+        $columns .= ')';
+        $doUpdate = rtrim($doUpdate, ',');
+        $values = rtrim($values, ',');
+        $values .= '),';
+
+        // generate next values
+        $countData = count($data);
+        for ($i = 1; $i < $countData; $i++) {
+            $values .= '(';
+            foreach ($data[$i] as $d) {
+                $values .= $this->escape($d) . ',';
+            }
+            $values = rtrim($values, ',');
+            $values .= '),';
+        }
+        $values = rtrim($values, ',');
+        
+        return "INSERT INTO $this->table $columns VALUES $values
+            ON CONFLICT ($this->primaryKey) $doUpdate";
+    }
+    
+    /**
+     * Upsert Batch (Update or Insert Batch)
+     *
+     * This function is combination of Update or Insert data batch.
+     * Update row if it already exists, otherwise it will be insert the new row
+     *
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function upsertBatch(array $data): bool
+    {
+        $query = $this->generateUpsertBatchQuery($data);
+        if ($this->simpleQuery($query)) {
+            return true;
+        }
+        return false;
     }
 }

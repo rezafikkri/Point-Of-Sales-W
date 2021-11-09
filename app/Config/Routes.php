@@ -47,6 +47,9 @@ $routes->group('admin', function ($routes) {
     $routes->get('produk/membuat', 'Products::create');
     $routes->post('produk/menyimpan', 'Products::store');
     $routes->get('produk/mencari/(:segment)', 'Products::search/$1');
+    $routes->get('produk/edit/(:segment)', 'Products::edit/$1');
+    $routes->post('produk/memperbaharui', 'Products::update');
+    $routes->post('produk/menghapus-harga-produk', 'Products::removeProductPrice');
 });
 
 $routes->get('sign_out', 'SignOut::index');

@@ -172,212 +172,159 @@ class Products extends BaseController
         ]);
     }
 
-    public function updateProduct(string $product_id)
+    public function edit(string $productId)
     {
-        $product_id = filter_var($product_id, FILTER_SANITIZE_STRING);
+        helper(['active_menu', 'form']);
 
-        $data['title'] = 'Perbaharui Produk . POSW';
-        $data['page'] = 'perbaharui_produk';
-        $data['product_id'] = $product_id;
-        $data['product_db'] = $this->productsModel->findProduct($product_id, 'kategori_produk_id,nama_produk,status_produk,foto_produk');
-        $data['product_prices_db'] = $this->productPricesModel->getProductPrices($product_id, 'harga_produk_id, besaran_produk, harga_produk');
-        $data['category_products_db'] = $this->productCategoriesModel->getCategoryProductsForFormSelect();
+        $productId = filter_var($productId, FILTER_SANITIZE_STRING);
 
-        return view('product/update_product', $data);
+        $data['title'] = 'Edit Produk . POSW';
+        $data['page'] = 'edit-produk';
+        $data['productId'] = $productId;
+        $data['productCategories'] = $this->productCategoriesModel->getAll('product_category_id, product_category_name');
+        $data['product'] = $this->productsModel->getOne($productId);
+        $data['productPrices'] = $this->productPricesModel->getAll($productId, 'product_price_id, product_magnitude, product_price');
+
+        return view('products/edit_product', $data);
     }
 
-    private function splitProductPriceCreateUpdate(array $product_price_ids, array $product_magnitudes, array $product_prices)
-    {
-        $data_product_magnitude_update = [];
-        $data_product_price_update = [];
-        $data_product_magnitude_insert = [];
-        $data_product_price_insert = [];
-
-        $count_product_magnitude = count($product_magnitudes);
-        for ($i = 0; $i < $count_product_magnitude; $i++) {
-            // if product_price_id exists
-            if (isset($product_price_ids[$i])) {
-                $data_product_magnitude_update[] = $product_magnitudes[$i];
-                $data_product_price_update[] = $product_prices[$i];
+    private function generateDataUpsertBatchProductPrice(
+        string $productId,
+        array $productPriceIds,
+        array $productMagnitudes,
+        array $productPrices
+    ): array {
+        $updateData = [];
+        $countProductMagnitude = count($productMagnitudes);
+        for ($i = 0; $i < $countProductMagnitude; $i++) {
+            // if product price id exist
+            if (isset($productPriceIds[$i])) {
+                $productPriceId = filter_var($productPriceIds[$i], FILTER_SANITIZE_STRING);
             } else {
-                $data_product_magnitude_insert[] = $product_magnitudes[$i];
-                $data_product_price_insert[] = $product_prices[$i];
+                $productPriceId = generate_uuid();
             }
-        }
 
-        return [
-            'data_product_magnitude_update' => $data_product_magnitude_update,
-            'data_product_price_update' => $data_product_price_update,
-            'data_product_magnitude_insert' => $data_product_magnitude_insert,
-            'data_product_price_insert' => $data_product_price_insert
-        ];
-    }
-
-    private function generateDataUpdateBatchProductPrice(array $product_price_ids, array $product_magnitudes, array $product_prices): array
-    {
-        $data_update = [];
-        $count_product_magnitude = count($product_magnitudes);
-        for ($i = 0; $i < $count_product_magnitude; $i++) {
-            $data_update[] = [
-                'harga_produk_id' => filter_var($product_price_ids[$i], FILTER_SANITIZE_STRING),
-                'besaran_produk' => filter_var($product_magnitudes[$i], FILTER_SANITIZE_STRING),
-                'harga_produk' => filter_var($product_prices[$i], FILTER_SANITIZE_STRING)
+            $updateData[] = [
+                'product_price_id' => $productPriceId,
+                'product_id' => $productId,
+                'product_magnitude' => filter_var($productMagnitudes[$i], FILTER_SANITIZE_STRING),
+                'product_price' => filter_var($productPrices[$i], FILTER_SANITIZE_STRING)
             ];
         }
-        return $data_update;
+        return $updateData;
     }
 
-    public function updateProductInDB()
+    public function update()
     {
-        // generate data validate
-        $data_validate = [
-            'category_product' => [
+        $productId = $this->request->getPost('product_id', FILTER_SANITIZE_STRING);
+
+        // generate validation data
+        $validationData = [
+            'product_category' => [
                 'label' => 'Kategori produk',
                 'rules' => 'required',
-                'errors' => $this->generateIndoErrorMessages(['required'])
             ],
             'product_name' => [
                 'label' => 'Nama produk',
-                'rules' => 'required|max_length[50]',
-                'errors' => $this->generateIndoErrorMessages(['required','max_length'])
+                'rules' => "required|max_length[50]|is_unique[products.product_name,product_id,$productId]",
             ],
             'product_status' => [
                 'label' => 'Status Produk',
                 'rules' => 'in_list[ada,tidak_ada]',
-                'errors' => $this->generateIndoErrorMessages(['in_list'])
             ],
             'product_magnitudes' => 'product_magnitude',
             'product_prices' => 'product_price'
         ];
 
-        $product_photo_file = $this->request->getFile('product_photo');
-        // if exists product photo
-        if ($product_photo_file->getError() !== 4) {
-            $data_validate = array_merge($data_validate, ['product_photo' => 'product_photo']);
+        $productPhotoFile = $this->request->getFile('product_photo');
+        // if product photo exist
+        if ($productPhotoFile->getError() != 4) {
+            $validationData = array_merge($validationData, ['product_photo' => 'product_photo']);
         }
 
         // validate data
-        if (!$this->validate($data_validate)) {
+        if (!$this->validate($validationData)) {
             // set validation errors message to flash session
-            $this->session->setFlashData('form_errors', $this->setDelimiterMessages(
-                '<small class="form-message form-message--danger">',
-                '</small>',
-                $this->validator->getErrors(),
-                ['product_magnitudes', 'product_prices']
-            ));
-
-            return redirect()->back()->withInput();
+            $this->ignoreMessages = ['product_magnitudes', 'product_prices'];
+            $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
+            return redirect()->to('/admin/produk/edit/' . $productId)->withInput();
         }
 
-        $product_id = $this->request->getPost('product_id', FILTER_SANITIZE_STRING);
-        // generate data update product
-        $data_update_product = [
-            'kategori_produk_id' => $this->request->getPost('category_product', FILTER_SANITIZE_STRING),
-            'nama_produk' => $this->request->getPost('product_name', FILTER_SANITIZE_STRING),
-            'status_produk' => $this->request->getPost('product_status', FILTER_SANITIZE_STRING),
-            'waktu_buat' => date('Y-m-d H:i:s')
+        // generate product update data
+        $productUpdateData = [
+            'product_category_id' => $this->request->getPost('product_category', FILTER_SANITIZE_STRING),
+            'product_name' => $this->request->getPost('product_name', FILTER_SANITIZE_STRING),
+            'product_status' => $this->request->getPost('product_status', FILTER_SANITIZE_STRING),
+            'edited_at' => date('Y-m-d H:i:s')
         ];
 
-        // if exists product photo
-        if ($product_photo_file->getError() !== 4) {
-            // genearate new random name for product photo
-            $product_photo_name = $product_photo_file->getRandomName();
-
-            $data_update_product = array_merge($data_update_product, ['foto_produk' => $product_photo_name]);
+        // if product photo exist
+        if ($productPhotoFile->getError() != 4) {
+            $productPhotoName = $productPhotoFile->getRandomName();
+            // add product photo to product update data array
+            $productUpdateData['product_photo'] = $productPhotoName;
         }
 
-        $product_price_ids = $this->request->getPost('product_price_ids');
-        // split product price create and product price update
-        $split_product_price = $this->splitProductPriceCreateUpdate(
-            $product_price_ids,
+        helper('generate_uuid');
+        
+        // generate product price upsert batch data
+        $productPriceIds = $this->request->getPost('product_price_ids');
+        $productPriceUpsertBatchData = $this->generateDataUpsertBatchProductPrice(
+            $productId,
+            $productPriceIds,
             $this->request->getPost('product_magnitudes'),
             $this->request->getPost('product_prices')
         );
+        
+        $this->productsModel->transStart();
 
-        $data_product_magnitude_update = $split_product_price['data_product_magnitude_update'];
-        $data_product_price_update = $split_product_price['data_product_price_update'];
-        $data_product_magnitude_insert = $split_product_price['data_product_magnitude_insert'];
-        $data_product_price_insert = $split_product_price['data_product_price_insert'];
+        // update product
+        $updateProduct = $this->productsModel->update($productId, $productUpdateData);
+        // update insert product price
+        $upsertProductPrice = $this->productPricesModel->upsertBatch($productPriceUpsertBatchData);
 
-        // generate data product price update and create
-        $data_product_price_update = $this->generateDataUpdateBatchProductPrice(
-            $product_price_ids,
-            $data_product_magnitude_update,
-            $data_product_price_update
-        );
+        $this->productsModel->transComplete();
 
-        $data_product_price_insert = $this->generateDataInsertBatchProductPrice(
-            $product_id,
-            $data_product_magnitude_insert,
-            $data_product_price_insert
-        );
-
-        try {
-            $this->productsModel->transBegin();
-
-            // update product
-            $this->productsModel->update($product_id, $data_update_product);
-            // update product price
-            $this->productPricesModel->updateBatch($data_product_price_update, 'harga_produk_id');
-            // insert product price
-            if (count($data_product_price_insert) > 0) {
-                $this->productPricesModel->insertBatch($data_product_price_insert);
-            }
-
-            $this->productsModel->transCommit();
-            $process = true;
-
-        } catch (\ErrorException $e) {
-            $this->productsModel->transRollback();
-            $process = false;
-        }
-
-        // if update product and update product price success and insert product price success
-        if ($process === true) {
-            // if exists product photo
-            if ($product_photo_file->getError() === 0) {
+        // if success update product
+        if ($updateProduct == true && $upsertProductPrice == true) {
+            // if product photo exist
+            if ($productPhotoFile->getError() != 4) {
                 // move product photo
-                $product_photo_file->move('dist/images/product_photo', $product_photo_name);
+                $productPhotoFile->move('dist/images/product-photos', $productPhotoName);
                 // remove old product photo
-                $old_product_photo = $this->request->getPost('old_product_photo');
-                if (file_exists('dist/images/product_photo/'.$old_product_photo)) {
-                    unlink('dist/images/product_photo/'.$old_product_photo);
+                $oldProductPhoto = $this->request->getPost('old_product_photo', FILTER_SANITIZE_STRING);
+                if (file_exists('dist/images/product-photos/'.$oldProductPhoto)) {
+                    unlink('dist/images/product-photos/'.$oldProductPhoto);
                 }
             }
 
-            // make success message
-            $this->session->setFlashData('form_success', $this->setDelimiterMessages(
-                '<div class="alert alert--success mb-3"><span class="alert__icon"></span><p>',
-                '</p><a class="alert__close" href="#"></a></div>',
-                ['update_product' => 'Produk telah diperbaharui.']
-            ));
-
-            return redirect()->back();
+            $message = 'Produk telah diperbaharui.';
+            $alertType = 'success';
+        } else {
+            $message = 'Produk gagal diperbaharui. Silahkan coba kembali!';
+            $alertType = 'warning';
         }
 
-        // make error message
-        $this->session->setFlashData('form_errors', $this->setDelimiterMessages(
-            '<div class="alert alert--warning mb-3"><span class="alert__icon"></span><p>',
-            '</p><a class="alert__close" href="#"></a></div>',
-            ['update_product' => 'Produk gagal diperbaharui. Silahkan coba kembali!']
-        ));
-        return redirect()->back();
+        $this->openDelimiterMessage = "<div class=\"alert alert--$alertType mb-3\"><span class=\"alert__icon\"></span><p>";
+        $this->closeDelimiterMessage = '</p><a class="alert__close" href="#"></a></div>';
+        $this->session->setFlashData('errors', $this->addDelimiterMessages(['edit_product' => $message]));
+        return redirect()->to('/admin/produk/edit/' . $productId);
     }
 
-    public function removeProductPriceInDB()
+    public function removeProductPrice()
     {
-        $product_price_id = $this->request->getPost('product_price_id', FILTER_SANITIZE_STRING);
-        if ($this->productPricesModel->removeProductPrice($product_price_id) > 0) {
+        $productPriceId = $this->request->getPost('product_price_id', FILTER_SANITIZE_STRING);
+        if ($this->productPricesModel->delete($productPriceId)) {
             return json_encode([
                 'status' => 'success',
                 'csrf_value' => csrf_hash()
             ]);
         }
 
-        $error_message = 'Gagal menghapus harga produk, cek apakah masih ada transaksi yang terhubung! <a href="https://github.com/rezafikkri/Point-Of-Sales-Warung/wiki/Produk#gagal-menghapus-harga-produk" target="_blank" rel="noreferrer noopener">Pelajari lebih lanjut!</a>';
+        $errorMessage = 'Gagal menghapus harga produk, cek apakah masih ada data transaksi yang terhubung!';
         return json_encode([
             'status' => 'fail',
-            'message' => $error_message,
+            'message' => $errorMessage,
             'csrf_value' => csrf_hash()
         ]);
     }
