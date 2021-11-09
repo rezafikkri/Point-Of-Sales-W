@@ -37,7 +37,7 @@
                         <label for="product-photo">Pilih file...</label>
                     </div>
                     <?= $_SESSION['errors']['product_photo'] ?? '<small class="form-message form-message--info">
-                    Ukuran file maksimal 1 MB dan ekstensi file harus .jpg atau .jpeg!</small>'; ?>
+                    Ukuran file maksimal 1 MB dan ekstensi file harus .jpg atau .jpeg.</small>'; ?>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="product-status">Status Produk</label>
@@ -90,7 +90,7 @@
                 </div><!-- magnitude-price -->
                 <small class="form-message form-message--info
                 mb-3">Pelajari lebih lanjut <a href="https://github.com/rezafikkri/Point-Of-Sales-Warung/wiki/Produk#harga-produk"
-                target="_blank" rel="noreferrer noopener">Harga Produk</a>!</small>
+                target="_blank" rel="noreferrer noopener">Harga Produk</a>.</small>
 
                 <a class="btn btn--gray-outline me-2" id="add-form-input-magnitude-price" href="">
                 Tambah Form Harga Produk</a><button class="btn btn--blue" type="submit">Simpan</button>

@@ -298,10 +298,10 @@ class Products extends BaseController
                 }
             }
 
-            $message = 'Produk telah diperbaharui.';
+            $message = 'Produk berhasil diedit.';
             $alertType = 'success';
         } else {
-            $message = 'Produk gagal diperbaharui. Silahkan coba kembali!';
+            $message = 'Produk gagal diedit. Silahkan coba kembali!';
             $alertType = 'warning';
         }
 
