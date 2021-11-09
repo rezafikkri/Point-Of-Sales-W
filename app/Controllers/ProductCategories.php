@@ -104,8 +104,8 @@ class ProductCategories extends BaseController
         ]);
 
         // make success messages
-        $this->openDelimiterMessages = '<div class="alert alert--success mb-3"><span class="alert__icon"></span><p>';
-        $this->closeDelimiterMessages = '</p><a class="alert__close" href="#"></a></div>';
+        $this->openDelimiterMessage = '<div class="alert alert--success mb-3"><span class="alert__icon"></span><p>';
+        $this->closeDelimiterMessage = '</p><a class="alert__close" href="#"></a></div>';
         $this->session->setFlashData('success', $this->addDelimiterMessages([
             'edit_product_category' => 'Kategori produk berhasil diedit.'
         ]));
