@@ -89,7 +89,7 @@
                 <?php endfor; ?>
                 </div><!-- magnitude-price -->
                 <small class="form-message form-message--info
-                mb-3">Pelajari lebih lanjut <a href="https://github.com/rezafikkri/Point-Of-Sales-Warung/wiki/Produk#harga-produk"
+                mb-3">Pelajari lebih lanjut <a href="https://github.com/rezafikkri/Point-Of-Sales-W/wiki/Produk#harga-produk"
                 target="_blank" rel="noreferrer noopener">Harga Produk</a>.</small>
 
                 <a class="btn btn--gray-outline me-2" id="add-form-input-magnitude-price" href="">
