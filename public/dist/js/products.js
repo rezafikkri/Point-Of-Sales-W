@@ -17,12 +17,12 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
             tableRowDetailElement.classList.toggle('table__row-detail--show');
         // else, is mean product detail not exists in table
         } else {
+            const loadingElement = document.querySelector('#loading');
             const baseUrl = document.querySelector('html').dataset.baseUrl;
             const productId = targetElement.dataset.productId;
 
-            // show loading
-            // tableElement.parentElement.nextElementSibling.classList.remove('d-none');
-            // disabled button search
+            // hide loading and enable button search
+            loadingElement.classList.remove('d-none');
             productSearchElement.classList.add('btn--disabled');
 
             try {
@@ -55,9 +55,8 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
                 console.error(error);
             }
 
-            // hide loading
-            tableElement.parentElement.nextElementSibling.classList.add('d-none');
-            // enabled button search
+            // hide loading and enable button search
+            loadingElement.classList.add('d-none');
             productSearchElement.classList.remove('btn--disabled');
         }
     }
