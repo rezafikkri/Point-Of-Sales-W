@@ -282,12 +282,12 @@ class Products extends BaseController
         // update product
         $updateProduct = $this->productsModel->update($productId, $productUpdateData);
         // update insert product price
-        $upsertProductPrice = $this->productPricesModel->upsertBatch($productPriceUpsertBatchData);
+        $upsertBatchProductPrice = $this->productPricesModel->upsertBatch($productPriceUpsertBatchData);
 
         $this->productsModel->transComplete();
 
-        // if success update product
-        if ($updateProduct == true && $upsertProductPrice == true) {
+        // if success edit product
+        if ($updateProduct == true && $upsertBatchProductPrice == true) {
             // if product photo exist
             if ($productPhotoFile->getError() != 4) {
                 // move product photo
