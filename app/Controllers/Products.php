@@ -82,7 +82,7 @@ class Products extends BaseController
             ],
             'product_status' => [
                 'label' => 'Status Produk',
-                'rules' => 'in_list[ada, tidak_ada]',
+                'rules' => 'in_list[ada,tidak_ada]',
             ],
             'product_photo' => 'product_photo',
             'product_magnitudes' => 'product_magnitude',
@@ -91,7 +91,7 @@ class Products extends BaseController
             // set validation errors message to flash session
             $this->ignoreMessages = ['product_magnitudes', 'product_prices'];
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->back()->withInput();
+            return redirect()->to('/admin/produk/membuat')->withInput();
         }
 
         helper('generate_uuid');
@@ -144,7 +144,7 @@ class Products extends BaseController
             $this->session->setFlashData('errors', $this->addDelimiterMessages([
                 'create_product' => 'Produk gagal dibuat. Silahkan coba kembali!'
             ]));
-            return redirect()->back()->withInput();
+            return redirect()->to('/admin/produk/membuat')->withInput();
         }
     }
 

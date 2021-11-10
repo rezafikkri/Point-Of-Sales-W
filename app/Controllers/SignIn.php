@@ -26,7 +26,7 @@ class SignIn extends BaseController
         ])) {
             // set validation error messages to flash session
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->back()->withInput();
+            return redirect()->to('/')->withInput();
         }
 
         $username = $this->request->getPost('username', FILTER_SANITIZE_STRING);
@@ -58,13 +58,13 @@ class SignIn extends BaseController
             $this->session->setFlashData('errors', $this->addDelimiterMessages([
                 'password' => 'Password salah.'
             ]));
-            return redirect()->back();
+            return redirect()->to('/');
         }
 
         // if username not found
         $this->session->setFlashData('errors', $this->addDelimiterMessages([
             'username' => 'Username tidak ditemukan.'
         ]));
-        return redirect()->back();
+        return redirect()->to('/');
     }
 }

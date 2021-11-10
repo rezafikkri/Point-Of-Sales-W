@@ -42,7 +42,7 @@ class ProductCategories extends BaseController
         ])) {
             // set validation error messages to flash session
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->back()->withInput();
+            return redirect()->to('/admin/kategori-produk/membuat')->withInput();
         }
 
         helper('generate_uuid');
@@ -79,6 +79,8 @@ class ProductCategories extends BaseController
 
     public function update()
     {
+        $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
+
         if (!$this->validate([
             'product_category_name' => [
                 'label' => 'Nama Kategori',
@@ -87,10 +89,9 @@ class ProductCategories extends BaseController
         ])) {
             // set validation error messages to flash session
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->back();
+            return redirect()->to('/admin/kategori-produk/edit/' . $productCategoryId);
         }
 
-        $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
         $productCategoryName = $this->request->getPost('product_category_name', FILTER_SANITIZE_STRING);
 
         /**
@@ -110,7 +111,7 @@ class ProductCategories extends BaseController
             'edit_product_category' => 'Kategori produk berhasil diedit.'
         ]));
 
-        return redirect()->back();
+        return redirect()->to('/admin/kategori-produk/edit/' . $productCategoryId);
     }
 
     public function remove()
