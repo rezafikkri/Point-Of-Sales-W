@@ -54,19 +54,19 @@ class Products extends BaseController
         return view('products/create_product', $data);
     }
 
-    private function generateDataInsertBatchProductPrice(string $productId, array $productMagnitudes, array $productPrices): array
+    private function generateProductPriceInsertBatchData(string $productId, array $productMagnitudes, array $productPrices): array
     {
-        $dataInsert = [];
+        $insertData = [];
         $countProductMagnitude = count($productMagnitudes);
         for ($i = 0; $i < $countProductMagnitude; $i++) {
-            $dataInsert[] = [
+            $insertData[] = [
                 'product_price_id' => generate_uuid(),
                 'product_id' => $productId,
                 'product_magnitude' => filter_var($productMagnitudes[$i], FILTER_SANITIZE_STRING),
                 'product_price' => filter_var($productPrices[$i], FILTER_SANITIZE_STRING)
             ];
         }
-        return $dataInsert;
+        return $insertData;
     }
 
     public function store()
@@ -123,17 +123,17 @@ class Products extends BaseController
          * if insert success, function insertBatch() will be return number of row inserted.
          * in production, if fail will be show oops page
          */
-        $productPriceData = $this->generateDataInsertBatchProductPrice(
+        $productPriceInsertBatchData = $this->generateProductPriceInsertBatchData(
             $productId,
             $this->request->getPost('product_magnitudes'),
             $this->request->getPost('product_prices')
         );
-        $insertBatchProductPrice = $this->productPricesModel->insertBatch($productPriceData);
+        $insertProductPriceBatch = $this->productPricesModel->insertBatch($productPriceInsertBatchData);
 
         $this->productsModel->transComplete();
 
         // if success create product 
-        if ($productId == true && $insertBatchProductPrice == true) {
+        if ($productId == true && $insertProductPriceBatch == true) {
             // move product photo
             $productPhotoFile->move('dist/images/product-photos', $productPhotoName);
             return redirect()->to('/admin/produk');
@@ -189,7 +189,7 @@ class Products extends BaseController
         return view('products/edit_product', $data);
     }
 
-    private function generateDataUpsertBatchProductPrice(
+    private function generateProductPriceUpsertBatchData(
         string $productId,
         array $productPriceIds,
         array $productMagnitudes,
@@ -270,7 +270,7 @@ class Products extends BaseController
         
         // generate product price upsert batch data
         $productPriceIds = $this->request->getPost('product_price_ids');
-        $productPriceUpsertBatchData = $this->generateDataUpsertBatchProductPrice(
+        $productPriceUpsertBatchData = $this->generateProductPriceUpsertBatchData(
             $productId,
             $productPriceIds,
             $this->request->getPost('product_magnitudes'),
@@ -282,12 +282,12 @@ class Products extends BaseController
         // update product
         $updateProduct = $this->productsModel->update($productId, $productUpdateData);
         // update insert product price
-        $upsertBatchProductPrice = $this->productPricesModel->upsertBatch($productPriceUpsertBatchData);
+        $upsertProductPriceBatch = $this->productPricesModel->upsertBatch($productPriceUpsertBatchData);
 
         $this->productsModel->transComplete();
 
         // if success edit product
-        if ($updateProduct == true && $upsertBatchProductPrice == true) {
+        if ($updateProduct == true && $upsertProductPriceBatch == true) {
             // if product photo exist
             if ($productPhotoFile->getError() != 4) {
                 // move product photo
