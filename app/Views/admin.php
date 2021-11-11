@@ -1,10 +1,10 @@
-<?= $this->extend('admin_layout'); ?>
+<?= $this->extend('admin_layout') ?>
 
-<?= $this->section('main'); ?>
+<?= $this->section('main') ?>
 <header class="header">
 <div class="container-xl">
     <h4 class="mb-0">Hi</h4>
-    <h5>, <?= $_SESSION['sign_in_user_full_name']; ?></h5>
+    <h5>, <?= $_SESSION['sign_in_user_full_name'] ?></h5>
 </div><!-- container-xl -->
 </header>
 
@@ -30,7 +30,7 @@
         <div class="col-sm-4 col-lg-6 pe-sm-1 mb-3">
         <div class="info-box info-box--blue">
             <div class="info-box__data">
-            <h4 class="mb-2"><?= number_to_amount($totalTransaction, 1); ?></h4>
+            <h4 class="mb-2"><?= number_to_amount($totalTransaction, 1) ?></h4>
                 <p class="mb-0">Total Transaksi</p>
             </div>
             <div class="info-box__icon">
@@ -42,7 +42,7 @@
         <div class="col-sm-4 col-lg-6 pe-sm-1 pe-lg-3 mb-3">
         <div class="info-box info-box--sky-blue">
             <div class="info-box__data">
-                <h4 class="mb-0 mb-2"><?= $totalUser; ?></h4>
+                <h4 class="mb-0 mb-2"><?= $totalUser ?></h4>
                 <p class="mb-0">Total Pengguna</p>
             </div>
             <div class="info-box__icon">
@@ -54,7 +54,7 @@
         <div class="col-sm-4 col-lg-6">
         <div class="info-box info-box--green">
             <div class="info-box__data">
-                <h4 class="mb-2"><?= number_to_amount($totalProduct, 1); ?></h4>
+                <h4 class="mb-2"><?= number_to_amount($totalProduct, 1) ?></h4>
                 <p class="mb-0">Total Produk</p>
             </div>
             <div class="info-box__icon">
@@ -69,8 +69,8 @@
 </div><!-- row -->
 </div><!-- container-xl -->
 </main>
-<?= $this->endSection(); ?>
+<?= $this->endSection() ?>
 
-<?= $this->section('script'); ?>
-<script type="module" src="<?= base_url('dist/js/admin.js'); ?>"></script>
-<?= $this->endSection(); ?>
+<?= $this->section('script') ?>
+<script type="module" src="<?= base_url('dist/js/admin.js') ?>"></script>
+<?= $this->endSection() ?>

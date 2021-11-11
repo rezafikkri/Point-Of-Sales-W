@@ -6,7 +6,7 @@ $this->extend('admin_layout');
 
 ?>
 
-<?= $this->section('main'); ?>
+<?= $this->section('main') ?>
 <div class="container-xl">
 <header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Produk</h4>
@@ -37,14 +37,14 @@ $this->extend('admin_layout');
                 // if exists product
                 if ($countProduct > 0) :
             ?>
-                <span class="text-muted me-1" id="result-status">1 - <?= $countProduct;  ?> dari <?= $totalProduct; ?> Total produk</span>
+                <span class="text-muted me-1" id="result-status">1 - <?= $countProduct;  ?> dari <?= $totalProduct ?> Total produk</span>
             <?php else : ?>
                 <span class="text-muted me-1" id="result-status">0 Total produk</span>
-            <?php endif; ?>
+            <?php endif ?>
             </div>
         </div><!-- d-flex -->
 
-        <div class="table-responsive" id="table" data-csrf-name="<?= csrf_token(); ?>" data-csrf-value="<?= csrf_hash(); ?>">
+        <div class="table-responsive" id="table" data-csrf-name="<?= csrf_token() ?>" data-csrf-value="<?= csrf_hash() ?>">
         <table class="table table--manual-striped min-width-711">
             <thead>
                 <tr>
@@ -71,33 +71,33 @@ $this->extend('admin_layout');
                 <tr class="table__row-odd">
             <?php else : ?>
                 <tr>
-            <?php endif; ?>
+            <?php endif ?>
                     <td width="10">
                         <div class="form-check">
                             <input type="checkbox" name="product_id" data-edited-at="<?= $p['edited_at'] ?>"
-                            class="form-check-input" value="<?= $p['product_id']; ?>">
+                            class="form-check-input" value="<?= $p['product_id'] ?>">
                         </div>
                     </td>
-                    <td width="10"><a href="/admin/produk/edit/<?= $p['product_id']; ?>" title="Ubah Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
-                    <td width="10"><a href="#" id="show-product-detail" data-product-id="<?= $p['product_id']; ?>" title="Tampilkan detail produk"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
+                    <td width="10"><a href="/admin/produk/edit/<?= $p['product_id'] ?>" title="Ubah Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
+                    <td width="10"><a href="#" id="show-product-detail" data-product-id="<?= $p['product_id'] ?>" title="Tampilkan detail produk"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
-                    <td><?= $p['product_name']; ?></td>
-                    <td><?= $p['product_category_name']; ?></td>
+                    <td><?= $p['product_name'] ?></td>
+                    <td><?= $p['product_category_name'] ?></td>
 
                     <?php if ($p['product_status'] == 'ada') : ?>
                         <td><span class="text-green">Ada</span></td>
                     <?php else : ?>
                         <td><span class="text-red">Tidak Ada</span></td>
-                    <?php endif; ?>
+                    <?php endif ?>
 
-                    <td><?= $createdAt->toLocalizedString('dd MMM yyyy HH:mm'); ?></td>
-                    <td><?= $editedAt->toLocalizedString('dd MMM yyyy HH:mm'); ?></td>
+                    <td><?= $createdAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
+                    <td><?= $editedAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
                 </tr>
             <?php $i++; endforeach; else : ?>
                 <tr class="table__row-odd">
                     <td colspan="7">Produk tidak ada.</td>
                 </tr>
-            <?php endif; ?>
+            <?php endif ?>
             </tbody>
         </table>
         </div><!-- table-reponsive -->
@@ -106,9 +106,9 @@ $this->extend('admin_layout');
         // if total product show = product limit
         if ($countProduct == $productLimit) :
     ?>
-        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit; ?> Produk terbaru yang ditampilkan, Pakai fitur
+        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit ?> Produk terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>
-    <?php endif; ?>
+    <?php endif ?>
 
         <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none" id="loading">
             <div class="loading mt-5">
@@ -119,8 +119,8 @@ $this->extend('admin_layout');
     </div><!-- main__box -->
 </main>
 </div>
-<?= $this->endSection(); ?>
+<?= $this->endSection() ?>
 
-<?= $this->section('script'); ?>
-<script type="module" src="<?= base_url('dist/js/products.js'); ?>"></script>
-<?= $this->endSection(); ?>
+<?= $this->section('script') ?>
+<script type="module" src="<?= base_url('dist/js/products.js') ?>"></script>
+<?= $this->endSection() ?>
