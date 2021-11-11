@@ -240,7 +240,7 @@ class Products extends BaseController
         $productPhotoFile = $this->request->getFile('product_photo');
         // if product photo exist
         if ($productPhotoFile->getError() != 4) {
-            $validationData = array_merge($validationData, ['product_photo' => 'product_photo']);
+            $validationData['product_photo'] = 'product_photo';
         }
 
         // validate data
@@ -301,14 +301,18 @@ class Products extends BaseController
 
             $message = 'Produk berhasil diedit.';
             $alertType = 'success';
+            $flashMessageName = 'success';
         } else {
             $message = 'Produk gagal diedit. Silahkan coba kembali!';
             $alertType = 'warning';
+            $flashMessageName = 'errors';
         }
 
         $this->openDelimiterMessage = "<div class=\"alert alert--$alertType mb-3\"><span class=\"alert__icon\"></span><p>";
         $this->closeDelimiterMessage = '</p><a class="alert__close" href="#"></a></div>';
-        $this->session->setFlashData('errors', $this->addDelimiterMessages(['edit_product' => $message]));
+        $this->session->setFlashData($flashMessageName, $this->addDelimiterMessages([
+            'edit_product' => $message
+        ]));
         return redirect()->to('/admin/produk/edit/' . $productId);
     }
 
