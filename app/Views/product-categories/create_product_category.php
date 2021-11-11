@@ -10,6 +10,7 @@
 <main class="main">
     <div class="row">
     <div class="col-md-8">
+        <?= $_SESSION['errors']['create_product_category'] ?? null; ?>
         <div class="main__box">
             <?= form_open('/admin/kategori-produk/menyimpan'); ?>
                 <div class="mb-3">
