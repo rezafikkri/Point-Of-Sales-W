@@ -17,8 +17,8 @@ class HasSignedInTest extends CIUnitTestCase
     public function testHasSignedInAccessRedirects(): void
     {
         // set session for has signed in simulation
-        $_SESSION['posw_sign_in_status'] = true;
-        $_SESSION['posw_user_level'] = 'admin';
+        $_SESSION['sign_in_status'] = true;
+        $_SESSION['sign_in_user_level'] = 'admin';
 
         $caller = $this->getFilterCaller('hasSignedIn', 'before');
         $result = $caller();
