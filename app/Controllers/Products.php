@@ -334,57 +334,61 @@ class Products extends BaseController
         ]);
     }
 
-    public function removeProductsInDB()
+    public function deletes()
     {
-        $product_ids = explode(',',$this->request->getPost('product_ids', FILTER_SANITIZE_STRING));
-        $photo_products = $this->productsModel->findProducts($product_ids, 'foto_produk');
-        // remove product
-        if ($this->productsModel->removeProducts($product_ids) > 0) {
-            // remove photo product
-            foreach($photo_products as $p) {
-                if (file_exists('dist/images/product_photo/'.$p['foto_produk'])) {
-                    unlink('dist/images/product_photo/'.$p['foto_produk']);
+        $productIds = explode(',',$this->request->getPost('product_ids', FILTER_SANITIZE_STRING));
+        $productPhotos = $this->productsModel->finds($productIds, 'product_photo');
+
+        // delete product
+        if ($this->productsModel->delete($productIds)) {
+            // delete product photo
+            foreach($productPhotos as $p) {
+                if (file_exists('dist/images/product-photos/'.$p['product_photo'])) {
+                    unlink('dist/images/product-photos/'.$p['product_photo']);
                 }
             }
 
-            $count_product_id = count($product_ids);
-            $smallest_create_time = $this->request->getPost('smallest_create_time');
+            $countProductId = count($productIds);
+            $smallestEditedAt = $this->request->getPost('smallest_edited_at', FILTER_SANITIZE_STRING);
             $keyword = $this->request->getPost('keyword', FILTER_SANITIZE_STRING);
 
-            // if keyword !== null
-            if ($keyword !== null) {
-                // product total
-                $product_total = $this->productsModel->countAllProductSearch($keyword);
+            // if keyword != null
+            if ($keyword != null) {
+                // total product
+                $totalProduct = $this->productsModel->getTotalSearch($keyword);
                 // get longer product
-                $longer_products = $this->productsModel->getLongerProductSearches($count_product_id, $smallest_create_time, $keyword);
+                $longerProducts = $this->productsModel->searchLonger($countProductId, $smallestEditedAt, $keyword);
 
             } else {
-                // product total
-                $product_total = $this->productsModel->countAllProduct();
+                // total product
+                $totalProduct = $this->productsModel->getTotal();
                 // get longer product
-                $longer_products = $this->productsModel->getLongerProducts($count_product_id, $smallest_create_time);
+                $longerProducts = $this->productsModel->getAllLonger($countProductId, $smallestEditedAt);
             }
 
-            // add array indo create time to longer products array
-            $count_longer_products = count($longer_products);
-            for ($i = 0; $i < $count_longer_products; $i++) {
-                $longer_products[$i]['indo_create_time'] = $this->indo_time->toIndoLocalizedString($longer_products[$i]['waktu_buat']);
+            // convert timestamp
+            foreach ($longerProducts as $key => $value) {
+                $createdAt = Time::createFromFormat('Y-m-d H:i:s', $value['created_at']);
+                $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
+
+                $longerProducts[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM yyyy HH:mm');
+                $longerProducts[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM yyyy HH:mm');
             }
 
             return json_encode([
                 'status' => 'success',
-                'longer_products' => $longer_products,
-                'product_total' => $product_total,
-                'product_limit' => static::PRODUCT_LIMIT,
+                'longer_products' => $longerProducts,
+                'total_product' => $totalProduct,
+                'limit_product' => static::PRODUCT_LIMIT,
                 'csrf_value' => csrf_hash()
             ]);
         }
 
-        $error_message = 'Gagal menghapus produk, cek apakah masih ada transaksi yang terhubung! <a href="https://github.com/rezafikkri/Point-Of-Sales-Warung/wiki/Produk#gagal-menghapus-produk" target="_blank" rel="noreferrer noopener">Pelajari lebih lanjut!</a>';
+        $errorMessage = 'Gagal menghapus produk, cek apakah masih ada data transaksi yang terhubung!';
         return json_encode([
             'status' => 'fail',
-            'message' => $error_message,
-            'csrf_value'=>csrf_hash()
+            'message' => $errorMessage,
+            'csrf_value' => csrf_hash()
         ]);
     }
 }

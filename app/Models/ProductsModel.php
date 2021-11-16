@@ -53,35 +53,29 @@ class ProductsModel extends Model
                     ->countAllResults();
     }
 
-    public function removeProducts(array $product_ids): int
+    public function finds(array $productIds, string $column): array
     {
-        try {
-            $this->whereIn('produk_id', $product_ids)->delete();
-            return $this->db->affectedRows();
-        } catch (\ErrorException $e) {
-            return 0;
-        }
+        return $this->select($column)->find($productIds);
     }
 
-    public function getLongerProducts(int $limit, string $smallest_create_time): array
+    public function getAllLonger(int $limit, string $smallestEditedAt): array
     {
-        return $this->select('produk_id,nama_produk,status_produk,produk.waktu_buat,nama_kategori_produk')
-                    ->join('kategori_produk', 'kategori_produk.kategori_produk_id = produk.kategori_produk_id', 'INNER')
-                    ->limit($limit)->orderBy('produk.waktu_buat', 'DESC')->getWhere(['produk.waktu_buat <' => $smallest_create_time])
-                    ->getResultArray();
+        return $this->select('product_id, product_name, product_status, products.created_at, products.edited_at, product_category_name')
+                    ->join('product_categories', 'product_categories.product_category_id = products.product_category_id', 'INNER')
+                    ->limit($limit)->orderBy('products.edited_at', 'DESC')
+                    ->getWhere([
+                        'products.edited_at <' => $smallestEditedAt
+                    ])->getResultArray();
     }
 
-    public function getLongerProductSearches(int $limit, string $smallest_create_time, string $match): array
+    public function searchLonger(int $limit, string $smallestEditedAt, string $keyword): array
     {
-         return $this->select('produk_id,nama_produk,status_produk,produk.waktu_buat,nama_kategori_produk')
-                     ->join('kategori_produk', 'kategori_produk.kategori_produk_id = produk.kategori_produk_id', 'INNER')
-                     ->limit($limit)->orderBy('produk.waktu_buat', 'DESC')->like('nama_produk',$match,'after')
-                     ->getWhere(['produk.waktu_buat <' => $smallest_create_time])->getResultArray();
-    }
-
-    public function findProducts(array $product_ids, string $column): array
-    {
-        return $this->select($column)->whereIn('produk_id', $product_ids)->get()->getResultArray();
+         return $this->select('product_id, product_name, product_status, products.created_at, products.edited_at, product_category_name')
+                     ->join('product_categories', 'product_categories.product_category_id = products.product_category_id', 'INNER')
+                     ->limit($limit)->orderBy('products.edited_at', 'DESC')
+                     ->like('product_name', $keyword)->getWhere([
+                         'products.edited_at <' => $smallestEditedAt
+                     ])->getResultArray();
     }
 
     public function getBestsellerProducts(int $limit): array

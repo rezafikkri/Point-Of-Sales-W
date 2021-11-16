@@ -8,7 +8,7 @@ class UsersSeeder extends Seeder
 {
     public function run()
     {
-        $dateTime = date('Y-m-d H:i:s');
+        $dateTime = date('Y-m-d') . ' 05:40:10';
         $builder = $this->db->table('users');
 
         $data = [

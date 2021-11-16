@@ -50,6 +50,7 @@ $routes->group('admin', function ($routes) {
     $routes->get('produk/edit/(:segment)', 'Products::edit/$1');
     $routes->post('produk/memperbaharui', 'Products::update');
     $routes->post('produk/menghapus-harga-produk', 'Products::removeProductPrice');
+    $routes->post('produk/menghapus', 'Products::deletes');
 });
 
 $routes->get('sign_out', 'SignOut::index');
