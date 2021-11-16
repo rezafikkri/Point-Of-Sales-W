@@ -103,8 +103,8 @@ $this->extend('admin_layout');
         </div><!-- table-reponsive -->
 
     <?php
-        // if total product show = product limit
-        if ($countProduct == $productLimit) :
+        // if total product > product limit
+        if ($totalProduct > $productLimit) :
     ?>
         <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit ?> Produk terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>

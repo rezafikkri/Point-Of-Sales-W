@@ -144,7 +144,7 @@ productSearchElement.addEventListener('click', async (e) => {
 
         const limitMessageElement = document.querySelector('#limit-message');
         // add limit message if total product search = product limit && limit message not exists
-        if (responseJson.products.length == responseJson.product_limit && limitMessageElement == null) {
+        if (responseJson.total_product > responseJson.product_limit && limitMessageElement == null) {
             const spanElement = document.createElement('span');
             spanElement.classList.add('text-muted');
             spanElement.classList.add('d-block');
@@ -157,7 +157,7 @@ productSearchElement.addEventListener('click', async (e) => {
             tableElement.after(spanElement);
         }
         // else if total product search != product limit and limit message exists
-        else if (responseJson.products.length != responseJson.product_limit && limitMessageElement != null) {
+        else if (responseJson.total_product <= responseJson.product_limit && limitMessageElement != null) {
             limitMessageElement.remove();
         }
     } catch (error) {
@@ -303,9 +303,9 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
                 }
             }
 
-            // if total product in table < product limit and limit message exist
+            // if total product in table <= product limit and limit message exist
             const limitMessageElement = document.querySelector('span#limit-message');
-            if (countProductInTable < responseJson.limit_product && limitMessageElement != null) {
+            if (responseJson.total_product <= responseJson.limit_product && limitMessageElement != null) {
                 limitMessageElement.remove();
             }
         }
