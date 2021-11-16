@@ -40,7 +40,7 @@ $routes->group('admin', function ($routes) {
     $routes->post('kategori-produk/menyimpan', 'ProductCategories::store');
     $routes->get('kategori-produk/edit/(:segment)', 'ProductCategories::edit/$1');
     $routes->post('kategori-produk/memperbaharui', 'ProductCategories::update');
-    $routes->post('kategori-produk/menghapus', 'ProductCategories::remove');
+    $routes->post('kategori-produk/menghapus', 'ProductCategories::delete');
 
     $routes->get('produk', 'Products::index');
     $routes->get('produk/tampilkan-detail/(:segment)', 'Products::showDetails/$1');
@@ -49,7 +49,7 @@ $routes->group('admin', function ($routes) {
     $routes->get('produk/mencari/(:segment)', 'Products::search/$1');
     $routes->get('produk/edit/(:segment)', 'Products::edit/$1');
     $routes->post('produk/memperbaharui', 'Products::update');
-    $routes->post('produk/menghapus-harga-produk', 'Products::removeProductPrice');
+    $routes->post('produk/menghapus-harga-produk', 'Products::deleteProductPrice');
     $routes->post('produk/menghapus', 'Products::deletes');
 });
 

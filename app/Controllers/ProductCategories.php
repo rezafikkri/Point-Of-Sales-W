@@ -135,7 +135,7 @@ class ProductCategories extends BaseController
         return redirect()->to('/admin/kategori-produk/edit/' . $productCategoryId);
     }
 
-    public function remove()
+    public function delete()
     {
         $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
         /**

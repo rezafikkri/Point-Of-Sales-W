@@ -316,7 +316,7 @@ class Products extends BaseController
         return redirect()->to('/admin/produk/edit/' . $productId);
     }
 
-    public function removeProductPrice()
+    public function deleteProductPrice()
     {
         $productPriceId = $this->request->getPost('product_price_id', FILTER_SANITIZE_STRING);
         if ($this->productPricesModel->delete($productPriceId)) {
