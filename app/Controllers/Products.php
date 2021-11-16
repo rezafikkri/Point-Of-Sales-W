@@ -379,7 +379,7 @@ class Products extends BaseController
                 'status' => 'success',
                 'longer_products' => $longerProducts,
                 'total_product' => $totalProduct,
-                'limit_product' => static::PRODUCT_LIMIT,
+                'product_limit' => static::PRODUCT_LIMIT,
                 'csrf_value' => csrf_hash()
             ]);
         }

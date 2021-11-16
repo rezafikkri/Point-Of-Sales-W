@@ -305,7 +305,7 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
 
             // if total product in table <= product limit and limit message exist
             const limitMessageElement = document.querySelector('span#limit-message');
-            if (responseJson.total_product <= responseJson.limit_product && limitMessageElement != null) {
+            if (responseJson.total_product <= responseJson.product_limit && limitMessageElement != null) {
                 limitMessageElement.remove();
             }
         }
