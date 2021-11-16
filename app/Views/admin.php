@@ -17,7 +17,7 @@
             <h5>Transaksi</h5>
             <p>Dalam 2 bulan terakhir</p>
         </div>
-        <div class="chart__body"></div>
+        <div class="chart__body" id="chart-body"></div>
         <div class="d-flex justify-content-center" id="loading">
             <div class="loading"><div></div></div>
         </div>

@@ -66,7 +66,7 @@ function renderChart(transactionsTwoMonthsAgo)
         }
     };
 
-    const chart = new ApexCharts(document.querySelector('.chart .chart__body'), options);
+    const chart = new ApexCharts(document.querySelector('#chart-body'), options);
     chart.render();
 }
 

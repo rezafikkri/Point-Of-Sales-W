@@ -6,8 +6,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const response = await fetch(`${baseUrl}/admin/tampilkan-transaksi-dua-bulan-yang-lalu`);
     const responseJson = await response.json();
-
-    renderChart(responseJson);
+    
+    // if transaction two months ago exist
+    if (responseJson.length > 0) {
+        renderChart(responseJson);
+    } else {
+        document.querySelector('#chart-body').innerHTML = '<p class="text-muted mb-0">Transaksi tidak ada.</p>';
+    }
 
     // hide loading
     loadingElement.classList.add('d-none');
