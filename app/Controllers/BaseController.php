@@ -34,9 +34,25 @@ class BaseController extends Controller
      */
     protected $helpers = [];
 
-    // property for add delimiter messages
+    /**
+     * Open delimiter message for add delimiter message
+     * 
+     * @var string
+     */
     protected $openDelimiterMessage = '<small class="form-message form-message--danger">';
+
+    /**
+     * Close delimiter message for add delimiter message
+     * 
+     * @var string
+     */
     protected $closeDelimiterMessage = '</small>';
+
+    /**
+     * List field for ignore from add delimiter message
+     * 
+     * @var array
+     */
     protected $ignoreMessages;
 
     /**

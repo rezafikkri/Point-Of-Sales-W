@@ -3,7 +3,9 @@
 /**
  * This helper for help automatic generate active menu class for navbar menu
  *
- * $menuName is menu name for navbar menu
+ * @param string $menuName Contain menu name from navbar menu
+ *
+ * @return string|null
  */
 function active_menu(string $menuName): ?string
 {

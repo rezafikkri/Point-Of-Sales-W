@@ -2,6 +2,9 @@
 
 namespace App\Libraries;
 
+/**
+ * POSW custom rules for validation
+ */
 class POSWRules
 {
     public function __construct()

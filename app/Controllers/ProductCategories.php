@@ -140,7 +140,7 @@ class ProductCategories extends BaseController
         $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
         /**
          * in production and development,
-         * if insert success, function update() will be return true.
+         * if insert success, function delete() will be return true.
          * in production, if fail will be return false
          */
         if ($this->productCategoriesModel->delete($productCategoryId)) {

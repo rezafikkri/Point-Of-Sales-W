@@ -57,7 +57,12 @@ class ProductsModel extends Model
     {
         return $this->select($column)->find($productIds);
     }
-
+    
+    /**
+     * Get all longer product
+     * 
+     * This method use for get all longer product when delete product success
+     */
     public function getAllLonger(int $limit, string $smallestEditedAt): array
     {
         return $this->select('product_id, product_name, product_status, products.created_at, products.edited_at, product_category_name')
@@ -68,6 +73,11 @@ class ProductsModel extends Model
                     ])->getResultArray();
     }
 
+    /**
+     * Search all longer product
+     * 
+     * This method use for search longer product when delete product success
+     */
     public function searchLonger(int $limit, string $smallestEditedAt, string $keyword): array
     {
          return $this->select('product_id, product_name, product_status, products.created_at, products.edited_at, product_category_name')
