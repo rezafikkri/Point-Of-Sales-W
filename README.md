@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="POSW Logo" src="https://github.com/rezafikkri/Point-Of-Sales-Warung/blob/master/public/dist/images/posw.svg" width="300">
+  <img alt="POSW Logo" src="https://github.com/rezafikkri/Point-Of-Sales-W/blob/main/public/dist/images/posw.svg" width="300">
 </p>
 <h2 align="center">Point Of Sales W (POSW)</h2>
 
