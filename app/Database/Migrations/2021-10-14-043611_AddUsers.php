@@ -35,6 +35,10 @@ class AddUsers extends Migration
             ],
             'edited_at' => [
                 'type' => 'TIMESTAMP'
+            ],
+            'deleted_at' => [
+                'type' => 'TIMESTAMP',
+                'null' => true
             ]
         ]);
         $this->forge->createTable('users');
