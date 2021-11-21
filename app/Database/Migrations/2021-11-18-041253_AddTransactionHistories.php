@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class TransactionHistories extends Migration
+class AddTransactionHistories extends Migration
 {
     public function up()
     {

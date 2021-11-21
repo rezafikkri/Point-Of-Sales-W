@@ -14,7 +14,8 @@ class AddTransactionDetails extends Migration
                 'type' => 'UUID'
             ],
             'product_price_id' => [
-                'type' => 'UUID'
+                'type' => 'UUID',
+                'null' => true
             ],
             'product_quantity' => [
                 'type' => 'NUMERIC',
@@ -22,7 +23,7 @@ class AddTransactionDetails extends Migration
             ]
         ]);
         $this->forge->addForeignKey('transaction_id', 'transactions', 'transaction_id', 'NO ACTION', 'CASCADE');
-        $this->forge->addForeignKey('product_price_id', 'product_prices', 'product_price_id');
+        $this->forge->addForeignKey('product_price_id', 'product_prices', 'product_price_id', 'NO ACTION', 'SET NULL');
         $this->forge->createTable('transaction_details');
     }
 
