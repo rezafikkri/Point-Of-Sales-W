@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const responseJson = await response.json();
     
     // if transaction two months ago exist
-    if (responseJson.length > 0) {
+    if (responseJson.amount != undefined && responseJson.edited_at != undefined) {
         renderChart(responseJson);
     } else {
         document.querySelector('#chart-body').innerHTML = '<p class="text-muted mb-0">Transaksi tidak ada.</p>';
