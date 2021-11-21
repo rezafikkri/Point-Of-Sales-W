@@ -326,7 +326,7 @@ class Products extends BaseController
             ]);
         }
 
-        $errorMessage = 'Gagal menghapus harga produk, cek apakah masih ada data transaksi yang terhubung!';
+        $errorMessage = 'Gagal menghapus harga produk.';
         return json_encode([
             'status' => 'fail',
             'message' => $errorMessage,
@@ -384,7 +384,7 @@ class Products extends BaseController
             ]);
         }
 
-        $errorMessage = 'Gagal menghapus produk, cek apakah masih ada data transaksi yang terhubung!';
+        $errorMessage = 'Gagal menghapus produk.';
         return json_encode([
             'status' => 'fail',
             'message' => $errorMessage,

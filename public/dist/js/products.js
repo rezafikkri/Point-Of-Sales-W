@@ -313,12 +313,7 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
         else if (responseJson.status == 'fail') {
             const parentElement = document.querySelector('main.main');
             const referenceElement = document.querySelector('div.main__box');
-            const message = `
-                ${responseJson.message}
-                <a href="https://github.com/rezafikkri/Point-Of-Sales-W/wiki/Produk#gagal-menghapus-produk"
-                target="_blank" rel="noreferrer noopener">Pelajari lebih lanjut.</a>
-            `;
-            renderAlert(parentElement, referenceElement, message, [
+            renderAlert(parentElement, referenceElement, responseJson.message, [
                 'alert--warning',
                 'mb-3'
             ]);
