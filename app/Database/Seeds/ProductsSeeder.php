@@ -155,12 +155,6 @@ class ProductsSeeder extends Seeder
                 'product_price' => '20000'
             ],
             [
-                'product_price_id' => 'e8635498-273c-4c2d-8530-6d5223ffa83a',
-                'product_id' => $productIds[4],
-                'product_magnitude' => '1 Gelas',
-                'product_price' => '20000'
-            ],
-            [
                 'product_price_id' => 'c5b668a1-7db7-4557-8f4b-c691886b0ea4',
                 'product_id' => $productIds[5],
                 'product_magnitude' => '1 Buah',
