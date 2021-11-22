@@ -33,7 +33,7 @@ class SignIn extends BaseController
         $password = $this->request->getPost('password', FILTER_SANITIZE_STRING);
 
         $usersModel = new UsersModel();
-        $userSignIn = $usersModel->getUserSignIn($username);
+        $userSignIn = $usersModel->getSignIn($username);
 
         // if username is exist
         if($userSignIn) {

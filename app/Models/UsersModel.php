@@ -20,16 +20,17 @@ class UsersModel extends Model
     ];
     protected $useAutoIncrement = false;
 
-    public function getUserSignIn(string $username): ?array
+    public function getSignIn(string $username): ?array
     {
         return $this->select('full_name, level, password, user_id')->getWhere([
             'username' => $username
         ])->getRowArray();
     }
 
-    public function getUsers(): array
+    public function getAll(): array
     {
-        return $this->select('user_id, full_name, level, last_sign_in')->orderBy('full_name', 'ASC')->get()->getResultArray();
+        return $this->select('user_id, full_name, level, last_sign_in, created_at, edited_at')
+                    ->orderBy('full_name', 'ASC')->get()->getResultArray();
     }
 
     public function getTotal(): int
@@ -37,13 +38,8 @@ class UsersModel extends Model
         return $this->countAll();
     }
 
-    public function findUser(string $userId, string $column): ?array
+    public function getOne(string $userId, string $column): ?array
     {
-        return $this->select($column)->getWhere([$this->primaryKey => $userId])->getRowArray();
-    }
-
-    public function deleteUser(string $userId): int
-    {
-        return $this->where('user_id !=', $_SESSION['posw_user_id'])->delete($userId);
+        return $this->select($column)->getWhere(['user_id' => $userId])->getRowArray();
     }
 }

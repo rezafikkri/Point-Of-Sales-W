@@ -51,6 +51,8 @@ $routes->group('admin', function ($routes) {
     $routes->post('produk/memperbaharui', 'Products::update');
     $routes->post('produk/menghapus-harga-produk', 'Products::deleteProductPrice');
     $routes->post('produk/menghapus', 'Products::deletes');
+    
+    $routes->get('pengguna', 'Users::index');
 });
 
 $routes->get('sign_out', 'SignOut::index');
