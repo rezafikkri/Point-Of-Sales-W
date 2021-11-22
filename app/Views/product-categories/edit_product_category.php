@@ -2,9 +2,9 @@
 
 <?= $this->section('main') ?>
 <div class="container-xl">
-<header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-start">
+<header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Edit Kategori Produk</h4>
-    <a href="/admin/kategori-produk" class="btn btn--gray-outline">Kembali</a>
+    <a href="/admin/kategori-produk" class="btn btn--gray-outline text-center">Kembali</a>
 </header>
 
 <main class="main">

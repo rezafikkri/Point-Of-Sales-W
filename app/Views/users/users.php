@@ -11,16 +11,16 @@ $this->extend('admin_layout');
 <header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Pengguna</h4>
     
-    <div class="d-flex flex-column flex-sm-row justify-content-start justify-content-sm-end align-items-sm-start flex-fill">
-        <a href="/admin/pengguna/membuat" class="btn btn--gray-outline text-center me-0 me-sm-2 mb-3 mb-sm-0" title="Kotak sampah"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg></a>
-        <a href="/admin/pengguna/membuat" class="btn btn--blue text-center">Membuat Pengguna</a>
+    <div class="d-flex flex-column-reverse flex-sm-row justify-content-start justify-content-sm-end align-items-sm-start flex-fill">
+        <a href="/admin/pengguna/membuat" class="btn btn--gray-outline text-center me-0 me-sm-2" title="Kotak sampah"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg></a>
+        <a href="/admin/pengguna/membuat" class="btn btn--blue text-center mb-3 mb-sm-0">Membuat Pengguna</a>
     </div><!-- d-flex -->
 </header>
 
 <main class="main">
     <div class="main__box position-relative">
 
-        <div class="table-reponsive" data-csrf-name="<?= csrf_token(); ?>" data-csrf-value="<?= csrf_hash(); ?>">
+        <div class="table-responsive" id="table" data-csrf-name="<?= csrf_token(); ?>" data-csrf-value="<?= csrf_hash(); ?>">
          <table class="table table--auto-striped min-width-711">
             <thead>
                 <tr>

@@ -1,20 +1,20 @@
 import { renderAlert, postData } from './module.js';
 
-// remove product category
+// delete product category
 const tableElement = document.querySelector('#table');
 tableElement.querySelector('tbody').addEventListener('click', async (e) => {
     let targetElement = e.target;
 
-    if (targetElement.getAttribute('id') != 'remove-product-category') targetElement = targetElement.parentElement;
-    if (targetElement.getAttribute('id') != 'remove-product-category') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'delete-product-category') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'delete-product-category') targetElement = targetElement.parentElement;
 
-    if (targetElement.getAttribute('id') == 'remove-product-category') {
+    if (targetElement.getAttribute('id') == 'delete-product-category') {
         e.preventDefault();
 
         const loadingElement = document.querySelector('#loading');
         const baseUrl = document.querySelector('html').dataset.baseUrl;
 
-        // data for remove product category
+        // data for delete product category
         const productCategoryId = targetElement.dataset.productCategoryId;
         const csrfName = tableElement.dataset.csrfName;
         const csrfValue = tableElement.dataset.csrfValue;
@@ -33,11 +33,11 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
                 tableElement.dataset.csrfValue = responseJson.csrf_value;
             }
 
-            // if success remove product category
+            // if success delete product category
             if (responseJson.status == 'success') {
                 targetElement.parentElement.parentElement.remove();
             }
-            // else if fail remove product category
+            // else if fail delete product category
             else if (responseJson.status == 'fail') {
                 const parentElement = document.querySelector('main.main');
                 const referenceElement = document.querySelector('div.main__box');
