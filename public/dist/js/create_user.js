@@ -24,14 +24,4 @@ document.querySelector('#generate-password').addEventListener('click', (e) => {
 });
 
 // show password
-document.querySelector('form').addEventListener('click', (e) => {
-    let targetElement = e.target;
-
-    if (targetElement.getAttribute('id') != 'show-password') targetElement = targetElement.parentElement;
-    if (targetElement.getAttribute('id') != 'show-password') targetElement = targetElement.parentElement;
-    
-    if (targetElement.getAttribute('id') == 'show-password') {
-        e.preventDefault();
-        showPassword(targetElement);
-    }
-});
+document.querySelector('form').addEventListener('click', showPassword);
