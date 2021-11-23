@@ -16,7 +16,6 @@ class ProductCategories extends BaseController
         helper('active_menu');
 
         $data['title'] = 'Kategori Produk . POSW';
-        $data['page'] = 'kategori-produk';
         $data['productCategories'] = $this->productCategoriesModel->getAll('*');
 
         return view('product-categories/product_categories', $data);
@@ -27,7 +26,6 @@ class ProductCategories extends BaseController
         helper(['active_menu', 'form']);
 
         $data['title'] = 'Membuat Kategori Produk . POSW';
-        $data['page'] = 'membuat-kategori-produk';
 
         return view('product-categories/create_product_category', $data);
     }
@@ -82,7 +80,6 @@ class ProductCategories extends BaseController
         $productCategoryId = filter_var($productCategoryId, FILTER_SANITIZE_STRING);
 
         $data['title'] = 'Edit Kategori Produk . POSW';
-        $data['page'] = 'edit-kategori-produk';
         $data['productCategoryId'] = $productCategoryId;
         $data['productCategoryDB'] = $this->productCategoriesModel->getOne($productCategoryId);
 

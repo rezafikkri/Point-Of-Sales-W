@@ -22,7 +22,6 @@ class Products extends BaseController
         helper('active_menu');
 
         $data['title'] = 'Produk . POSW';
-        $data['page'] = 'produk';
 
         $data['totalProduct'] = $this->productsModel->getTotal();
         $data['products'] = $this->productsModel->getAll(static::PRODUCT_LIMIT);
@@ -180,7 +179,6 @@ class Products extends BaseController
         $productId = filter_var($productId, FILTER_SANITIZE_STRING);
 
         $data['title'] = 'Edit Produk . POSW';
-        $data['page'] = 'edit-produk';
         $data['productId'] = $productId;
         $data['productCategories'] = $this->productCategoriesModel->getAll('product_category_id, product_category_name');
         $data['product'] = $this->productsModel->getOne($productId);

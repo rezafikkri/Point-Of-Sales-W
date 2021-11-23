@@ -103,7 +103,6 @@ class Users extends BaseController
         $user_id = filter_var($user_id, FILTER_SANITIZE_STRING);
 
         $data['title'] = 'Perbaharui Pengguna . POSW';
-        $data['page'] = 'perbaharui_pengguna';
         $data['user_id'] = $user_id;
         $data['user_db'] = $this->model->findUser($user_id, 'full_name, username, tingkat');
 

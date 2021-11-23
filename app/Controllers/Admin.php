@@ -20,7 +20,6 @@ class Admin extends Controller
         $productsModel = new ProductsModel();
 
         $data['title'] = 'Home . POSW';
-        $data['page'] = 'home';
         $data['totalUser'] = $usersModel->getTotal();
         $data['totalProduct'] = $productsModel->getTotal();
         $data['totalTransaction'] = $this->transactionsModel->getTotal();
