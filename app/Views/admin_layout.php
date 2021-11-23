@@ -41,7 +41,7 @@
                 <li>
                     <hr>
                 </li>
-                <li><a href="/sign_out" class="text-hover-red">Sign Out</a></li>
+                <li><a href="/sign_out" class="text-hover-red">Keluar</a></li>
             </ul>
         </li>
     </ul>

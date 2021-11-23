@@ -13,7 +13,7 @@
     <!-- POSW CSS -->
     <link rel="stylesheet" href="<?= base_url('/dist/css/posw.min.css') ?>">
 
-    <title>Sign In . POSW</title>
+    <title>Masuk . POSW</title>
 </head>
 <body class="p-0">
 
@@ -21,7 +21,7 @@
     <div class="signin">
         <div class="signin__head text-center">
             <img src="<?= base_url('/dist/images/posw.svg') ?>" width="100" class="mb-4">
-            <h5 class="mb-4">Sign in ke POSW</h5>
+            <h5 class="mb-4">Masuk ke POSW</h5>
         </div><!-- sign in head -->
         <div class="signin__body">
             <?= form_open('/sign_in') ?>
@@ -43,7 +43,7 @@
                     <?= $_SESSION['errors']['password'] ?? null ?>
                 </div>
 
-                <button type="submit" class="btn btn--blue">Sign In</button>
+                <button type="submit" class="btn btn--blue">Masuk</button>
             </form>
         </div><!-- sign in body -->
         <div class="signin__footer mt-3">
