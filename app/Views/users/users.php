@@ -6,7 +6,7 @@ $this->extend('admin_layout');
 
 ?>
 
-<?= $this->section('main'); ?>
+<?= $this->section('main') ?>
 <div class="container-xl">
 <header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Pengguna</h4>
@@ -20,7 +20,7 @@ $this->extend('admin_layout');
 <main class="main">
     <div class="main__box position-relative">
 
-        <div class="table-responsive" id="table" data-csrf-name="<?= csrf_token(); ?>" data-csrf-value="<?= csrf_hash(); ?>">
+        <div class="table-responsive" id="table" data-csrf-name="<?= csrf_token() ?>" data-csrf-value="<?= csrf_hash() ?>">
          <table class="table table--auto-striped min-width-711">
             <thead>
                 <tr>
@@ -38,25 +38,25 @@ $this->extend('admin_layout');
                     $createdAt = Time::createFromFormat('Y-m-d H:i:s', $u['created_at']);
                     $editedAt = Time::createFromFormat('Y-m-d H:i:s', $u['edited_at']);
             ?>
-                <tr id="user<?= $u['user_id']; ?>">
+                <tr id="user<?= $u['user_id'] ?>">
                     <?php
                         // if user id = user id sign in
                         if ($u['user_id'] !== $_SESSION['sign_in_user_id']) :
                     ?>
-                    <td width="10"><a href="#" data-user-id="<?= $u['user_id']; ?>" data-full-name="<?= $u['full_name']; ?>" title="Mengapus pengguna" class="text-hover-red" id="delete-user"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg></a></td>
+                    <td width="10"><a href="#" data-user-id="<?= $u['user_id'] ?>" data-full-name="<?= $u['full_name'] ?>" title="Mengapus pengguna" class="text-hover-red" id="delete-user"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg></a></td>
                     <td width="10">
                     <?php else : ?>
                     <td width="10" colspan="2" class="text-center">
-                    <?php endif; ?>
-                        <a href="/admin/pengguna/edit/<?= $u['user_id']; ?>" title="Edit pengguna"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a>
+                    <?php endif ?>
+                        <a href="/admin/pengguna/edit/<?= $u['user_id'] ?>" title="Edit pengguna"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a>
                     </td>
-                    <td><?= $u['full_name']; ?></td>
-                    <td><?= ($u['level'] == 'admin') ? 'Admin' : 'Kasir'; ?></td>
-                    <td><?= $u['last_sign_in']; ?></td>
+                    <td><?= $u['full_name'] ?></td>
+                    <td><?= $u['level'] == 'admin' ? 'Admin' : 'Kasir' ?></td>
+                    <td><?= $u['last_sign_in'] ?></td>
                     <td><?= $createdAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
                     <td><?= $editedAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
                 </tr>
-            <?php endforeach; ?>
+            <?php endforeach ?>
             </tbody>
         </table>
         </div><!-- table-responsive -->
@@ -91,8 +91,8 @@ $this->extend('admin_layout');
         </div><!-- position-relative -->
     </div>
 </div><!-- modal -->
-<?= $this->endSection(); ?>
+<?= $this->endSection() ?>
 
-<?= $this->section('script'); ?>
-<script src="<?= base_url('dist/js/user.posw.min.js'); ?>"></script>
-<?= $this->endSection(); ?>
+<?= $this->section('script') ?>
+<script src="<?= base_url('dist/js/user.posw.min.js') ?>"></script>
+<?= $this->endSection() ?>

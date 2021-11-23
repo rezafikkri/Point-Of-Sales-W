@@ -16,62 +16,86 @@ class Users extends BaseController
         helper('active_menu');
 
         $data['title'] = 'Pengguna . POSW';
-        $data['page'] = 'pengguna';
         $data['users'] = $this->usersModel->getAll();
 
         return view('users/users', $data);
     }
 
-    public function createUser()
+    public function create()
     {
-        $data['title'] = 'Buat Pengguna . POSW';
-        $data['page'] = 'buat_pengguna';
+        helper(['active_menu', 'form']);
 
-        return view('user/create_user', $data);
+        $data['title'] = 'Membuat Pengguna . POSW';
+
+        return view('users/create_user', $data);
     }
 
-    public function saveUserToDB()
+    public function store()
     {
         if (!$this->validate([
             'full_name' => [
-                'label' => 'Nama lengkap',
-                'rules' => 'required|min_length[4]|max_length[32]',
-                'errors' => $this->generateIndoErrorMessages(['required','min_length','max_length'])
+                'label' => 'Nama Lengkap',
+                'rules' => 'required|min_length[4]|max_length[32]'
             ],
             'username' => [
                 'label' => 'Username',
-                'rules' => 'required|min_length[4]|max_length[32]|is_unique[pengguna.username]',
-                'errors' => $this->generateIndoErrorMessages(['required','min_length','max_length','is_unique'])
+                'rules' => 'required|min_length[4]|max_length[32]|is_unique[users.username]'
             ],
             'level' => [
                 'label' => 'Tingkat',
-                'rules' => 'in_list[admin,kasir]',
-                'errors' => $this->generateIndoErrorMessages(['in_list'])
+                'rules' => 'in_list[admin,cashier]'
             ],
             'password' => [
                 'label' => 'Password',
-                'rules' => 'required|min_length[8]',
-                'errors' => $this->generateIndoErrorMessages(['required','min_length'])
+                'rules' => 'required|min_length[8]'
+            ],
+            'user_sign_in_password' => [
+                'label' => 'Password Mu',
+                'rules' => 'required'
             ]
         ])) {
-            // set validation errors message to flash session
-            $this->session->setFlashData('form_errors', $this->setDelimiterMessages(
-                '<small class="form-message form-message--danger">',
-                '</small>',
-                $this->validator->getErrors()
-            ));
-
-            return redirect()->back()->withInput();
+            // set validation error messages to flash session
+            $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
+            return redirect()->to('/admin/pengguna/membuat')->withInput();
         }
 
-        $this->model->insert([
-            'pengguna_id' => generate_uuid(),
-            'nama_lengkap' => $this->request->getPost('full_name', FILTER_SANITIZE_STRING),
+        // check user sign in password
+        $userSignInPassword = $this->request->getPost('user_sign_in_password', FILTER_SANITIZE_STRING);
+        $passwordHash = $this->usersModel->getOne($_SESSION['sign_in_user_id'], 'password')['password'];
+        
+        if (!password_verify($userSignInPassword, $passwordHash)) {
+            // set validation error messages to flash session
+            $this->session->setFlashData('errors', $this->addDelimiterMessages([
+                'user_sign_in_password' => 'Password salah.'
+            ]));
+            return redirect()->to('/admin/pengguna/membuat')->withInput();
+        }
+        
+        helper('generate_uuid');
+
+        $createdAt = date('Y-m-d H:i:s');
+        $insertUser = $this->usersModel->insert([
+            'user_id' => generate_uuid(),
+            'full_name' => $this->request->getPost('full_name', FILTER_SANITIZE_STRING),
             'username' => $this->request->getPost('username', FILTER_SANITIZE_STRING),
-            'tingkat' => $this->request->getPost('level', FILTER_SANITIZE_STRING),
-            'password' => password_hash($this->request->getPost('password', FILTER_SANITIZE_STRING), PASSWORD_DEFAULT)
+            'level' => $this->request->getPost('level', FILTER_SANITIZE_STRING),
+            'password' => password_hash($this->request->getPost('password', FILTER_SANITIZE_STRING), PASSWORD_DEFAULT),
+            'created_at' => $createdAt,
+            'edited_at' => $createdAt
         ]);
-        return redirect()->to('/admin/pengguna');
+
+        // if success create user
+        if ($insertUser) {
+            return redirect()->to('/admin/pengguna');
+        }
+
+        // make error message
+        $this->openDelimiterMessage = '<div class="alert alert--warning mb-3"><span class="alert__icon"></span><p>';
+        $this->closeDelimiterMessage = '</p><a class="alert__close" href="#"></a></div>';
+        $this->session->setFlashData('errors', $this->addDelimiterMessages([
+            'create_user' => 'User gagal dibuat. Silahkan coba kembali!'
+        ]));
+        return redirect()->to('/admin/pengguna/membuat');
     }
 
     public function updateUser(string $user_id)
@@ -81,7 +105,7 @@ class Users extends BaseController
         $data['title'] = 'Perbaharui Pengguna . POSW';
         $data['page'] = 'perbaharui_pengguna';
         $data['user_id'] = $user_id;
-        $data['user_db'] = $this->model->findUser($user_id, 'nama_lengkap, username, tingkat');
+        $data['user_db'] = $this->model->findUser($user_id, 'full_name, username, tingkat');
 
         return view('user/update_user', $data);
     }
@@ -113,7 +137,7 @@ class Users extends BaseController
             ],
             'username' => [
                 'label' => 'Username',
-                'rules' => 'required|min_length[4]|max_length[32]|is_unique[pengguna.username,pengguna_id,'.$user_id.']',
+                'rules' => 'required|min_length[4]|max_length[32]|is_unique[pengguna.username,user_id,'.$user_id.']',
                 'errors' => $this->generateIndoErrorMessages(['required','min_length','max_length','is_unique'])
             ],
             'level' => [
@@ -146,7 +170,7 @@ class Users extends BaseController
 
         // generate array update data
         $data_update = [
-            'nama_lengkap' => $this->request->getPost('full_name', FILTER_SANITIZE_STRING),
+            'full_name' => $this->request->getPost('full_name', FILTER_SANITIZE_STRING),
             'username' => $this->request->getPost('username', FILTER_SANITIZE_STRING),
             'tingkat' => $this->request->getPost('level', FILTER_SANITIZE_STRING)
         ];

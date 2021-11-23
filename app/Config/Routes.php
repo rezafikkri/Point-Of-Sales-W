@@ -53,6 +53,8 @@ $routes->group('admin', function ($routes) {
     $routes->post('produk/menghapus', 'Products::deletes');
     
     $routes->get('pengguna', 'Users::index');
+    $routes->get('pengguna/membuat', 'Users::create');
+    $routes->post('pengguna/menyimpan', 'Users::store');
 });
 
 $routes->get('sign_out', 'SignOut::index');
