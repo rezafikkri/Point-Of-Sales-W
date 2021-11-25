@@ -17,7 +17,7 @@ $this->extend('admin_layout');
     </div><!-- d-flex -->
 </header>
 
-<main class="main">
+<main class="main mb-5">
     <div class="main__box position-relative">
 
         <div class="table-responsive" id="table" data-csrf-name="<?= csrf_token() ?>" data-csrf-value="<?= csrf_hash() ?>">

@@ -243,7 +243,7 @@ class Products extends BaseController
 
         // validate data
         if (!$this->validate($validationData)) {
-            // set validation errors message to flash session
+            // set validation error messages to flash session
             $this->ignoreMessages = ['product_magnitudes', 'product_prices'];
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
             return redirect()->to('/admin/produk/edit/' . $productId)->withInput();

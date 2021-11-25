@@ -37,7 +37,7 @@
 
         <li class="dropdown"><a href="" class="dropdown-toggle" target=".dropdown-menu"><?= $_SESSION['sign_in_user_full_name']  ?></a>
             <ul class="dropdown-menu dropdown-menu--end d-none">
-                <li><a href="/admin/perbaharui_pengguna/<?= $_SESSION['sign_in_user_id'] ?>">Pengaturan</a></li>
+                <li><a href="/admin/pengguna/edit/<?= $_SESSION['sign_in_user_id'] ?>">Pengaturan</a></li>
                 <li>
                     <hr>
                 </li>

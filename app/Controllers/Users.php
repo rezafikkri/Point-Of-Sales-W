@@ -98,96 +98,98 @@ class Users extends BaseController
         return redirect()->to('/admin/pengguna/membuat');
     }
 
-    public function updateUser(string $user_id)
+    public function edit(string $userId)
     {
-        $user_id = filter_var($user_id, FILTER_SANITIZE_STRING);
+        helper(['active_menu', 'form']);
 
-        $data['title'] = 'Perbaharui Pengguna . POSW';
-        $data['user_id'] = $user_id;
-        $data['user_db'] = $this->model->findUser($user_id, 'full_name, username, tingkat');
+        $userId = filter_var($userId, FILTER_SANITIZE_STRING);
 
-        return view('user/update_user', $data);
+        $data['title'] = 'Edit Pengguna . POSW';
+        $data['userId'] = $userId;
+        $data['user'] = $this->usersModel->getOne($userId, 'full_name, username, level');
+
+        return view('users/edit_user', $data);
     }
 
-    public function updateUserInDB()
+    public function update()
     {
-        $user_id = $this->request->getPost('user_id', FILTER_SANITIZE_STRING);
+        $userId = $this->request->getPost('user_id', FILTER_SANITIZE_STRING);
 
-        // check password sign in user
-        $password_sign_in_user = $this->request->getPost('password_sign_in_user', FILTER_SANITIZE_STRING);
-        $password_db = $this->model->findUser($_SESSION['posw_user_id'], 'password')['password'];
-        $check_password = check_password_sign_in_user($password_sign_in_user, $password_db);
-        if ($check_password !== 'yes') {
-            // make password errors message
-            $this->session->setFlashData('form_errors', $this->setDelimiterMessages(
-                '<small class="form-message form-message--danger">',
-                '</small>',
-                ['password_sign_in_user' => $check_password]
-            ));
-            return redirect()->back();
-        }
-
-        // generate array validate
-        $data_validate = [
+        // generate validation data
+        $validationData = [
             'full_name' => [
-                'label' => 'Nama lengkap',
-                'rules' => 'required|min_length[4]|max_length[32]',
-                'errors' => $this->generateIndoErrorMessages(['required','min_length','max_length'])
+                'label' => 'Nama Lengkap',
+                'rules' => 'required|min_length[4]|max_length[32]'
             ],
             'username' => [
                 'label' => 'Username',
-                'rules' => 'required|min_length[4]|max_length[32]|is_unique[pengguna.username,user_id,'.$user_id.']',
-                'errors' => $this->generateIndoErrorMessages(['required','min_length','max_length','is_unique'])
+                'rules' => "required|min_length[4]|max_length[32]|is_unique[users.username,user_id,$userId]"
             ],
             'level' => [
                 'label' => 'Tingkat',
-                'rules' => 'in_list[admin,kasir]',
-                'errors' => $this->generateIndoErrorMessages(['in_list'])
+                'rules' => 'in_list[admin,cashier]'
+            ],
+            'user_sign_in_password' => [
+                'label' => 'Password Mu',
+                'rules' => 'required'
             ]
         ];
 
         $password = $this->request->getPost('password', FILTER_SANITIZE_STRING);
         if (!empty(trim($password))) {
-            $data_validate = array_merge($data_validate, [
-                'password' => [
-                    'label' => 'Password',
-                    'rules' => 'min_length[8]',
-                    'errors' => $this->generateIndoErrorMessages(['min_length'])
-                ]
-            ]);
+            $validationData['password'] = [
+                'label' => 'Password',
+                'rules' => 'min_length[8]'
+            ];
         }
 
-        if (!$this->validate($data_validate)) {
-            // set validation errors message to flash session
-            $this->session->setFlashData('form_errors', $this->setDelimiterMessages(
-                '<small class="form-message form-message--danger">',
-                '</small>',
-                $this->validator->getErrors()
-            ));
-            return redirect()->back();
+        // validate data
+        if (!$this->validate($validationData)) {
+            // set validation error messages to flash session
+            $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
+            return redirect()->to('/admin/pengguna/edit/' . $userId)->withInput();
         }
 
-        // generate array update data
-        $data_update = [
+        // check user sign in password
+        $userSignInPassword = $this->request->getPost('user_sign_in_password', FILTER_SANITIZE_STRING);
+        $passwordHash = $this->usersModel->getOne($_SESSION['sign_in_user_id'], 'password')['password'];
+        
+        if (!password_verify($userSignInPassword, $passwordHash)) {
+            // set validation error messages to flash session
+            $this->session->setFlashData('errors', $this->addDelimiterMessages([
+                'user_sign_in_password' => 'Password salah.'
+            ]));
+            return redirect()->to('/admin/pengguna/edit/' . $userId)->withInput();
+        }
+
+        // generate user update data
+        $userUpdateData = [
             'full_name' => $this->request->getPost('full_name', FILTER_SANITIZE_STRING),
             'username' => $this->request->getPost('username', FILTER_SANITIZE_STRING),
-            'tingkat' => $this->request->getPost('level', FILTER_SANITIZE_STRING)
+            'level' => $this->request->getPost('level', FILTER_SANITIZE_STRING)
         ];
 
         if (!empty(trim($password))) {
-            $data_update = array_merge($data_update, ['password' => password_hash($password, PASSWORD_DEFAULT)]);
+            $userUpdateData['password'] = password_hash($password, PASSWORD_DEFAULT);
         }
 
-        // update data
-        if ($this->model->update($user_id, $data_update)) {
-            // make success message
-            $this->session->setFlashData('form_success', $this->setDelimiterMessages(
-                '<div class="alert alert--success mb-3"><span class="alert__icon"></span><p>',
-                '</p><a class="alert__close" href="#"></a></div>',
-                ['update_user' => 'Pengguna telah diperbaharui.']
-            ));
+        // if success update product category
+        if ($this->usersModel->update($userId, $userUpdateData)) {
+            $message = 'User berhasil diedit.';
+            $alertType = 'success';
+            $flashMessageName = 'success';
+        } else {
+            $message = 'User gagal diedit. Silahkan coba kembali!';
+            $alertType = 'warning';
+            $flashMessageName = 'errors';
         }
-        return redirect()->back();
+
+        $this->openDelimiterMessage = "<div class=\"alert alert--$alertType mb-3\"><span class=\"alert__icon\"></span><p>";
+        $this->closeDelimiterMessage = '</p><a class="alert__close" href="#"></a></div>';
+        $this->session->setFlashData($flashMessageName, $this->addDelimiterMessages([
+            'edit_user' => $message
+        ]));
+        return redirect()->to('/admin/pengguna/edit/' . $userId);
     }
 
     public function removeUserInDB()

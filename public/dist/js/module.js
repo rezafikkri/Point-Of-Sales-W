@@ -44,13 +44,14 @@ function addFormInputMagnitudePrice(targetElement)
 
 function showPassword(e)
 {
-	e.preventDefault();
 	let targetElement = e.target;
 
     if (targetElement.getAttribute('id') != 'show-password') targetElement = targetElement.parentElement;
     if (targetElement.getAttribute('id') != 'show-password') targetElement = targetElement.parentElement;
     
     if (targetElement.getAttribute('id') == 'show-password') {
+	    e.preventDefault();
+
     	const inputElement = targetElement.previousElementSibling;
     	if(inputElement.getAttribute('type') == 'password') {
     	    inputElement.setAttribute('type', 'text');
