@@ -192,33 +192,39 @@ class Users extends BaseController
         return redirect()->to('/admin/pengguna/edit/' . $userId);
     }
 
-    public function removeUserInDB()
+    public function delete()
     {
-        // check password sign in user
-        $password = $this->request->getPost('password', FILTER_SANITIZE_STRING);
-        $password_db = $this->model->findUser($_SESSION['posw_user_id'], 'password')['password'];
-        $check_password = check_password_sign_in_user($password, $password_db);
-        if ($check_password !== 'yes') {
+        // check user sign in password
+        $userSignInPassword = $this->request->getPost('user_sign_in_password', FILTER_SANITIZE_STRING);        
+        if (empty(trim($userSignInPassword))) {
             return json_encode([
                 'status' => 'wrong_password',
-                'message' => $check_password,
+                'message' => 'Bidang Password Mu diperlukan.',
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+        
+        $passwordHash = $this->usersModel->getOne($_SESSION['sign_in_user_id'], 'password')['password'];
+        if (!password_verify($userSignInPassword, $passwordHash)) {
+            return json_encode([
+                'status' => 'wrong_password',
+                'message' => 'Password salah.',
                 'csrf_value' => csrf_hash()
             ]);
         }
 
-        $user_id = $this->request->getPost('user_id', FILTER_SANITIZE_STRING);
-        if ($this->model->removeUser($user_id) > 0) {
+        $userId = $this->request->getPost('user_id', FILTER_SANITIZE_STRING);
+        if ($this->usersModel->delete($userId) > 0) {
             return json_encode([
                 'status' => 'success',
                 'csrf_value' => csrf_hash()
             ]);
         }
 
-        $error_message = 'Gagal menghapus pengguna, cek apakah masih ada transaksi yang terhubung! <a href="https://github.com/rezafikkri/Point-Of-Sales-Warung/wiki/Pengguna#gagal-menghapus-pengguna" target="_blank" rel="noreferrer noopener">Pelajari lebih lanjut!</a>';
         return json_encode([
             'status' => 'fail',
-            'message' => $error_message,
-            'csrf_value'=>csrf_hash()
+            'message' => 'Gagal menghapus pengguna.',
+            'csrf_value' => csrf_hash()
         ]);
     }
 }

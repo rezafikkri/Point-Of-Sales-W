@@ -57,6 +57,7 @@ $routes->group('admin', function ($routes) {
     $routes->post('pengguna/menyimpan', 'Users::store');
     $routes->get('pengguna/edit/(:segment)', 'Users::edit/$1');
     $routes->post('pengguna/memperbaharui', 'Users::update');
+    $routes->post('pengguna/menghapus', 'Users::delete');
 });
 
 $routes->get('sign_out', 'SignOut::index');

@@ -20,27 +20,29 @@ class UsersModel extends Model
         'deleted_at'
     ];
     protected $useAutoIncrement = false;
+    protected $useSoftDeletes = true;
 
     public function getSignIn(string $username): ?array
     {
-        return $this->select('full_name, level, password, user_id')->getWhere([
-            'username' => $username
-        ])->getRowArray();
+        return $this->select('full_name, level, password, user_id')
+                    ->where('deleted_at IS NULL', '', false)->getWhere([
+                        'username' => $username
+                    ])->getRowArray();
     }
 
     public function getAll(): array
     {
         return $this->select('user_id, full_name, level, last_sign_in, created_at, edited_at')
-                    ->orderBy('full_name', 'ASC')->get()->getResultArray();
+                    ->orderBy('full_name', 'ASC')->where('deleted_at IS NULL', '', false)->get()->getResultArray();
     }
 
     public function getTotal(): int
     {
-        return $this->countAll();
+        return $this->where('deleted_at IS NULL', '', false)->countAll();
     }
 
     public function getOne(string $userId, string $column): ?array
     {
-        return $this->select($column)->getWhere(['user_id' => $userId])->getRowArray();
+        return $this->select($column)->where('deleted_at IS NULL', '', false)->getWhere(['user_id' => $userId])->getRowArray();
     }
 }

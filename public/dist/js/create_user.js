@@ -14,7 +14,9 @@ function generatePassword(inputElement)
 
 // generate passsword when document loaded
 const inputElement = document.querySelector('input[name="password"]')
-generatePassword(inputElement);
+document.addEventListener('DOMContentLoaded', () => {
+    generatePassword(inputElement);
+});
 
 // generate password when button clicked
 document.querySelector('#generate-password').addEventListener('click', (e) => {

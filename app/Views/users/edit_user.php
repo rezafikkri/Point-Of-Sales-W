@@ -33,7 +33,7 @@
                         for ($i = 0; $i < 2; $i++) :
                     ?>
                         <option value="<?= $levels[$i] ?>"
-                        <?= $levels[$i] == $user['level'] ? 'selected' : '' ?>>
+                        <?= $levels[$i] == ($user['level'] ?? null) ? 'selected' : '' ?>>
                             <?= $levels[$i] == 'cashier' ? 'Kasir' : 'Admin' ?>
                         </option>
                     <?php endfor ?>
