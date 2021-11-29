@@ -37,6 +37,7 @@ $this->extend('admin_layout');
                 foreach ($users as $u) :
                     $createdAt = Time::createFromFormat('Y-m-d H:i:s', $u['created_at']);
                     $editedAt = Time::createFromFormat('Y-m-d H:i:s', $u['edited_at']);
+                    $lastSignIn = Time::createFromFormat('Y-m-d H:i:s', $u['last_sign_in']);
             ?>
                 <tr id="user<?= $u['user_id'] ?>">
                     <?php
@@ -52,7 +53,7 @@ $this->extend('admin_layout');
                     </td>
                     <td><?= $u['full_name'] ?></td>
                     <td><?= $u['level'] == 'admin' ? 'Admin' : 'Kasir' ?></td>
-                    <td><?= $u['last_sign_in'] ?></td>
+                    <td><?= $lastSignIn->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
                     <td><?= $createdAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
                     <td><?= $editedAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
                 </tr>
