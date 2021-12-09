@@ -6,9 +6,9 @@ const productSearchElement = document.querySelector('a#search-product');
 // show hide product detail
 tableElement.querySelector('tbody').addEventListener('click', async (e) => {
     let targetElement = e.target;
-    if (targetElement.getAttribute('id') !== 'show-product-detail') targetElement = targetElement.parentElement;
-    if (targetElement.getAttribute('id') !== 'show-product-detail') targetElement = targetElement.parentElement;
-    if (targetElement.getAttribute('id') === 'show-product-detail') {
+    if (targetElement.getAttribute('id') != 'show-product-detail') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'show-product-detail') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') == 'show-product-detail') {
         e.preventDefault();
         
         /**
@@ -16,7 +16,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
          * is element with table__row-detail class, or is mean product detail exists in table
          */
         const tableRowDetailElement = targetElement.parentElement.parentElement.nextElementSibling;
-        if (tableRowDetailElement !== null && tableRowDetailElement.classList.contains('table__row-detail')) {
+        if (tableRowDetailElement != null && tableRowDetailElement.classList.contains('table__row-detail')) {
             tableRowDetailElement.classList.toggle('table__row-detail--show');
         // else, is mean product detail not exists in table
         } else {
@@ -29,7 +29,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
             productSearchElement.classList.add('btn--disabled');
 
             try {
-                const response = await fetch(`${baseUrl}/admin/produk/tampilkan-detail/${productId}`);
+                const response = await fetch(`${baseUrl}/admin/product/show-details/${productId}`);
                 const responseJson = await response.json();
 
                 // set new csrf hash to table tag
@@ -85,7 +85,7 @@ productSearchElement.addEventListener('click', async (e) => {
     try {
         const resultStatusElement = document.querySelector('span#result-status');
 
-        const response = await fetch(`${baseUrl}/admin/produk/mencari/${keyword}`);
+        const response = await fetch(`${baseUrl}/admin/product/search/${keyword}`);
         const responseJson = await response.json();
 
         // if product exists
@@ -105,7 +105,7 @@ productSearchElement.addEventListener('click', async (e) => {
                             class="form-check-input" value="${p.product_id}">
                         </div>
                     </td>
-                    <td width="10"><a href="/admin/produk/edit/${p.product_id}" title="Ubah Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
+                    <td width="10"><a href="/admin/product/edit/${p.product_id}" title="Ubah Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
                     <td width="10"><a href="#" id="show-product-detail" data-product-id="${p.product_id}" title="Lihat detail produk"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
                     <td>${p.product_name}</td>
@@ -215,7 +215,7 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
     productSearchElement.classList.add('btn--disabled');
     
     try {
-        const responseJson = await postData(`${baseUrl}/admin/produk/menghapus`, data);
+        const responseJson = await postData(`${baseUrl}/admin/product/deletes`, data);
 
         // set new csrf hash to table tag
         if (responseJson.csrf_value != undefined) {
@@ -252,7 +252,7 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
                                 <input type="checkbox" name="product_id" data-edited-at="${p.edited_at}" class="form-check-input" value="${p.product_id}">
                             </div>
                         </td>
-                        <td width="10"><a href="/admin/produk/edit/${p.product_id}" title="Edit Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
+                        <td width="10"><a href="/admin/product/edit/${p.product_id}" title="Edit Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
                         <td width="10"><a href="#" id="show-product-detail" data-product-id="${p.product_id}" title="Tampilkan detail produk"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
                         <td>${p.product_name}</td>

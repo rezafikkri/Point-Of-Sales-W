@@ -41,9 +41,9 @@ class Filters extends BaseConfig
         'after' => [
             'toolbar' => [
                 'except' => [
-                    'admin/tampilkan-transaksi-dua-bulan-yang-lalu',
-                    'admin/produk/tampilkan-detail/*',
-                    'admin/produk/mencari/*'
+                    'admin/show-transactions-two-months-ago',
+                    'admin/product/show-details/*',
+                    'admin/product/search/*'
                 ]
             ],
             // 'honeypot',

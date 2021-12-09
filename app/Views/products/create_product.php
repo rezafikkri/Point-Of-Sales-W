@@ -4,7 +4,7 @@
 <div class="container-xl">
 <header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Membuat Produk</h4>
-    <a href="/admin/produk" class="btn btn--gray-outline text-center">Batal</a>
+    <a href="/admin/product" class="btn btn--gray-outline text-center">Batal</a>
 </header>
 
 <main class="main mb-5">
@@ -12,7 +12,7 @@
     <div class="col-md-8">
         <?= $_SESSION['errors']['create_product'] ?? null ?>
         <div class="main__box">
-            <?= form_open_multipart('/admin/produk/menyimpan') ?>
+            <?= form_open_multipart('/admin/product/store') ?>
                 <div class="mb-3">
                     <label class="form-label" for="category-product">Kategori Produk</label>
                     <select class="form-select" name="product_category" id="category-product">

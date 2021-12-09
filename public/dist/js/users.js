@@ -61,7 +61,7 @@ modalContentElement.querySelector('#delete-user').addEventListener('click', asyn
     
     try {
         const responseJson = await postData(
-            `${baseUrl}/admin/pengguna/menghapus`,
+            `${baseUrl}/admin/user/delete`,
             `${csrfName}=${csrfValue}&user_id=${userId}&user_sign_in_password=${userSignInPassword}`
         );
 

@@ -56,7 +56,7 @@ class Users extends BaseController
         ])) {
             // set validation error messages to flash session
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->to('/admin/pengguna/membuat')->withInput();
+            return redirect()->to('/admin/user/create')->withInput();
         }
 
         // check user sign in password
@@ -68,7 +68,7 @@ class Users extends BaseController
             $this->session->setFlashData('errors', $this->addDelimiterMessages([
                 'user_sign_in_password' => 'Password salah.'
             ]));
-            return redirect()->to('/admin/pengguna/membuat')->withInput();
+            return redirect()->to('/admin/user/create')->withInput();
         }
         
         helper('generate_uuid');
@@ -86,7 +86,7 @@ class Users extends BaseController
 
         // if success create user
         if ($insertUser) {
-            return redirect()->to('/admin/pengguna');
+            return redirect()->to('/admin/users');
         }
 
         // make error message
@@ -95,7 +95,7 @@ class Users extends BaseController
         $this->session->setFlashData('errors', $this->addDelimiterMessages([
             'create_user' => 'User gagal dibuat. Silahkan coba kembali!'
         ]));
-        return redirect()->to('/admin/pengguna/membuat');
+        return redirect()->to('/admin/user/create');
     }
 
     public function edit(string $userId)
@@ -147,7 +147,7 @@ class Users extends BaseController
         if (!$this->validate($validationData)) {
             // set validation error messages to flash session
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->to('/admin/pengguna/edit/' . $userId)->withInput();
+            return redirect()->to('/admin/user/edit/' . $userId)->withInput();
         }
 
         // check user sign in password
@@ -159,7 +159,7 @@ class Users extends BaseController
             $this->session->setFlashData('errors', $this->addDelimiterMessages([
                 'user_sign_in_password' => 'Password salah.'
             ]));
-            return redirect()->to('/admin/pengguna/edit/' . $userId)->withInput();
+            return redirect()->to('/admin/user/edit/' . $userId)->withInput();
         }
 
         // generate user update data
@@ -189,7 +189,7 @@ class Users extends BaseController
         $this->session->setFlashData($flashMessageName, $this->addDelimiterMessages([
             'edit_user' => $message
         ]));
-        return redirect()->to('/admin/pengguna/edit/' . $userId);
+        return redirect()->to('/admin/user/edit/' . $userId);
     }
 
     public function delete()

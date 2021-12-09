@@ -24,7 +24,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
 
         try {
             const responseJson = await postData(
-                `${baseUrl}/admin/kategori-produk/menghapus`,
+                `${baseUrl}/admin/product-category/delete`,
                 `${csrfName}=${csrfValue}&product_category_id=${productCategoryId}`
             );
 

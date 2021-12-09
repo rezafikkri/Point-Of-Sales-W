@@ -4,7 +4,7 @@
 <div class="container-xl">
 <header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Edit Produk</h4>
-    <a href="/admin/produk" class="btn btn--gray-outline text-center">Kembali</a>
+    <a href="/admin/products" class="btn btn--gray-outline text-center">Kembali</a>
 </header>
 
 <main class="main mb-5" data-csrf-name="<?= csrf_token() ?>">
@@ -13,7 +13,7 @@
         <?= $_SESSION['errors']['edit_product'] ?? null ?>
         <?= $_SESSION['success']['edit_product'] ?? null ?>
         <div class="main__box position-relative">
-            <?= form_open_multipart('/admin/produk/memperbaharui') ?>
+            <?= form_open_multipart('/admin/product/update') ?>
                 <input type="hidden" name="product_id" value="<?= $productId ?>">
                 <div class="mb-3">
                     <label class="form-label" for="product-category">Kategori Produk</label>

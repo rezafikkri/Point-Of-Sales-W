@@ -40,7 +40,7 @@ class ProductCategories extends BaseController
         ])) {
             // set validation error messages to flash session
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->to('/admin/kategori-produk/membuat')->withInput();
+            return redirect()->to('/admin/product-category/create')->withInput();
         }
 
         helper('generate_uuid');
@@ -61,7 +61,7 @@ class ProductCategories extends BaseController
 
         // if success create product category
         if ($insertProductCategory == true) {
-            return redirect()->to('/admin/kategori-produk');
+            return redirect()->to('/admin/product-categories');
         }
 
         // make error message
@@ -70,7 +70,7 @@ class ProductCategories extends BaseController
         $this->session->setFlashData('errors', $this->addDelimiterMessages([
             'create_product_category' => 'Kategori produk gagal dibuat. Silahkan coba kembali!'
         ]));
-        return redirect()->to('/admin/kategori-produk/membuat');
+        return redirect()->to('/admin/product-category/create');
     }
 
     public function edit(string $productCategoryId)
@@ -98,7 +98,7 @@ class ProductCategories extends BaseController
         ])) {
             // set validation error messages to flash session
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->to('/admin/kategori-produk/edit/' . $productCategoryId);
+            return redirect()->to('/admin/product-category/edit/' . $productCategoryId);
         }
 
         $productCategoryName = $this->request->getPost('product_category_name', FILTER_SANITIZE_STRING);
@@ -129,7 +129,7 @@ class ProductCategories extends BaseController
         $this->session->setFlashData($flashMessageName, $this->addDelimiterMessages([
             'edit_product_category' => $message
         ]));
-        return redirect()->to('/admin/kategori-produk/edit/' . $productCategoryId);
+        return redirect()->to('/admin/product-category/edit/' . $productCategoryId);
     }
 
     public function delete()

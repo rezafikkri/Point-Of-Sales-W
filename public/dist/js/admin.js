@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadingElement = document.querySelector('#loading');
     const baseUrl = document.querySelector('html').dataset.baseUrl;
 
-    const response = await fetch(`${baseUrl}/admin/tampilkan-transaksi-dua-bulan-yang-lalu`);
+    const response = await fetch(`${baseUrl}/admin/show-transactions-two-months-ago`);
     const responseJson = await response.json();
     
     // if transaction two months ago exist

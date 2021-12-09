@@ -33,7 +33,7 @@ magnitudePriceElement.addEventListener('click', async (e) => {
             
             try {
                 const responseJson = await postData(
-                    `${baseUrl}/admin/produk/menghapus-harga-produk`,
+                    `${baseUrl}/admin/product/delete-product-price`,
                     `${csrfName}=${csrfValue}&product_price_id=${productPriceId}`
                 );
 

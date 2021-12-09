@@ -33,31 +33,31 @@ $routes->setAutoRoute(false);
 // route since we don't have to scan directories.
 $routes->group('admin', function ($routes) {
     $routes->get('', 'Admin::index');
-    $routes->get('tampilkan-transaksi-dua-bulan-yang-lalu', 'Admin::showTransactionsTwoMonthsAgo');
+    $routes->get('show-transactions-two-months-ago', 'Admin::showTransactionsTwoMonthsAgo');
 
-    $routes->get('kategori-produk', 'ProductCategories::index');
-    $routes->get('kategori-produk/membuat', 'ProductCategories::create');
-    $routes->post('kategori-produk/menyimpan', 'ProductCategories::store');
-    $routes->get('kategori-produk/edit/(:segment)', 'ProductCategories::edit/$1');
-    $routes->post('kategori-produk/memperbaharui', 'ProductCategories::update');
-    $routes->post('kategori-produk/menghapus', 'ProductCategories::delete');
+    $routes->get('product-categories', 'ProductCategories::index');
+    $routes->get('product-category/create', 'ProductCategories::create');
+    $routes->post('product-category/store', 'ProductCategories::store');
+    $routes->get('product-category/edit/(:segment)', 'ProductCategories::edit/$1');
+    $routes->post('product-category/update', 'ProductCategories::update');
+    $routes->post('product-category/delete', 'ProductCategories::delete');
 
-    $routes->get('produk', 'Products::index');
-    $routes->get('produk/tampilkan-detail/(:segment)', 'Products::showDetails/$1');
-    $routes->get('produk/membuat', 'Products::create');
-    $routes->post('produk/menyimpan', 'Products::store');
-    $routes->get('produk/mencari/(:segment)', 'Products::search/$1');
-    $routes->get('produk/edit/(:segment)', 'Products::edit/$1');
-    $routes->post('produk/memperbaharui', 'Products::update');
-    $routes->post('produk/menghapus-harga-produk', 'Products::deleteProductPrice');
-    $routes->post('produk/menghapus', 'Products::deletes');
+    $routes->get('products', 'Products::index');
+    $routes->get('product/show-details/(:segment)', 'Products::showDetails/$1');
+    $routes->get('product/create', 'Products::create');
+    $routes->post('product/store', 'Products::store');
+    $routes->get('product/search/(:segment)', 'Products::search/$1');
+    $routes->get('product/edit/(:segment)', 'Products::edit/$1');
+    $routes->post('product/update', 'Products::update');
+    $routes->post('product/delete-product-price', 'Products::deleteProductPrice');
+    $routes->post('product/deletes', 'Products::deletes');
     
-    $routes->get('pengguna', 'Users::index');
-    $routes->get('pengguna/membuat', 'Users::create');
-    $routes->post('pengguna/menyimpan', 'Users::store');
-    $routes->get('pengguna/edit/(:segment)', 'Users::edit/$1');
-    $routes->post('pengguna/memperbaharui', 'Users::update');
-    $routes->post('pengguna/menghapus', 'Users::delete');
+    $routes->get('users', 'Users::index');
+    $routes->get('user/create', 'Users::create');
+    $routes->post('user/store', 'Users::store');
+    $routes->get('user/edit/(:segment)', 'Users::edit/$1');
+    $routes->post('user/update', 'Users::update');
+    $routes->post('user/delete', 'Users::delete');
 });
 
 $routes->get('sign_out', 'SignOut::index');

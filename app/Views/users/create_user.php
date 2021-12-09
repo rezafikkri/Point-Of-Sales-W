@@ -4,7 +4,7 @@
 <div class="container-xl">
 <header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Membuat Pengguna</h4>
-    <a href="/admin/pengguna" class="btn btn--gray-outline text-center">Batal</a>
+    <a href="/admin/users" class="btn btn--gray-outline text-center">Batal</a>
 </header>
 
 <main class="main mb-5">
@@ -12,7 +12,7 @@
     <div class="col-md-8">
         <?= $_SESSION['errors']['create_user'] ?? null ?>
         <div class="main__box">
-            <?= form_open('/admin/pengguna/menyimpan') ?>
+            <?= form_open('/admin/user/store') ?>
                 <div class="mb-3">
                     <label class="form-label" for="full-name">Nama Lengkap</label>
                     <input class="form-input" id="full-name" type="text" name="full_name" value="<?= old('full_name') ?>">

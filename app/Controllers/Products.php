@@ -90,7 +90,7 @@ class Products extends BaseController
             // set validation errors message to flash session
             $this->ignoreMessages = ['product_magnitudes', 'product_prices'];
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->to('/admin/produk/membuat')->withInput();
+            return redirect()->to('/admin/product/create')->withInput();
         }
 
         helper('generate_uuid');
@@ -135,7 +135,7 @@ class Products extends BaseController
         if ($productId == true && $insertProductPriceBatch == true) {
             // move product photo
             $productPhotoFile->move('dist/images/product-photos', $productPhotoName);
-            return redirect()->to('/admin/produk');
+            return redirect()->to('/admin/products');
         } else {
             // make error message
             $this->openDelimiterMessage = '<div class="alert alert--warning mb-3"><span class="alert__icon"></span><p>';
@@ -143,7 +143,7 @@ class Products extends BaseController
             $this->session->setFlashData('errors', $this->addDelimiterMessages([
                 'create_product' => 'Produk gagal dibuat. Silahkan coba kembali!'
             ]));
-            return redirect()->to('/admin/produk/membuat')->withInput();
+            return redirect()->to('/admin/product/create')->withInput();
         }
     }
 
@@ -246,7 +246,7 @@ class Products extends BaseController
             // set validation error messages to flash session
             $this->ignoreMessages = ['product_magnitudes', 'product_prices'];
             $this->session->setFlashData('errors', $this->addDelimiterMessages($this->validator->getErrors()));
-            return redirect()->to('/admin/produk/edit/' . $productId)->withInput();
+            return redirect()->to('/admin/product/edit/' . $productId)->withInput();
         }
 
         // generate product update data
@@ -311,7 +311,7 @@ class Products extends BaseController
         $this->session->setFlashData($flashMessageName, $this->addDelimiterMessages([
             'edit_product' => $message
         ]));
-        return redirect()->to('/admin/produk/edit/' . $productId);
+        return redirect()->to('/admin/product/edit/' . $productId);
     }
 
     public function deleteProductPrice()
