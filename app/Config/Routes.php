@@ -58,6 +58,7 @@ $routes->group('admin', function ($routes) {
     $routes->get('user/edit/(:segment)', 'Users::edit/$1');
     $routes->post('user/update', 'Users::update');
     $routes->post('user/delete', 'Users::delete');
+    $routes->get('users/trash', 'Users::trash');
 });
 
 $routes->get('sign_out', 'SignOut::index');

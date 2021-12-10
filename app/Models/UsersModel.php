@@ -29,11 +29,17 @@ class UsersModel extends Model
                         'username' => $username
                     ])->getRowArray();
     }
-
+    
     public function getAll(): array
     {
         return $this->select('user_id, full_name, level, last_sign_in, created_at, edited_at')
-                    ->orderBy('full_name', 'ASC')->where('deleted_at IS NULL', '', false)->get()->getResultArray();
+             ->orderBy('full_name', 'ASC')->where('deleted_at IS NULL', '', false)->get()->getResultArray();
+    }
+
+    public function getAllDeleted(): array
+    {
+         return $this->select('user_id, full_name, level, deleted_at')
+             ->orderBy('full_name', 'ASC')->where('deleted_at IS NOT NULL', '', false)->get()->getResultArray();       
     }
 
     public function getTotal(): int

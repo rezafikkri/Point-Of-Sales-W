@@ -227,4 +227,14 @@ class Users extends BaseController
             'csrf_value' => csrf_hash()
         ]);
     }
+
+    public function trash()
+    {
+        helper('active_menu');
+
+        $data['title'] = 'Kotak Sampah Pengguna . POSW';
+        $data['users'] = $this->usersModel->getAllDeleted();
+
+        return view('users/trash', $data);
+    }
 }
