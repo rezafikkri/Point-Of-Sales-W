@@ -4,7 +4,7 @@
 <div class="container-xl">
 <header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
     <h4 class="mb-4 mb-sm-0 me-2">Membuat Produk</h4>
-    <a href="/admin/product" class="btn btn--gray-outline text-center">Batal</a>
+    <a href="/admin/products" class="btn btn--gray-outline text-center">Batal</a>
 </header>
 
 <main class="main mb-5">
