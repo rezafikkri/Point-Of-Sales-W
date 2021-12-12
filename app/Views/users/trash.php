@@ -12,7 +12,7 @@ $this->extend('admin_layout');
     <h4 class="mb-4 mb-sm-0 me-2">Kotak Sampah Pengguna</h4>
     
     <div class="d-flex flex-column-reverse flex-sm-row justify-content-start justify-content-sm-end align-items-sm-start flex-fill">
-        <a href="/admin/user/create" class="btn btn--gray-outline text-center mb-3 mb-sm-0">Kembali</a>
+        <a href="/admin/users" class="btn btn--gray-outline text-center mb-3 mb-sm-0">Kembali</a>
     </div><!-- d-flex -->
 </header>
 
@@ -44,7 +44,7 @@ $this->extend('admin_layout');
                 <?php else : ?>
                     <td width="10" colspan="2" class="text-center">
                 <?php endif ?>
-                        <a href="#" data-user-id="<?= $u['user_id'] ?>" data-full-name="<?= $u['full_name'] ?>" title="Memulihkan pengguna"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" class="bi bi-arrow-return-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 0 0 1 2v4.8a2.5 2.5 0 0 0 2.5 2.5h9.793l-3.347 3.346a.5.5 0 0 0 .708.708l4.2-4.2a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 8.3H3.5A1.5 1.5 0 0 1 2 6.8V2a.5.5 0 0 0-.5-.5z"/></svg></a>
+                        <a href="#" data-user-id="<?= $u['user_id'] ?>" data-full-name="<?= $u['full_name'] ?>" title="Memulihkan pengguna" id="restore-user"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" class="bi bi-arrow-return-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 0 0 1 2v4.8a2.5 2.5 0 0 0 2.5 2.5h9.793l-3.347 3.346a.5.5 0 0 0 .708.708l4.2-4.2a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 8.3H3.5A1.5 1.5 0 0 1 2 6.8V2a.5.5 0 0 0-.5-.5z"/></svg></a>
                     </td>
                     <td><?= $u['full_name'] ?></td>
                     <td><?= $u['level'] == 'admin' ? 'Admin' : 'Kasir' ?></td>
@@ -59,7 +59,8 @@ $this->extend('admin_layout');
 </main>
 </div><!-- container-xl -->
 
-<div class="modal modal--red">
+<div id="modals">
+<div class="modal modal--red" id="permanently-delete-user-modal">
     <div class="modal__content">
         <a class="btn btn--light" id="btn-close" href=""><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg></a>
         <div class="modal__icon mb-4">
@@ -84,9 +85,37 @@ $this->extend('admin_layout');
             </div>
         </div><!-- position-relative -->
     </div>
-</div><!-- modal -->
+</div><!-- delete user permanently modal -->
+
+<div class="modal modal--blue" id="restore-user-modal">
+    <div class="modal__content">
+        <a class="btn btn--light" id="btn-close" href=""><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg></a>
+        <div class="modal__icon mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" fill="currentColor" viewBox="0 0 16 16"><path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3.496 6.033a.237.237 0 0 1-.24-.247C5.35 4.091 6.737 3.5 8.005 3.5c1.396 0 2.672.73 2.672 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.105a.25.25 0 0 1-.25.25h-.81a.25.25 0 0 1-.25-.246l-.004-.217c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.803 0-1.253.478-1.342 1.134-.018.137-.128.25-.266.25h-.825zm2.325 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z"/></svg>
+        </div>
+        <div class="modal__body mb-4">
+            <h4 class="mb-2">Konfirmasi Memulihkan Pengguna</h4>
+            <p class="mb-4">Yakin mau memulihkan <strong></strong>?</p>
+            <input type="hidden" name="user_id">
+            <div class="input-group">
+                <input type="password" name="user_sign_in_password" class="form-input" placeholder="Password Mu...">
+                <a class="btn btn--gray-outline" id="show-password" href=""><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></a>
+            </div>
+        </div>
+        <div class="position-relative d-inline-block">
+            <a class="btn btn--blue-outline" href="#" id="restore-user">Ya, Pulihkan</a>
+
+            <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none">
+                <div class="loading loading--blue">
+                    <div></div>
+                </div>
+            </div>
+        </div><!-- position-relative -->
+    </div>
+</div><!-- restore user modal -->
+</div><!-- modals -->
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-<script type="module" src="<?= base_url('dist/js/users.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/users/trash.js') ?>"></script>
 <?= $this->endSection() ?>

@@ -6,6 +6,15 @@ use App\Models\UsersModel;
 
 class Users extends BaseController
 {
+    /**
+     * User sign in error message
+     * 
+     * Contains error message from validate user sign in password
+     *
+     * @var string $signInPassErrorMessage
+     */
+    private $signInPassErrorMessage = '';
+
     public function __construct()
     {
         $this->usersModel = new UsersModel();
@@ -192,23 +201,29 @@ class Users extends BaseController
         return redirect()->to('/admin/user/edit/' . $userId);
     }
 
-    public function delete()
+    private function validateUserSignInPassword($userSignInPassword): bool
     {
-        // check user sign in password
-        $userSignInPassword = $this->request->getPost('user_sign_in_password', FILTER_SANITIZE_STRING);        
         if (empty(trim($userSignInPassword))) {
-            return json_encode([
-                'status' => 'wrong_password',
-                'message' => 'Bidang Password Mu diperlukan.',
-                'csrf_value' => csrf_hash()
-            ]);
+            $this->userSignInPasswordErrorMessage = 'Bidang Password Mu diperlukan.';
+            return false;
         }
         
         $passwordHash = $this->usersModel->getOne($_SESSION['sign_in_user_id'], 'password')['password'];
         if (!password_verify($userSignInPassword, $passwordHash)) {
+            $this->userSignInPasswordErrorMessage = 'Password salah.';
+            return false;
+        }       
+        return true;
+    }
+
+    public function delete()
+    {
+        // check user sign in password
+        $userSignInPassword = $this->request->getPost('user_sign_in_password', FILTER_SANITIZE_STRING);        
+        if (!$this->validateUserSignInPassword($userSignInPassword)) {
             return json_encode([
                 'status' => 'wrong_password',
-                'message' => 'Password salah.',
+                'message' => $this->userSignInPasswordErrorMessage,
                 'csrf_value' => csrf_hash()
             ]);
         }
@@ -236,5 +251,37 @@ class Users extends BaseController
         $data['users'] = $this->usersModel->getAllDeleted();
 
         return view('users/trash', $data);
+    }
+
+    public function restore()
+    {
+        // check user sign in password
+        $userSignInPassword = $this->request->getPost('user_sign_in_password', FILTER_SANITIZE_STRING);        
+        if (!$this->validateUserSignInPassword($userSignInPassword)) {
+            return json_encode([
+                'status' => 'wrong_password',
+                'message' => $this->userSignInPasswordErrorMessage,
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        $userId = $this->request->getPost('user_id', FILTER_SANITIZE_STRING);
+        $updateUser = $this->usersModel->update($userId, [
+            'deleted_at' => null
+        ]);
+
+        // if success update user
+        if ($updateUser > 0) {
+            return json_encode([
+                'status' => 'success',
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        return json_encode([
+            'status' => 'fail',
+            'message' => 'Gagal memulihkan pengguna.',
+            'csrf_value' => csrf_hash()
+        ]);
     }
 }
