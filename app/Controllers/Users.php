@@ -36,7 +36,7 @@ class Users extends BaseController
 
         $data['title'] = 'Membuat Pengguna . POSW';
 
-        return view('users/create_user', $data);
+        return view('users/create', $data);
     }
 
     public function store()
@@ -117,7 +117,7 @@ class Users extends BaseController
         $data['userId'] = $userId;
         $data['user'] = $this->usersModel->getOne($userId, 'full_name, username, level');
 
-        return view('users/edit_user', $data);
+        return view('users/edit', $data);
     }
 
     public function update()

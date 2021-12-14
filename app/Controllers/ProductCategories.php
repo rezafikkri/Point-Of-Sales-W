@@ -27,7 +27,7 @@ class ProductCategories extends BaseController
 
         $data['title'] = 'Membuat Kategori Produk . POSW';
 
-        return view('product-categories/create_product_category', $data);
+        return view('product-categories/create', $data);
     }
 
     public function store()
@@ -83,7 +83,7 @@ class ProductCategories extends BaseController
         $data['productCategoryId'] = $productCategoryId;
         $data['productCategoryDB'] = $this->productCategoriesModel->getOne($productCategoryId);
 
-        return view('product-categories/edit_product_category', $data);
+        return view('product-categories/edit', $data);
     }
 
     public function update()

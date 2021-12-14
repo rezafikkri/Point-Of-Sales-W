@@ -50,7 +50,7 @@ class Products extends BaseController
         $data['productCategories'] = $this->productCategoriesModel->getAll('product_category_id, product_category_name');
         $data['title'] = 'Membuat Produk . POSW';
 
-        return view('products/create_product', $data);
+        return view('products/create', $data);
     }
 
     private function generateProductPriceInsertBatchData(string $productId, array $productMagnitudes, array $productPrices): array
@@ -184,7 +184,7 @@ class Products extends BaseController
         $data['product'] = $this->productsModel->getOne($productId);
         $data['productPrices'] = $this->productPricesModel->getAll($productId, 'product_price_id, product_magnitude, product_price');
 
-        return view('products/edit_product', $data);
+        return view('products/edit', $data);
     }
 
     private function generateProductPriceUpsertBatchData(
