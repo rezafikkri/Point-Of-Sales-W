@@ -1,4 +1,4 @@
-import { renderAlert, numberFormatterToCurrency, postData } from './module.js';
+import { renderAlert, numberFormatterToCurrency, postData } from '../module.js';
 
 const tableElement = document.querySelector('#table');
 const productSearchElement = document.querySelector('a#search-product');

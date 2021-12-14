@@ -122,5 +122,5 @@ $this->extend('admin_layout');
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-<script type="module" src="<?= base_url('dist/js/products.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/products/products.js') ?>"></script>
 <?= $this->endSection() ?>

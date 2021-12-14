@@ -101,5 +101,5 @@ $this->extend('admin_layout');
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-<script type="module" src="<?= base_url('dist/js/users.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/users/users.js') ?>"></script>
 <?= $this->endSection() ?>

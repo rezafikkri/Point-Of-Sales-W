@@ -131,5 +131,5 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-<script type="module" src="<?= base_url('dist/js/edit_product.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/products/edit.js') ?>"></script>
 <?= $this->endSection() ?>

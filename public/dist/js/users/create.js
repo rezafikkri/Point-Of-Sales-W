@@ -1,4 +1,4 @@
-import { showPassword } from './module.js';
+import { showPassword } from '../module.js';
 
 function generatePassword(inputElement)
 {

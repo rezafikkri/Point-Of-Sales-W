@@ -103,5 +103,5 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-<script type="module" src="<?= base_url('dist/js/create_product.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/products/create.js') ?>"></script>
 <?= $this->endSection() ?>

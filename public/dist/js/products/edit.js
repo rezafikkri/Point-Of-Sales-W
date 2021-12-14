@@ -1,4 +1,4 @@
-import { addFormInputMagnitudePrice, renderAlert, postData } from './module.js';
+import { addFormInputMagnitudePrice, renderAlert, postData } from '../module.js';
 
 // get file name and replace text in label with it
 const formFileElement = document.querySelector('div.form-file input[type="file"]');

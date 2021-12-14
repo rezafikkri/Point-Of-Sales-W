@@ -63,5 +63,5 @@ $this->extend('admin_layout');
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-<script type="module" src="<?= base_url('dist/js/product_categories.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/product-categories/product_categories.js') ?>"></script>
 <?= $this->endSection() ?>

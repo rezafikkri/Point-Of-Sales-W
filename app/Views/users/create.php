@@ -66,5 +66,5 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-<script type="module" src="<?= base_url('dist/js/create_user.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/users/create.js') ?>"></script>
 <?= $this->endSection() ?>

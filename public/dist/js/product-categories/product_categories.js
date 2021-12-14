@@ -1,4 +1,4 @@
-import { renderAlert, postData } from './module.js';
+import { renderAlert, postData } from '../module.js';
 
 // delete product category
 const tableElement = document.querySelector('#table');

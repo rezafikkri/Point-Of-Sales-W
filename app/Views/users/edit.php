@@ -68,5 +68,5 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-<script type="module" src="<?= base_url('dist/js/edit_user.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/users/edit.js') ?>"></script>
 <?= $this->endSection() ?>

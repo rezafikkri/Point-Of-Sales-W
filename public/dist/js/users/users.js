@@ -1,4 +1,4 @@
-import { showModal, hideModal, showPassword, renderAlert, postData } from './module.js';
+import { showModal, hideModal, showPassword, renderAlert, postData } from '../module.js';
 
 // delete user
 const tableElement  = document.querySelector('#table');
