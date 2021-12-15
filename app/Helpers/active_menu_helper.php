@@ -3,11 +3,11 @@
 /**
  * This helper for help automatic generate active menu class for navbar menu
  *
- * @param string $menuName Contain menu name from navbar menu
+ * @param array $menuNames Contains menu name list from navbar menu
  *
  * @return string|null
  */
-function active_menu(string $menuName): ?string
+function active_menu(array $menuNames): ?string
 {
     $request = \Config\Services::request();
 
@@ -21,8 +21,8 @@ function active_menu(string $menuName): ?string
         $segment = $segments[0];
     }
 
-    // if $menuName = $segment
-    if ($menuName == $segment) {
+    // if $segment is in $menuNames
+    if (in_array($segment, $menuNames)) {
         return $activeMenuClass;
     }
     return null;
