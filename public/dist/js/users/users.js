@@ -61,7 +61,7 @@ modalContentElement.querySelector('#delete-user').addEventListener('click', asyn
     
     try {
         const responseJson = await postData(
-            `${baseUrl}/admin/user/delete`,
+            `${baseUrl}/admin/user/delete/soft`,
             `${csrfName}=${csrfValue}&user_id=${userId}&user_sign_in_password=${userSignInPassword}`
         );
 
@@ -86,7 +86,7 @@ modalContentElement.querySelector('#delete-user').addEventListener('click', asyn
         }
         // else if fail remove user
         else if (responseJson.status == 'fail') {
-            const parentElement = document.querySelector('main.main > div');
+            const parentElement = document.querySelector('main.main');
             const referenceElement = document.querySelector('div.main__box');
             renderAlert(parentElement, referenceElement, responseJson.message, [
                 'alert--warning',

@@ -216,7 +216,7 @@ class Users extends BaseController
         return true;
     }
 
-    public function delete()
+    public function delete(string $type)
     {
         // check user sign in password
         $userSignInPassword = $this->request->getPost('user_sign_in_password', FILTER_SANITIZE_STRING);        
@@ -228,8 +228,15 @@ class Users extends BaseController
             ]);
         }
 
+        // $purge Allows overriding the soft deletes setting
+        if ($type == 'hard') {
+            $purge = true;
+        } else {
+            $purge = false;
+        }
+
         $userId = $this->request->getPost('user_id', FILTER_SANITIZE_STRING);
-        if ($this->usersModel->delete($userId) > 0) {
+        if ($this->usersModel->delete($userId, $purge) > 0) {
             return json_encode([
                 'status' => 'success',
                 'csrf_value' => csrf_hash()

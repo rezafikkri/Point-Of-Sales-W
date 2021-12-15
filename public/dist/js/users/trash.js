@@ -106,9 +106,19 @@ async function RDUser(targetElement, path, action)
         }
         // else if fail remove user
         else if (responseJson.status == 'fail') {
-            const parentElement = document.querySelector('main.main > div');
+            const parentElement = document.querySelector('main.main');
             const referenceElement = document.querySelector('div.main__box');
-            renderAlert(parentElement, referenceElement, responseJson.message, [
+
+            let message = responseJson.message;
+            if (action == 'delete') {
+                message = `
+                    ${responseJson.message}
+                    <a href="https://github.com/rezafikkri/Point-Of-Sales-W/wiki/Pengguna#gagal-menghapus-permanen-pengguna"
+                    target="_blank" rel="noreferrer noopener">Pelajari lebih lanjut.</a>
+                `;
+            }
+
+            renderAlert(parentElement, referenceElement, message, [
                 'alert--warning',
                 'mb-3'
             ]);
@@ -143,6 +153,10 @@ document.querySelector('#modals').addEventListener('click', (e) => {
     let targetRestoreElement = e.target;
     if (targetRestoreElement.getAttribute('id') != 'restore-user') targetRestoreElement = targetRestoreElement.parentElement;
     if (targetRestoreElement.getAttribute('id') != 'restore-user') targetRestoreElement = targetRestoreElement.parentElement;
+
+    let targetDeleteElement = e.target;
+    if (targetDeleteElement.getAttribute('id') != 'delete-user') targetDeleteElement = targetDeleteElement.parentElement;
+    if (targetDeleteElement.getAttribute('id') != 'delete-user') targetDeleteElement = targetDeleteElement.parentElement;
     
     // if btn close modal clicked
     if (targetCloseModalElement.getAttribute('id') == 'btn-close') {
@@ -161,5 +175,10 @@ document.querySelector('#modals').addEventListener('click', (e) => {
     else if (targetRestoreElement.getAttribute('id') == 'restore-user') {
         e.preventDefault();
         RDUser(targetRestoreElement, '/admin/user/restore', 'restore');
+    }
+    // if btn delete user clicked
+    else if (targetDeleteElement.getAttribute('id') == 'delete-user') {
+        e.preventDefault();
+        RDUser(targetDeleteElement, '/admin/user/delete/hard', 'delete');
     }
 });

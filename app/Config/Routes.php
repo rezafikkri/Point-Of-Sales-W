@@ -57,7 +57,7 @@ $routes->group('admin', function ($routes) {
     $routes->post('user/store', 'Users::store');
     $routes->get('user/edit/(:segment)', 'Users::edit/$1');
     $routes->post('user/update', 'Users::update');
-    $routes->post('user/delete', 'Users::delete');
+    $routes->post('user/delete/(:alpha)', 'Users::delete/$1');
     $routes->get('users/trash', 'Users::trash');
     $routes->post('user/restore', 'Users::restore');
 });

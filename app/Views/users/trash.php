@@ -68,7 +68,7 @@ $this->extend('admin_layout');
         </div>
         <div class="modal__body mb-4">
             <h4 class="mb-2">Konfirmasi Menghapus Pengguna</h4>
-            <p class="mb-4">Yakin mau menghapus <strong></strong>?</p>
+            <p class="mb-4">Pengguna akan dihapus permanen. Yakin mau menghapus <strong></strong>?</p>
             <input type="hidden" name="user_id">
             <div class="input-group">
                 <input type="password" name="user_sign_in_password" class="form-input form-input--focus-red" placeholder="Password Mu...">
