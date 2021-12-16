@@ -92,7 +92,13 @@ async function RDUser(targetElement, path, action)
 
         // if success remove user
         if (responseJson.status == 'success') {
+            // remove user from table
             document.querySelector(`tr#user${userId}`).remove();
+            // add description
+            const usersTable = tbodyElement.querySelectorAll('tr');
+            if (usersTable.length == 0) {
+                tbodyElement.innerHTML = '<tr><td colspan="5">Pengguna tidak ada.</td></tr>';
+            }
         }
         // else if password sign in user is wrong
         else if (responseJson.status == 'wrong_password') {

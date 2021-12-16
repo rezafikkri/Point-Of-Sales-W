@@ -2,7 +2,8 @@ import { renderAlert, postData } from '../module.js';
 
 // delete product category
 const tableElement = document.querySelector('#table');
-tableElement.querySelector('tbody').addEventListener('click', async (e) => {
+const tbodyElement = tableElement.querySelector('tbody');
+tbodyElement.addEventListener('click', async (e) => {
     let targetElement = e.target;
 
     if (targetElement.getAttribute('id') != 'delete-product-category') targetElement = targetElement.parentElement;
@@ -35,7 +36,13 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
 
             // if success delete product category
             if (responseJson.status == 'success') {
+                // remove product category from table
                 targetElement.parentElement.parentElement.remove();
+                // add description
+                const productCategoriesTable = tbodyElement.querySelectorAll('tr');
+                if (productCategoriesTable.length == 0) {
+                    tbodyElement.innerHTML = '<tr><td colspan="5">Pengguna tidak ada.</td></tr>';
+                }
             }
             // else if fail delete product category
             else if (responseJson.status == 'fail') {

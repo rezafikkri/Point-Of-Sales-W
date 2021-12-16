@@ -31,6 +31,8 @@ $this->extend('admin_layout');
             </thead>
             <tbody>
             <?php
+                // if exists users
+                if (count($users) > 0) :
                 foreach ($users as $u) :
                     $deletedAt = Time::createFromFormat('Y-m-d H:i:s', $u['deleted_at']);
             ?>
@@ -50,7 +52,11 @@ $this->extend('admin_layout');
                     <td><?= $u['level'] == 'admin' ? 'Admin' : 'Kasir' ?></td>
                     <td><?= $deletedAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
                 </tr>
-            <?php endforeach ?>
+            <?php endforeach; else : ?>
+                <tr>
+                    <td colspan="5">Pengguna tidak ada.</td>
+                </tr>
+            <?php endif; ?>
             </tbody>
         </table>
         </div><!-- table-responsive -->
