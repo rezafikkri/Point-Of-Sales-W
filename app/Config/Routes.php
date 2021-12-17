@@ -60,6 +60,8 @@ $routes->group('admin', function ($routes) {
     $routes->post('user/delete/(:alpha)', 'Users::delete/$1');
     $routes->get('users/trash', 'Users::trash');
     $routes->post('user/restore', 'Users::restore');
+    
+    $routes->post('transactions', 'Transactions::index');
 });
 
 $routes->get('sign_out', 'SignOut::index');

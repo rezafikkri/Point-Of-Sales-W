@@ -69,7 +69,6 @@ class TransactionsSeeder extends Seeder
             for ($n = 1; $n <= $maxTransaction; $n++) {
                 $dateTime = date('Y-m-d', $i) . ' ' . '06:' . rand(10, 23) . ':00';
                 $transactionId = generate_uuid();
-                $transactionDetailId = generate_uuid();
                 $productRandomInt = rand(0, 5);
 
                 $transactionData[] = [
@@ -81,14 +80,10 @@ class TransactionsSeeder extends Seeder
                     'edited_at' => $dateTime
                 ];
                 $transactionDetailData[] = [
-                    'transaction_detail_id' => $transactionDetailId,
+                    'transaction_detail_id' => generate_uuid(),
                     'transaction_id' => $transactionId,
                     'product_price_id' => $products[$productRandomInt]['product_price_id'],
-                    'product_quantity' => 1
-                ];
-                $transactionHistoryData[] = [
-                    'transaction_history_id' => generate_uuid(),
-                    'transaction_detail_id' => $transactionDetailId,
+                    'product_quantity' => 1,
                     'product_name' => $products[$productRandomInt]['product_name'],
                     'product_magnitude' => $products[$productRandomInt]['product_magnitude'],
                     'product_price' => $products[$productRandomInt]['product_price']
@@ -98,7 +93,6 @@ class TransactionsSeeder extends Seeder
 
         $this->transactionData = $transactionData;
         $this->transactionDetailData = $transactionDetailData;
-        $this->transactionHistoryData = $transactionHistoryData;
 
         return true;
     }
@@ -111,7 +105,5 @@ class TransactionsSeeder extends Seeder
         $transactionBuilder->insertBatch($this->transactionData);
         $transactionDetailBuilder = $this->db->table('transaction_details');
         $transactionDetailBuilder->insertBatch($this->transactionDetailData);
-        $transactionHistoryBuilder = $this->db->table('transaction_histories');
-        $transactionHistoryBuilder->insertBatch($this->transactionHistoryData);
     }
 }

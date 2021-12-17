@@ -23,7 +23,7 @@ class TransactionsModel extends Model
         return $this->countAll();
     }
 
-    public function getTransactions(int $limit): array
+    public function getAll(int $limit): array
     {
         return $this->select('
                         transaksi.transaksi_id,

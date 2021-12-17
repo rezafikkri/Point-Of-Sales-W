@@ -20,6 +20,18 @@ class AddTransactionDetails extends Migration
             'product_quantity' => [
                 'type' => 'NUMERIC',
                 'constraint' => 4
+            ],
+            'product_name' => [
+                'type' => 'VARCHAR',
+                'constraint' => 50
+            ],
+            'product_magnitude' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20
+            ],
+            'product_price' => [
+                'type' => 'NUMERIC',
+                'constraint' => 10
             ]
         ]);
         $this->forge->addForeignKey('transaction_id', 'transactions', 'transaction_id', 'NO ACTION', 'CASCADE');
