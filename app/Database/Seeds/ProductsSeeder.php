@@ -37,7 +37,7 @@ class ProductsSeeder extends Seeder
                 'product_category_id' => 'd97e5f5d-9b1d-49a0-be4f-406148bfcea9',
                 'product_name' => 'Pomegranate Juice',
                 'product_photo' => 'Pomegranate juice.jpg',
-                'product_status' => 'tidak_ada',
+                'product_status' => 'tiada',
                 'created_at' => date('Y-m-d') . ' 05:17:00',
                 'edited_at' => date('Y-m-d') . ' 05:17:00'
             ],

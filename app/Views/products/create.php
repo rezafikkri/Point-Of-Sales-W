@@ -43,7 +43,7 @@
                     <label class="form-label" for="product-status">Status Produk</label>
                     <select class="form-select" name="product_status" id="product-status">
                     <?php
-                        $productStatuses = ['ada' => 'Ada', 'tidak_ada' => 'Tidak Ada'];
+                        $productStatuses = ['ada' => 'Ada', 'tiada' => 'Tiada'];
                         foreach ($productStatuses as $key => $value) :
                     ?>
                         <option value="<?= $key ?>"

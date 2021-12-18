@@ -26,17 +26,17 @@ class TransactionsModel extends Model
     public function getAll(int $limit): array
     {
         return $this->select('
-                        transaksi.transaksi_id,
-                        status_transaksi,
-                        transaksi.waktu_buat,
-                        nama_lengkap,
-                        SUM(harga_produk*jumlah_produk) as payment_total'
-                    , false)
-                    ->selectSum('jumlah_produk', 'product_total')
-                    ->join('transaksi_detail', 'transaksi.transaksi_id=transaksi_detail.transaksi_id', 'LEFT')
-                    ->join('harga_produk', 'transaksi_detail.harga_produk_id=harga_produk.harga_produk_id', 'lEFT')
-                    ->join('pengguna', 'transaksi.pengguna_id=pengguna.pengguna_id', 'INNER')
-                    ->limit($limit)->groupBy(['transaksi.transaksi_id', 'nama_lengkap'])->orderBy('transaksi.waktu_buat', 'DESC')
+                        transactions.transaction_id,
+                        transaction_status,
+                        transactions.created_at,
+                        transactions.edited_at,
+                        full_name,
+                        SUM(product_price*product_quantity) as payment_total
+                    ', false)
+                    ->selectSum('product_quantity', 'product_total')
+                    ->join('transaction_details', 'transactions.transaction_id=transaction_details.transaction_id', 'LEFT')
+                    ->join('users', 'transactions.user_id=users.user_id', 'INNER')
+                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.created_at', 'DESC')
                     ->get()->getResultArray();
     }
 

@@ -12,7 +12,10 @@ class TransactionDetailsModel extends Model
         'transaction_detail_id',
         'transaction_id',
         'product_price_id',
-        'product_quantity'
+        'product_quantity',
+        'product_name',
+        'product_magnitude',
+        'product_price'
     ];
     protected $useAutoIncrement = false;
 

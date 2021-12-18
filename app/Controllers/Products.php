@@ -81,7 +81,7 @@ class Products extends BaseController
             ],
             'product_status' => [
                 'label' => 'Status Produk',
-                'rules' => 'in_list[ada,tidak_ada]',
+                'rules' => 'in_list[ada,tiada]',
             ],
             'product_photo' => 'product_photo',
             'product_magnitudes' => 'product_magnitude',
@@ -229,7 +229,7 @@ class Products extends BaseController
             ],
             'product_status' => [
                 'label' => 'Status Produk',
-                'rules' => 'in_list[ada,tidak_ada]',
+                'rules' => 'in_list[ada,tiada]',
             ],
             'product_magnitudes' => 'product_magnitude',
             'product_prices' => 'product_price'

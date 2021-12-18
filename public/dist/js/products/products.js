@@ -114,7 +114,7 @@ productSearchElement.addEventListener('click', async (e) => {
                 if (p.product_status == 'ada') {
                      tr += '<td><span class="text-green">Ada</span></td>';
                 } else {
-                     tr += '<td><span class="text-red">Tidak Ada</span></td>';
+                     tr += '<td><span class="text-red">Tiada</span></td>';
                 }
                 tr += `
                     <td>${p.created_at}</td>
@@ -262,7 +262,7 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
                     if (p.product_status == 'ada') {
                          td += '<td><span class="text-green">Ada</span></td>';
                     } else {
-                         td += '<td><span class="text-red">Tidak Ada</span></td>';
+                         td += '<td><span class="text-red">Tiada</span></td>';
                     }
                     td += `
                         <td>${p.created_at}</td>

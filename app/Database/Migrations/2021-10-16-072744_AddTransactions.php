@@ -15,7 +15,7 @@ class AddTransactions extends Migration
             ],
             'transaction_status' => [
                 'type' => 'VARCHAR',
-                'constraint' => 8
+                'constraint' => 11
             ],
             'customer_money' => [
                 'type' => 'NUMERIC',
@@ -23,10 +23,12 @@ class AddTransactions extends Migration
                 'null' => true
             ],
             'created_at' => [
-                'type' => 'TIMESTAMP'
+                'type' => 'TIMESTAMP',
+                'null' => true
             ],
             'edited_at' => [
-                'type' => 'TIMESTAMP'
+                'type' => 'TIMESTAMP',
+                'null' => true
             ]
         ]);
         $this->forge->addForeignKey('user_id', 'users', 'user_id', 'NO ACTION', 'RESTRICT');

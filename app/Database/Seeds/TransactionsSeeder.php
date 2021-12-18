@@ -18,8 +18,8 @@ class TransactionsSeeder extends Seeder
         $transactionDetailData = [];
         $transactionHistoryData = [];
 
-        $startTimestamp = mktime(0, 0, 0, date('m') - 1, 0, date('Y'));
-        $endTimestamp = mktime(23, 59, 59, date('m') + 1, 0, date('Y'));
+        $startTimestamp = mktime(0, 0, 0, date('m') - 2, 0, date('Y'));
+        $endTimestamp = mktime(05, 00, 00, date('m'), date('d'), date('Y'));
         $products = [
             [
                 'product_name' => 'Lemon Juice',
@@ -63,7 +63,7 @@ class TransactionsSeeder extends Seeder
             '8ca354cb-f0fc-47dd-8b5e-8d88e460c6c7'
         ];
 
-        for ($i = $startTimestamp; $i <= $endTimestamp; $i += (3600*24)) {
+        for ($i = $startTimestamp; $i <= $endTimestamp; $i += (3600 * 24)) {
             $maxTransaction = rand(1, 50);
 
             for ($n = 1; $n <= $maxTransaction; $n++) {
@@ -74,7 +74,7 @@ class TransactionsSeeder extends Seeder
                 $transactionData[] = [
                     'transaction_id' => $transactionId,
                     'user_id' => $userIds[rand(0, 1)],
-                    'transaction_status' => 'finished',
+                    'transaction_status' => 'selesai',
                     'customer_money' => 80000,
                     'created_at' => $dateTime,
                     'edited_at' => $dateTime

@@ -23,7 +23,7 @@ class AddProducts extends Migration
             ],
             'product_status' => [
                 'type' => 'VARCHAR',
-                'constraint' => 9
+                'constraint' => 5
             ],
             'created_at' => [
                 'type' => 'TIMESTAMP'

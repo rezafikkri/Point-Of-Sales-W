@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
-use App\Models\{TransactionsModel, UsersModel, TransactionDetailsModel}
+use App\Models\{TransactionsModel, UsersModel, TransactionDetailsModel};
 use PhpOffice\PhpSpreadsheet\{Spreadsheet, Writer\Xlsx};
 use CodeIgniter\I18n\Time;
 
@@ -15,20 +15,20 @@ class Transactions extends BaseController
     {
         $this->transactionsModel = new TransactionsModel();
         $this->transactionDetailsModel = new TransactionDetailsModel();
-        $this->usersModel = new UserModel();
+        $this->usersModel = new UsersModel();
     }
 
     public function index()
     {
-        helper('active_menu');
+        helper(['active_menu', 'is_allowed_delete_transaction']);
 
-        $data['title'] = 'Produk . POSW';
+        $data['title'] = 'Transaksi . POSW';
 
-        $data['totalProduct'] = $this->productsModel->getTotal();
-        $data['products'] = $this->productsModel->getAll(static::PRODUCT_LIMIT);
-        $data['productLimit'] = static::PRODUCT_LIMIT;
+        $data['totalTransaction'] = $this->transactionsModel->getTotal();
+        $data['transactions'] = $this->transactionsModel->getAll(static::TRANSACTION_LIMIT);
+        $data['transactionLimit'] = static::TRANSACTION_LIMIT;
 
-        return view('products/products', $data);
+        return view('transactions', $data);
     }
 
     public function showTransactionSearches()

@@ -87,7 +87,7 @@ $this->extend('admin_layout');
                     <?php if ($p['product_status'] == 'ada') : ?>
                         <td><span class="text-green">Ada</span></td>
                     <?php else : ?>
-                        <td><span class="text-red">Tidak Ada</span></td>
+                        <td><span class="text-red">Tiada</span></td>
                     <?php endif ?>
 
                     <td><?= $createdAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
@@ -118,7 +118,7 @@ $this->extend('admin_layout');
 
     </div><!-- main__box -->
 </main>
-</div>
+</div><!-- container-xl -->
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>

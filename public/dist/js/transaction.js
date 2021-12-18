@@ -1,6 +1,5 @@
-import {create_alert_node, number_formatter_to_currency, show_modal, hide_modal, show_password} from './module.posw.js';
-import flatpickr from 'flatpickr';
-import { Indonesian } from "flatpickr/dist/l10n/id.js";
+import { renderAlert, numberFormatterToCurrency, showModal, hideModal, showPassword } from './module.js';
+import Indonesian from '../plugins/flatpickr/id.js';
 
 const table = document.querySelector('table.table');
 const search_transaction = document.querySelector('a#search-transaction');
@@ -17,11 +16,7 @@ flatpickr('input[name="date_range"]', {
     altInput: true,
     altFormat: 'j M, Y',
     altInputClass: 'form-input form-input--rounded-left hover-cursor-pointer',
-    locale: Indonesian,
-    onReady: () => {
-        // this function for change name for 7th day in 1 week
-        document.querySelectorAll('.flatpickr-weekdaycontainer .flatpickr-weekday')[6].innerText = 'Ahad';
-    }
+    locale: Indonesian
 });
 
 // search transaction
@@ -244,7 +239,7 @@ modal_content.querySelector('a#btn-close').addEventListener('click', e => {
 });
 
 // show password
-document.querySelector('.modal a#show-password').addEventListener('click', show_password);
+document.querySelector('.modal a#show-password').addEventListener('click', showPassword);
 
 // remove transaction
 document.querySelector('a#remove-transaction-in-db').addEventListener('click', e => {
