@@ -66,6 +66,9 @@ $this->extend('admin_layout');
             </thead>
             <tbody>
             <?php
+                $fmt = new \NumberFormatter('id_ID', \NumberFormatter::CURRENCY);
+                $fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, 0);
+
                 // if exists transaction
                 if ($countTransaction > 0) :
                     $i = 1;
@@ -91,7 +94,7 @@ $this->extend('admin_layout');
                         <td width="10"><a href="#" id="show-transaction-detail" data-transaction-id="<?= $t['transaction_id'] ?>" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
                     <td><?= $t['product_total'] ?? 0 ?></td>
-                    <td><?= $t['payment_total'] ?></td>
+                    <td><?= $fmt->formatCurrency($t['payment_total'] ?? 0, 'IDR') ?></td>
 
                     <?php if ($t['transaction_status'] == 'selesai') : ?>
                         <td><span class="text-green">Selesai</span></td>
