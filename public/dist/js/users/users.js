@@ -43,6 +43,7 @@ modalContentElement.querySelector('#btn-close').addEventListener('click', (e) =>
 modalContentElement.querySelector('#delete-user').addEventListener('click', async (e) => {
     e.preventDefault();
 
+    const loadingElement = document.querySelector('#loading');
     const baseUrl = document.querySelector('html').dataset.baseUrl;
     const userSignInPassword = modalContentElement.querySelector('input[name="user_sign_in_password"]').value;
     const userId = modalContentElement.querySelector('input[name="user_id"]').value;
@@ -57,7 +58,7 @@ modalContentElement.querySelector('#delete-user').addEventListener('click', asyn
 
     // loading
     e.target.classList.add('btn--disabled');
-    e.target.nextElementSibling.classList.remove('d-none');
+    loadingElement.classList.remove('d-none');
     
     try {
         const responseJson = await postData(
@@ -106,7 +107,7 @@ modalContentElement.querySelector('#delete-user').addEventListener('click', asyn
 
     // hide loading
     e.target.classList.remove('btn--disabled');
-    e.target.nextElementSibling.classList.add('d-none');
+    loadingElement.classList.add('d-none');
 });
 
 // show password

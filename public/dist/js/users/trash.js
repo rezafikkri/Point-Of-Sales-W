@@ -63,6 +63,10 @@ async function RDUser(targetElement, path, action)
 {
     const modalContentElement = targetElement.parentElement.parentElement;
     const modalElement = modalContentElement.parentElement;
+    let loadingElement = document.querySelector('#restore-loading');
+    if (action == 'delete') {
+        loadingElement = document.querySelector('#delete-loading');
+    }
     const baseUrl = document.querySelector('html').dataset.baseUrl;
     const userSignInPassword = modalContentElement.querySelector('input[name="user_sign_in_password"]').value;
     const userId = modalContentElement.querySelector('input[name="user_id"]').value;
@@ -77,7 +81,7 @@ async function RDUser(targetElement, path, action)
 
     // show loading
     targetElement.classList.add('btn--disabled');
-    targetElement.nextElementSibling.classList.remove('d-none');
+    loadingElement.classList.remove('d-none');
    
     try {
         const responseJson = await postData(
@@ -142,7 +146,7 @@ async function RDUser(targetElement, path, action)
 
     // hide loading
     targetElement.classList.remove('btn--disabled');
-    targetElement.nextElementSibling.classList.add('d-none');
+    loadingElement.classList.add('d-none');
 }
 
 // close modal

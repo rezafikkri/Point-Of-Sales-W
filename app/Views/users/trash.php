@@ -84,7 +84,7 @@ $this->extend('admin_layout');
         <div class="position-relative d-inline-block">
             <a class="btn btn--red-outline" href="#" id="delete-user">Ya, Hapus</a>
 
-            <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none">
+            <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none" id="delete-loading">
                 <div class="loading loading--red">
                     <div></div>
                 </div>
@@ -111,7 +111,7 @@ $this->extend('admin_layout');
         <div class="position-relative d-inline-block">
             <a class="btn btn--blue-outline" href="#" id="restore-user">Ya, Pulihkan</a>
 
-            <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none">
+            <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none" id="restore-loading">
                 <div class="loading loading--blue">
                     <div></div>
                 </div>
