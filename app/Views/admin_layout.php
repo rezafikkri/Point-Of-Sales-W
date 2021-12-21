@@ -32,7 +32,7 @@
         <li><a href="/admin" class="<?= active_menu(['admin']) ?>">Home</a></li>
         <li><a href="/admin/product-categories" class="<?= active_menu(['product-categories', 'product-category']) ?>">Kategori Produk</a></li>
         <li><a href="/admin/products" class="<?= active_menu(['products', 'product']) ?>">Produk</a></li>
-        <li><a href="/admin/transactions" class="<?= active_menu(['transactions', 'transaction']) ?>">Transaksi</a></li>
+        <li><a href="/admin/transactions" class="<?= active_menu(['transactions']) ?>">Transaksi</a></li>
         <li><a href="/admin/users" class="<?= active_menu(['users', 'user']) ?>">Pengguna</a></li>
 
         <li class="dropdown"><a href="" class="dropdown-toggle" target=".dropdown-menu"><?= $_SESSION['sign_in_user_full_name']  ?></a>
