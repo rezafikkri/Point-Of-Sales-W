@@ -31,32 +31,33 @@ class Transactions extends BaseController
         return view('transactions', $data);
     }
 
-    public function showTransactionSearches()
+    public function search(string $dateRange)
     {
-        $arr_date_range = explode(' - ', $this->request->getPost('date_range', FILTER_SANITIZE_STRING));
-        $date_start = $arr_date_range[0].' 00:00:00';
-        $date_end = ($arr_date_range[1]??$arr_date_range[0]).' 23:59:59';
+        helper('is_allowed_delete_transaction');
 
-        // get transaction search total
-        $transaction_search_total = $this->transaction_model->countAllTransactionSearch($date_start, $date_end);
+        $arrDateRange = explode(' - ', filter_var($dateRange, FILTER_SANITIZE_STRING));
+        $dateStart = $arrDateRange[0] . ' 00:00:00';
+        $dateEnd = ($arrDateRange[1] ?? $arrDateRange[0]) . ' 23:59:59';
 
-        // get transactions search
-        $transactions_db = $this->transaction_model->getTransactionSearches(static::TRANSACTION_LIMIT, $date_start, $date_end);
+        // get total transaction search and transactions search 
+        $totalTransaction = $this->transactionsModel->getTotalSearch($dateStart, $dateEnd);
+        $transactions = $this->transactionsModel->search(static::TRANSACTION_LIMIT, $dateStart, $dateEnd);
 
-        $count_transactions_db = count($transactions_db);
-        for ($i = 0; $i < $count_transactions_db; $i++) {
-            // convert timestamp
-            $transactions_db[$i]['indo_create_time'] = $this->indo_time->toIndoLocalizedString($transactions_db[$i]['waktu_buat']);
-            // generate permission for delete
-            $transactions_db[$i]['permission_delete'] = is_transaction_allowed_delete(
-                $transactions_db[$i]['waktu_buat'],
-                $transactions_db[$i]['status_transaksi']
-            );
+        // convert timestamp
+        foreach ($transactions as $key => $value) {
+            $createdAt = Time::createFromFormat('Y-m-d H:i:s', $value['created_at']);
+            $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
+
+            $transactions[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM yyyy HH:mm');
+            $transactions[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM yyyy HH:mm');
+
+            // check permission to delete
+            $transactions[$key]['delete_permission'] = is_allowed_delete_transaction($value['edited_at']);
         }
 
         return json_encode([
-            'transactions_db' => $transactions_db,
-            'transaction_search_total' => $transaction_search_total,
+            'transactions' => $transactions,
+            'total_transaction' => $totalTransaction,
             'transaction_limit' => static::TRANSACTION_LIMIT,
             'csrf_value' => csrf_hash()
         ]);
@@ -97,7 +98,7 @@ class Transactions extends BaseController
             if ($date_range !== null) {
                 $arr_date_range = explode(' - ', $date_range);
                 $date_start = $arr_date_range[0].' 00:00:00';
-                $date_end = ($arr_date_range[1]??$arr_date_range[0]).' 23:59:59';
+                $date_end = ($arr_date_range[1] ?? $arr_date_range[0]).' 23:59:59';
 
                 // transaction total
                 $transaction_total = $this->transaction_model->countAllTransactionSearch($date_start, $date_end);
@@ -314,7 +315,7 @@ class Transactions extends BaseController
         if ($dateRange !== null) {
             $arrDateRange = explode(' - ', $dateRange);
             $dateStart = $arrDateRange[0].' 00:00:00';
-            $dateEnd = ($arrDateRange[1]??$arrDateRange[0]).' 23:59:59';
+            $dateEnd = ($arrDateRange[1] ?? $arrDateRange[0]).' 23:59:59';
 
             // get transaction from db
             $transactions = $this->transaction_model->getTransactionSearches(0, $dateStart, $dateEnd);
@@ -332,7 +333,7 @@ class Transactions extends BaseController
         }
 
         // make transaction excel file
-        $this->makeTransactionExcelFile($transactions, $startRow, $dateRange, $dateStart??null, $dateEnd??null);
+        $this->makeTransactionExcelFile($transactions, $startRow, $dateRange, $dateStart ?? null, $dateEnd ?? null);
 
         return json_encode([
             'status' => 'success',

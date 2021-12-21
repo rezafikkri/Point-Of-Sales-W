@@ -14,7 +14,7 @@ $this->extend('admin_layout');
     <div class="d-flex flex-column-reverse flex-sm-row justify-content-start justify-content-sm-end align-items-sm-start flex-fill">
         <div class="input-group me-0 me-sm-2">
            <input type="text" name="date_range" placeholder="Pilih Rentang Waktu...">
-           <a class="btn btn--blue" href="#" id="search-transaction">
+           <a class="btn btn--blue" href="#" id="search-transactions">
                <svg xmlns="http://www.w3.org/2000/svg" width="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/><path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/></svg>
            </a>
        </div><!-- input-group -->
@@ -93,8 +93,8 @@ $this->extend('admin_layout');
                     </td>
                         <td width="10"><a href="#" id="show-transaction-detail" data-transaction-id="<?= $t['transaction_id'] ?>" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
-                    <td><?= $t['product_total'] ?? 0 ?></td>
-                    <td><?= $fmt->formatCurrency($t['payment_total'] ?? 0, 'IDR') ?></td>
+                    <td><?= $t['total_product'] ?? 0 ?></td>
+                    <td><?= $fmt->formatCurrency($t['total_payment'] ?? 0, 'IDR') ?></td>
 
                     <?php if ($t['transaction_status'] == 'selesai') : ?>
                         <td><span class="text-green">Selesai</span></td>
@@ -122,7 +122,7 @@ $this->extend('admin_layout');
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>
     <?php endif ?>
 
-        <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none">
+        <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none" id="loading">
             <div class="loading mt-5">
                 <div></div>
             </div>
@@ -149,7 +149,7 @@ $this->extend('admin_layout');
         <div class="position-relative d-inline-block">
             <a class="btn btn--red-outline" href="#" id="remove-transaction-in-db">Ya, Hapus</a>
 
-            <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none">
+            <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none" id="delete-loading">
                 <div class="loading loading--red">
                     <div></div>
                 </div>
@@ -165,5 +165,5 @@ $this->extend('admin_layout');
 
 <?= $this->section('script') ?>
 <script src="<?= base_url('dist/plugins/flatpickr/flatpickr.min.js') ?>"></script>
-<script type="module" src="<?= base_url('dist/js/transaction.js') ?>"></script>
+<script type="module" src="<?= base_url('dist/js/transactions.js') ?>"></script>
 <?= $this->endSection() ?>

@@ -43,7 +43,8 @@ class Filters extends BaseConfig
                 'except' => [
                     'admin/show-transactions-two-months-ago',
                     'admin/product/show-details/*',
-                    'admin/product/search/*'
+                    'admin/products/search/*',
+                    'admin/transactions/search/*'
                 ]
             ],
             // 'honeypot',

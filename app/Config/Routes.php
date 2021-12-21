@@ -46,11 +46,11 @@ $routes->group('admin', function ($routes) {
     $routes->get('product/show-details/(:segment)', 'Products::showDetails/$1');
     $routes->get('product/create', 'Products::create');
     $routes->post('product/store', 'Products::store');
-    $routes->get('product/search/(:segment)', 'Products::search/$1');
+    $routes->get('products/search/(:segment)', 'Products::search/$1');
     $routes->get('product/edit/(:segment)', 'Products::edit/$1');
     $routes->post('product/update', 'Products::update');
     $routes->post('product/delete-product-price', 'Products::deleteProductPrice');
-    $routes->post('product/deletes', 'Products::deletes');
+    $routes->post('products/delete', 'Products::delete');
     
     $routes->get('users', 'Users::index');
     $routes->get('user/create', 'Users::create');
@@ -62,6 +62,7 @@ $routes->group('admin', function ($routes) {
     $routes->post('user/restore', 'Users::restore');
     
     $routes->get('transactions', 'Transactions::index');
+    $routes->get('transactions/search/(:segment)', 'Transactions::search/$1');
 });
 
 $routes->get('sign_out', 'SignOut::index');

@@ -31,12 +31,12 @@ class TransactionsModel extends Model
                         transactions.created_at,
                         transactions.edited_at,
                         full_name,
-                        SUM(product_price*product_quantity) as payment_total
+                        SUM(product_price*product_quantity) as total_payment
                     ', false)
-                    ->selectSum('product_quantity', 'product_total')
-                    ->join('transaction_details', 'transactions.transaction_id=transaction_details.transaction_id', 'LEFT')
-                    ->join('users', 'transactions.user_id=users.user_id', 'INNER')
-                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.created_at', 'DESC')
+                    ->selectSum('product_quantity', 'total_product')
+                    ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
+                    ->join('users', 'transactions.user_id = users.user_id', 'INNER')
+                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'DESC')
                     ->get()->getResultArray();
     }
 
@@ -50,30 +50,29 @@ class TransactionsModel extends Model
                     ->getResultArray();
     }
 
-    public function getTransactionSearches(int $limit, string $date_start, string $date_end): array
+    public function search(int $limit, string $dateStart, string $dateEnd): array
     {
         return $this->select('
-                        transaksi.transaksi_id,
-                        status_transaksi,
-                        transaksi.waktu_buat,
-                        nama_lengkap,
-                        SUM(harga_produk*jumlah_produk) as payment_total'
-                    , false)
-                    ->selectSum('jumlah_produk', 'product_total')
-                    ->join('transaksi_detail', 'transaksi.transaksi_id=transaksi_detail.transaksi_id', 'LEFT')
-                    ->join('harga_produk', 'transaksi_detail.harga_produk_id=harga_produk.harga_produk_id', 'lEFT')
-                    ->join('pengguna', 'transaksi.pengguna_id=pengguna.pengguna_id', 'INNER')
-                    ->where('transaksi.waktu_buat >=', $date_start)->where('transaksi.waktu_buat <=', $date_end)
-                    ->limit($limit)->groupBy(['transaksi.transaksi_id', 'nama_lengkap'])->orderBy('transaksi.waktu_buat', 'DESC')
+                        transactions.transaction_id,
+                        transaction_status,
+                        transactions.created_at,
+                        transactions.edited_at,
+                        full_name,
+                        SUM(product_price*product_quantity) as total_payment
+                    ', false)
+                    ->selectSum('product_quantity', 'total_product')
+                    ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
+                    ->join('users', 'transactions.user_id = users.user_id', 'INNER')
+                    ->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
+                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'DESC')
                     ->get()->getResultArray();
     }
 
-    public function countAllTransactionSearch(string $date_start, string $date_end): int
+    public function getTotalSearch(string $dateStart, string $dateEnd): int
     {
-        return $this->select('transaksi_id')
-                    ->where('transaksi.waktu_buat >=', $date_start)
-                    ->where('transaksi.waktu_buat <=', $date_end)
-                    ->get()->getNumRows();
+        return $this->select('transaction_id')
+                    ->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
+                    ->countAllResults();
     }
 
     public function getNotTransactionYetId(): ?string

@@ -1,7 +1,7 @@
 import { renderAlert, numberFormatterToCurrency, postData } from '../module.js';
 
 const tableElement = document.querySelector('#table');
-const productSearchElement = document.querySelector('a#search-product');
+const productSearchElement = document.querySelector('a#search-products');
 
 // show hide product detail
 tableElement.querySelector('tbody').addEventListener('click', async (e) => {
@@ -85,7 +85,7 @@ productSearchElement.addEventListener('click', async (e) => {
     try {
         const resultStatusElement = document.querySelector('span#result-status');
 
-        const response = await fetch(`${baseUrl}/admin/product/search/${keyword}`);
+        const response = await fetch(`${baseUrl}/admin/products/search/${keyword}`);
         const responseJson = await response.json();
 
         // if product exists
@@ -143,7 +143,7 @@ productSearchElement.addEventListener('click', async (e) => {
         }
 
         const limitMessageElement = document.querySelector('#limit-message');
-        // add limit message if total product search = product limit && limit message not exists
+        // add limit message if total product search > product limit && limit message not exists
         if (responseJson.total_product > responseJson.product_limit && limitMessageElement == null) {
             const spanElement = document.createElement('span');
             spanElement.classList.add('text-muted');
@@ -156,7 +156,7 @@ productSearchElement.addEventListener('click', async (e) => {
             `;
             tableElement.after(spanElement);
         }
-        // else if total product search != product limit and limit message exists
+        // else if total product search <= product limit and limit message exists
         else if (responseJson.total_product <= responseJson.product_limit && limitMessageElement != null) {
             limitMessageElement.remove();
         }
@@ -164,7 +164,7 @@ productSearchElement.addEventListener('click', async (e) => {
         console.error(error);
     }
 
-    // hide loading and disable search button
+    // hide loading and enable search button
     loadingElement.classList.add('d-none');
     productSearchElement.classList.remove('btn--disabled');
 });
@@ -215,7 +215,7 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
     productSearchElement.classList.add('btn--disabled');
     
     try {
-        const responseJson = await postData(`${baseUrl}/admin/product/deletes`, data);
+        const responseJson = await postData(`${baseUrl}/admin/products/delete`, data);
 
         // set new csrf hash to table tag
         if (responseJson.csrf_value != undefined) {
