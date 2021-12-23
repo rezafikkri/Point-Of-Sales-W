@@ -63,6 +63,7 @@ $routes->group('admin', function ($routes) {
     
     $routes->get('transactions', 'Transactions::index');
     $routes->get('transactions/search/(:segment)', 'Transactions::search/$1');
+    $routes->get('transaction/show-details/(:segment)', 'Transactions::showDetails/$1');
 });
 
 $routes->get('sign_out', 'SignOut::index');

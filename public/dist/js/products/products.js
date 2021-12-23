@@ -32,11 +32,6 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
                 const response = await fetch(`${baseUrl}/admin/product/show-details/${productId}`);
                 const responseJson = await response.json();
 
-                // set new csrf hash to table tag
-                if (responseJson.csrf_value != undefined) {
-                    tableElement.dataset.csrfValue = responseJson.csrf_value;
-                }
-
                 // if product price exists
                 if (responseJson.product_prices.length > 0) {
                     let li = '';

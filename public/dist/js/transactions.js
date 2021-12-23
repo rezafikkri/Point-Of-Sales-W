@@ -122,76 +122,61 @@ searchTransactionElement.addEventListener('click', async (e) => {
 });
 
 // show hide transaction details
-tableElement.querySelector('tbody').addEventListener('click', e => {
-    let target = e.target;
-    if(target.getAttribute('id') !== 'show-transaction-detail') target = target.parentElement;
-    if(target.getAttribute('id') !== 'show-transaction-detail') target = target.parentElement;
-    if(target.getAttribute('id') === 'show-transaction-detail') {
+tableElement.querySelector('tbody').addEventListener('click', async (e) => {
+    let targetElement = e.target;
+    if(targetElement.getAttribute('id') != 'show-transaction-detail') targetElement = targetElement.parentElement;
+    if(targetElement.getAttribute('id') != 'show-transaction-detail') targetElement = targetElement.parentElement;
+    if(targetElement.getAttribute('id') == 'show-transaction-detail') {
         e.preventDefault();
 
-        // if next element sibling exists and next element sibling is tr.table__row-detail, or is mean transaction detail exists in table
-        const table_row_detail = target.parentElement.parentElement.nextElementSibling;
-        if(table_row_detail !== null && table_row_detail.classList.contains('table__row-detail')) {
-            table_row_detail.classList.toggle('table__row-detail--show');
-
+        /**
+         * if next element sibling exist and next element sibling
+         * is element with table__row-detail class, or is mean product detail exists in table
+         */
+        const tableRowDetailElement = targetElement.parentElement.parentElement.nextElementSibling;
+        if(tableRowDetailElement !== null && tableRowDetailElement.classList.contains('table__row-detail')) {
+            tableRowDetailElement.classList.toggle('table__row-detail--show');
         // else, is mean transaction detail not exists in table
         } else {
-            const transaction_id = target.dataset.transactionId;
-            const csrfName = tableElement.dataset.csrfName;
-            const csrfValue = tableElement.dataset.csrfValue;
+            const loadingElement = document.querySelector('#loading');
+            const baseUrl = document.querySelector('html').dataset.baseUrl;
+            const transactionId = targetElement.dataset.transactionId;
 
-            // loading
+            // show loading and disable button search
             loadingElement.classList.remove('d-none');
-            // disabled button search
             searchTransactionElement.classList.add('btn--disabled');
 
-            fetch('/admin/tampil_transaksi_detail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: `${csrfName}=${csrfValue}&transaction_id=${transaction_id}`
-            })
-            .finally(() => {
-                // loading
-                loadingElement.classList.add('d-none');
-                // enabled button search
-                searchTransactionElement.classList.remove('btn--disabled');
-            })
-            .then(response => {
-                return response.json();
-            })
-            .then(json => {
-                // set new csrf hash to table tag
-                if (responseJson.csrfValue !== undefined) {
-                    tableElement.dataset.csrfValue = responseJson.csrfValue;
-                }
+            try {
+                const response = await fetch(`${baseUrl}/admin/transaction/show-details/${transactionId}`);
+                const responseJson = await response.json();
 
                 // if exists transaction details
                 if (responseJson.transaction_details.length > 0) {
                     let li = '';
                     responseJson.transaction_details.forEach(val => {
-                        li += `<li><span class="table__title">${val.nama_produk}</span>
+                        li += `<li><span class="table__title">${val.product_name}</span>
                             <span class="table__information">Harga :</span><span class="table__data">
-                                ${number_formatter_to_currency(parseInt(val.harga_produk))} / ${val.besaran_produk}
+                                ${numberFormatterToCurrency(parseInt(val.product_price))} / ${val.product_magnitude}
                             </span>
-                            <span class="table__information">Jumlah :</span><span class="table__data">${val.jumlah_produk}</span>
+                            <span class="table__information">Jumlah :</span><span class="table__data">${val.product_quantity}</span>
                             <span class="table__information">Bayaran :</span><span class="table__data">
-                                ${number_formatter_to_currency(parseInt(val.harga_produk*val.jumlah_produk))}
+                                ${numberFormatterToCurrency(parseInt(val.product_price * val.product_quantity))}
                             </span></li>`;
                     });
 
-                    const tr = document.createElement('tr');
-                    tr.classList.add('table__row-detail');
-                    tr.classList.add('table__row-detail--show');
-                    tr.innerHTML = `<td colspan="7"><ul>${li}</ul></td>`;
-                    target.parentElement.parentElement.after(tr);
+                    const trElement = document.createElement('tr');
+                    trElement.classList.add('table__row-detail');
+                    trElement.classList.add('table__row-detail--show');
+                    trElement.innerHTML = `<td colspan="8"><ul>${li}</ul></td>`;
+                    targetElement.parentElement.parentElement.after(trElement);
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error(error);
-            });
+            }
+
+            // hide loading and enable button search
+            loadingElement.classList.add('d-none');
+            searchTransactionElement.classList.remove('btn--disabled');
         }
     }
 });

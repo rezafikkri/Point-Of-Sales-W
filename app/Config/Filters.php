@@ -44,7 +44,8 @@ class Filters extends BaseConfig
                     'admin/show-transactions-two-months-ago',
                     'admin/product/show-details/*',
                     'admin/products/search/*',
-                    'admin/transactions/search/*'
+                    'admin/transactions/search/*',
+                    'admin/transaction/show-details/*'
                 ]
             ],
             // 'honeypot',

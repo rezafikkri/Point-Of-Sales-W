@@ -63,14 +63,14 @@ class Transactions extends BaseController
         ]);
     }
 
-    public function showTransactionDetails()
+    public function showDetails(string $transactionId)
     {
-        $transaction_id = $this->request->getPost('transaction_id', FILTER_SANITIZE_STRING);
-        $transaction_details = $this->transaction_detail_model->getTransactionDetails(
-            $transaction_id,
-            'nama_produk, harga_produk, besaran_produk, jumlah_produk'
+        $transactionId = filter_var($transactionId, FILTER_SANITIZE_STRING);
+        $transactionDetails = $this->transactionDetailsModel->getAll(
+            $transactionId,
+            'product_name, product_price, product_magnitude, product_quantity'
         );
-        return json_encode(['transaction_details' => $transaction_details, 'csrf_value' => csrf_hash()]);
+        return json_encode(['transaction_details' => $transactionDetails]);
     }
 
     public function removeTransactionsInDB()

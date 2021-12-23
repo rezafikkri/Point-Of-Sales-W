@@ -21,11 +21,7 @@ class TransactionDetailsModel extends Model
 
     public function getAll(string $transactionId, string $columns): array
     {
-        return $this->select($columns)
-                    ->join('harga_produk', 'transaksi_detail.product_price_id = harga_produk.product_price_id', 'INNER')
-                    ->join('produk', 'harga_produk.produk_id = produk.produk_id', 'INNER')
-                    ->getWhere(['transaction_id' => $transactionId])
-                    ->getResultArray();
+        return $this->select($columns)->getWhere(['transaction_id' => $transactionId])->getResultArray();
     }
 
     public function updateProductQty(string $transaction_detail_id, int $product_qty_new, string $transactionId): bool
