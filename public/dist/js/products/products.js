@@ -1,14 +1,14 @@
 import { renderAlert, numberFormatterToCurrency, postData } from '../module.js';
 
 const tableElement = document.querySelector('#table');
-const productSearchElement = document.querySelector('a#search-products');
+const searchElement = document.querySelector('a#search');
 
-// show hide product detail
+// show hide product details
 tableElement.querySelector('tbody').addEventListener('click', async (e) => {
     let targetElement = e.target;
-    if (targetElement.getAttribute('id') != 'show-product-detail') targetElement = targetElement.parentElement;
-    if (targetElement.getAttribute('id') != 'show-product-detail') targetElement = targetElement.parentElement;
-    if (targetElement.getAttribute('id') == 'show-product-detail') {
+    if (targetElement.getAttribute('id') != 'show-product-details') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'show-product-details') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') == 'show-product-details') {
         e.preventDefault();
         
         /**
@@ -26,7 +26,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
 
             // hide loading and enable button search
             loadingElement.classList.remove('d-none');
-            productSearchElement.classList.add('btn--disabled');
+            searchElement.classList.add('btn--disabled');
 
             try {
                 const response = await fetch(`${baseUrl}/admin/product/show-details/${productId}`);
@@ -55,13 +55,13 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
 
             // hide loading and enable button search
             loadingElement.classList.add('d-none');
-            productSearchElement.classList.remove('btn--disabled');
+            searchElement.classList.remove('btn--disabled');
         }
     }
 });
 
 // search product
-productSearchElement.addEventListener('click', async (e) => {
+searchElement.addEventListener('click', async (e) => {
     e.preventDefault();
 
     const loadingElement = document.querySelector('#loading');
@@ -75,7 +75,7 @@ productSearchElement.addEventListener('click', async (e) => {
 
     // show loading and disable search button
     loadingElement.classList.remove('d-none');
-    productSearchElement.classList.add('btn--disabled');
+    searchElement.classList.add('btn--disabled');
 
     try {
         const resultStatusElement = document.querySelector('span#result-status');
@@ -101,7 +101,7 @@ productSearchElement.addEventListener('click', async (e) => {
                         </div>
                     </td>
                     <td width="10"><a href="/admin/product/edit/${p.product_id}" title="Ubah Produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/></svg></a></td>
-                    <td width="10"><a href="#" id="show-product-detail" data-product-id="${p.product_id}" title="Lihat detail produk"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
+                    <td width="10"><a href="#" id="show-product-details" data-product-id="${p.product_id}" title="Lihat detail produk"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
                     <td>${p.product_name}</td>
                     <td>${p.product_category_name}</td>
@@ -161,11 +161,11 @@ productSearchElement.addEventListener('click', async (e) => {
 
     // hide loading and enable search button
     loadingElement.classList.add('d-none');
-    productSearchElement.classList.remove('btn--disabled');
+    searchElement.classList.remove('btn--disabled');
 });
 
-// delete product and automatic delete product price
-document.querySelector('a#delete-product').addEventListener('click', async (e) => {
+// delete products and automatic delete product prices
+document.querySelector('a#delete').addEventListener('click', async (e) => {
     e.preventDefault();
 
     const checkedCheckboxElements = document.querySelectorAll('input[type="checkbox"][name="product_id"]:checked');
@@ -207,7 +207,7 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
     // show loading
     loadingElement.classList.remove('d-none');
     // disable button search
-    productSearchElement.classList.add('btn--disabled');
+    searchElement.classList.add('btn--disabled');
     
     try {
         const responseJson = await postData(`${baseUrl}/admin/products/delete`, data);
@@ -231,13 +231,13 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
                 val.parentElement.parentElement.parentElement.remove();
             });
 
-            // if longer product exist
+            // if longer products exist
             if (responseJson.longer_products.length > 0) {
                 responseJson.longer_products.forEach((p, i) => {
                     const trElement = document.createElement('tr');
 
                     // if i is odd number
-                    if ((i+1)%2 != 0) {
+                    if ((i + 1) % 2 != 0) {
                         trElement.classList.add('table__row-odd');
                     }
 
@@ -323,5 +323,5 @@ document.querySelector('a#delete-product').addEventListener('click', async (e) =
     // hide loading
     loadingElement.classList.add('d-none');
     // enable button search
-    productSearchElement.classList.remove('btn--disabled');
+    searchElement.classList.remove('btn--disabled');
 });

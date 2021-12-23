@@ -67,7 +67,7 @@ class TransactionsSeeder extends Seeder
             $maxTransaction = rand(1, 50);
 
             for ($n = 1; $n <= $maxTransaction; $n++) {
-                $dateTime = date('Y-m-d', $i) . ' ' . '06:' . rand(10, 23) . ':00';
+                $dateTime = date('Y-m-d', $i) . ' ' . rand(2, 6) . ':' . rand(10, 23) . ':' . rand(0, 23);
                 $transactionId = generate_uuid();
                 $productRandomInt = rand(0, 5);
 

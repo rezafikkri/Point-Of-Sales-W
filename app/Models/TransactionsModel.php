@@ -75,6 +75,41 @@ class TransactionsModel extends Model
                     ->countAllResults();
     }
 
+    public function getAllLonger(int $limit, string $smallestEditedAt): array
+    {
+        return $this->select('
+                        transactions.transaction_id,
+                        transaction_status,
+                        transactions.created_at,
+                        transactions.edited_at,
+                        full_name,
+                        SUM(product_price*product_quantity) as total_payment
+                    ', false)
+                    ->selectSum('product_quantity', 'total_product')
+                    ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
+                    ->join('users', 'transactions.user_id = users.user_id', 'INNER')
+                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'DESC')
+                    ->getWhere(['transactions.edited_at <' => $smallestEditedAt])->getResultArray();
+    }
+
+    public function searchLonger(int $limit, string $smallestEditedAt, string $dateStart, string $dateEnd): array
+    {
+        return $this->select('
+                        transactions.transaction_id,
+                        transaction_status,
+                        transactions.created_at,
+                        transactions.edited_at,
+                        full_name,
+                        SUM(product_price*product_quantity) as total_payment
+                    ', false)
+                    ->selectSum('product_quantity', 'total_product')
+                    ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
+                    ->join('users', 'transactions.user_id = users.user_id', 'INNER')
+                    ->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
+                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'DESC')
+                    ->getWhere(['transactions.edited_at <' => $smallestEditedAt])->getResultArray();
+    }
+
     public function getNotTransactionYetId(): ?string
     {
         return $this->select('transaksi_id')
@@ -95,53 +130,5 @@ class TransactionsModel extends Model
         return $this->select($column)
                     ->getWhere(['transaksi_id' => $transaction_id])
                     ->getRowArray();
-    }
-
-    public function removeTransactions(array $transaction_ids): int
-    {
-        $timestamp_three_days_ago = date('Y-m-d H:i:s', mktime(00, 00, 00, date('m'), date('d'), date('Y')) - (60 * 60 * 24 * 3));
-
-        try {
-            $this->whereIn('transaksi_id', $transaction_ids)
-                 ->where(['status_transaksi' => 'selesai', 'waktu_buat <' => $timestamp_three_days_ago])->delete();
-            return $this->db->affectedRows();
-        } catch (\ErrorException $e) {
-            return 0;
-        }
-    }
-
-    public function getLongerTransactions(int $limit, string $smallest_create_time): array
-    {
-        return $this->select('
-                        transaksi.transaksi_id,
-                        status_transaksi,
-                        transaksi.waktu_buat,
-                        nama_lengkap,
-                        SUM(harga_produk*jumlah_produk) as payment_total'
-                    , false)
-                    ->selectSum('jumlah_produk', 'product_total')
-                    ->join('transaksi_detail', 'transaksi.transaksi_id=transaksi_detail.transaksi_id', 'LEFT')
-                    ->join('harga_produk', 'transaksi_detail.harga_produk_id=harga_produk.harga_produk_id', 'lEFT')
-                    ->join('pengguna', 'transaksi.pengguna_id=pengguna.pengguna_id', 'INNER')
-                    ->limit($limit)->groupBy(['transaksi.transaksi_id', 'nama_lengkap'])->orderBy('transaksi.waktu_buat', 'DESC')
-                    ->getWhere(['waktu_buat <' => $smallest_create_time])->getResultArray();
-    }
-
-    public function getLongerTransactionSearches(int $limit, string $smallest_create_time, string $date_start, string $date_end): array
-    {
-        return $this->select('
-                        transaksi.transaksi_id,
-                        status_transaksi,
-                        transaksi.waktu_buat,
-                        nama_lengkap,
-                        SUM(harga_produk*jumlah_produk) as payment_total'
-                    , false)
-                    ->selectSum('jumlah_produk', 'product_total')
-                    ->join('transaksi_detail', 'transaksi.transaksi_id=transaksi_detail.transaksi_id', 'LEFT')
-                    ->join('harga_produk', 'transaksi_detail.harga_produk_id=harga_produk.harga_produk_id', 'lEFT')
-                    ->join('pengguna', 'transaksi.pengguna_id=pengguna.pengguna_id', 'INNER')
-                    ->where('transaksi.waktu_buat >=', $date_start)->where('transaksi.waktu_buat <=', $date_end)
-                    ->limit($limit)->groupBy(['transaksi.transaksi_id', 'nama_lengkap'])->orderBy('transaksi.waktu_buat', 'DESC')
-                    ->getWhere(['waktu_buat <' => $smallest_create_time])->getResultArray();
     }
 }

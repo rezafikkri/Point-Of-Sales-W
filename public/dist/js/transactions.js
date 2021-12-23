@@ -1,12 +1,19 @@
-import { renderAlert, numberFormatterToCurrency, showModal, hideModal, showPassword } from './module.js';
+import {
+    renderAlert,
+    numberFormatterToCurrency,
+    showModal,
+    hideModal,
+    showPassword,
+    postData
+} from './module.js';
 import Indonesian from '../plugins/flatpickr/id.js';
 
 const tableElement = document.querySelector('#table');
-const searchTransactionElement = document.querySelector('a#search-transactions');
-const export_transaction_excel = document.querySelector('a#export-transaction-excel');
-const modal = document.querySelector('.modal');
-const modal_content = modal.querySelector('.modal__content');
+const searchElement = document.querySelector('a#search');
+const modalElement = document.querySelector('.modal');
+const modalContentElement = modalElement.querySelector('.modal__content');
 
+const export_transaction_excel = document.querySelector('a#export-transaction-excel');
 
 // flatpickr setting
 flatpickr('input[name="date_range"]', {
@@ -18,8 +25,8 @@ flatpickr('input[name="date_range"]', {
     locale: Indonesian
 });
 
-// search transaction
-searchTransactionElement.addEventListener('click', async (e) => {
+// search transactions
+searchElement.addEventListener('click', async (e) => {
     e.preventDefault();
     
     const loadingElement = document.querySelector('#loading');
@@ -33,7 +40,7 @@ searchTransactionElement.addEventListener('click', async (e) => {
 
     // show loading and disable button search
     loadingElement.classList.remove('d-none');
-    searchTransactionElement.classList.add('btn--disabled');
+    searchElement.classList.add('btn--disabled');
     
     try {
         const resultStatusElement = document.querySelector('span#result-status');
@@ -41,7 +48,7 @@ searchTransactionElement.addEventListener('click', async (e) => {
         const response = await fetch(`${baseUrl}/admin/transactions/search/${dateRange}`);
         const responseJson = await response.json();
 
-        // if transaction exists
+        // if transactions exists
         if (responseJson.transactions.length > 0) {
             let tr = '';
 
@@ -62,7 +69,7 @@ searchTransactionElement.addEventListener('click', async (e) => {
                 }
 
                 tr += `</td>
-                    <td width="10"><a href="#" id="show-transaction-detail" data-transaction-id="${t.transaction_id}" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
+                    <td width="10"><a href="#" id="show-transaction-details" data-transaction-id="${t.transaction_id}" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
                     <td>${t.total_product || 0}</td>
                     <td>${numberFormatterToCurrency(parseInt(t.total_payment || 0))}</td>`;
@@ -85,7 +92,7 @@ searchTransactionElement.addEventListener('click', async (e) => {
             tableElement.dataset.typeShow = 'date-range';
             tableElement.dataset.dateRange = dateRange;
         }
-        // if transaction not exists
+        // if transactions not exists
         else {
             // inner html message
             tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="8">Transaksi tidak ada.</td></tr>`;
@@ -95,7 +102,7 @@ searchTransactionElement.addEventListener('click', async (e) => {
         }
 
         const limitMessageElement = document.querySelector('span#limit-message');
-        // add limit message if total transaction search > product limit && limit message not exists
+        // add limit message if total transaction search > transaction limit && limit message not exists
         if (responseJson.total_transaction > responseJson.transaction_limit && limitMessageElement == null) {
             const spanElement = document.createElement('span');
             spanElement.classList.add('text-muted');
@@ -108,7 +115,7 @@ searchTransactionElement.addEventListener('click', async (e) => {
             `;
             tableElement.after(spanElement);
         }
-        // else if total transaction search <= product limit and limit message exists
+        // else if total transaction search <= transaction limit and limit message exists
         else if (responseJson.total_transaction <= responseJson.transaction_limit && limitMessageElement != null) {
             limitMessageElement.remove();
         }
@@ -118,15 +125,15 @@ searchTransactionElement.addEventListener('click', async (e) => {
 
     // hide loading and enable button search
     loadingElement.classList.add('d-none');
-    searchTransactionElement.classList.remove('btn--disabled');
+    searchElement.classList.remove('btn--disabled');
 });
 
 // show hide transaction details
 tableElement.querySelector('tbody').addEventListener('click', async (e) => {
     let targetElement = e.target;
-    if(targetElement.getAttribute('id') != 'show-transaction-detail') targetElement = targetElement.parentElement;
-    if(targetElement.getAttribute('id') != 'show-transaction-detail') targetElement = targetElement.parentElement;
-    if(targetElement.getAttribute('id') == 'show-transaction-detail') {
+    if(targetElement.getAttribute('id') != 'show-transaction-details') targetElement = targetElement.parentElement;
+    if(targetElement.getAttribute('id') != 'show-transaction-details') targetElement = targetElement.parentElement;
+    if(targetElement.getAttribute('id') == 'show-transaction-details') {
         e.preventDefault();
 
         /**
@@ -144,7 +151,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
 
             // show loading and disable button search
             loadingElement.classList.remove('d-none');
-            searchTransactionElement.classList.add('btn--disabled');
+            searchElement.classList.add('btn--disabled');
 
             try {
                 const response = await fetch(`${baseUrl}/admin/transaction/show-details/${transactionId}`);
@@ -176,224 +183,216 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
 
             // hide loading and enable button search
             loadingElement.classList.add('d-none');
-            searchTransactionElement.classList.remove('btn--disabled');
+            searchElement.classList.remove('btn--disabled');
         }
     }
 });
 
-document.querySelector('a#remove-transaction').addEventListener('click', e => {
+document.querySelector('a#show-modal-delete').addEventListener('click', (e) => {
     e.preventDefault();
 
-    const checkboxs_checked = document.querySelectorAll('input[type="checkbox"][name="transaction_id"]:checked');
-    // if not found input checkbox checklist
-    if (checkboxs_checked.length === 0) {
+    const checkboxsChecked = document.querySelectorAll('input[type="checkbox"][name="transaction_id"]:checked');
+    // if not found checked checkbox
+    if (checkboxsChecked.length == 0) {
         return false;
     }
 
     // show modal
-    show_modal(modal, modal_content);
+    showModal(modalElement, modalContentElement);
 });
 
 // close modal
-modal_content.querySelector('a#btn-close').addEventListener('click', e => {
+modalContentElement.querySelector('a#btn-close').addEventListener('click', (e) => {
     e.preventDefault();
 
     // hide modal
-    hide_modal(modal, modal_content);
+    hideModal(modalElement, modalContentElement);
 
     // reset modal
-    modal_content.querySelector('input[name="password"]').value = '';
-    const small = modal_content.querySelector('small.form-message')
-    if (small !== null) {
-        small.remove();
+    modalContentElement.querySelector('input[name="password"]').value = '';
+    const smallElement = modalContentElement.querySelector('small.form-message');
+    if (smallElement != null) {
+        smallElement.remove();
     }
 });
 
 // show password
 document.querySelector('.modal a#show-password').addEventListener('click', showPassword);
 
-// remove transaction
-document.querySelector('a#remove-transaction-in-db').addEventListener('click', e => {
+// delete transactions and automatic delete transaction details
+document.querySelector('a#delete').addEventListener('click', async (e) => {
     e.preventDefault();
 
     // reset form message
-    const small = modal_content.querySelector('small.form-message');
-    if (small !== null) {
-        small.remove();
+    const smallElement = modalContentElement.querySelector('small.form-message');
+    if (smallElement != null) {
+        smallElement.remove();
     }
+
+    const loadingElement = document.querySelector('#delete-loading');
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
 
     // generate data
     let data = '';
 
-    const csrf_name = tableElement.dataset.csrfName;
+    const csrfName = tableElement.dataset.csrfName;
     const csrfValue = tableElement.dataset.csrfValue;
-    const password = modal_content.querySelector('input[name="password"]').value;
-    data += `${csrf_name}=${csrfValue}&password=${password}`;
+    const userSignInPassword = modalContentElement.querySelector('input[name="user_sign_in_password"]').value;
+    data += `${csrfName}=${csrfValue}&user_sign_in_password=${userSignInPassword}`;
 
-    let transaction_ids = '';
-    const checkboxs_checked = document.querySelectorAll('input[type="checkbox"][name="transaction_id"]:checked');
-    checkboxs_checked.forEach((val, index) => {
+    let transactionIds = '';
+    const checkedCheckboxElements = document.querySelectorAll('input[type="checkbox"][name="transaction_id"]:checked');
+    checkedCheckboxElements.forEach((val, index) => {
         // if last checkbox
-        if (index === checkboxs_checked.length-1) {
-            transaction_ids += val.value;
+        if (index == checkedCheckboxElements.length-1) {
+            transactionIds += val.value;
         } else {
-            transaction_ids += val.value+',';
+            transactionIds += val.value + ',';
         }
     });
-    data += `&transaction_ids=${transaction_ids}`;
+    data += `&transaction_ids=${transactionIds}`;
 
-    // get smallest create time in table
-    const all_checkboxs = document.querySelectorAll('input[type="checkbox"][name="transaction_id"]');
-    data += `&smallest_create_time=${all_checkboxs[all_checkboxs.length-1].dataset.createTime}`;
+    // get smallest edited at in table
+    const allCheckboxElements = document.querySelectorAll('input[type="checkbox"][name="transaction_id"]');
+    data += `&smallest_edited_at=${allCheckboxElements[allCheckboxElements.length-1].dataset.editedAt}`;
 
     // if dataset type-show and dataset date-range exists in table tag
     if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.dateRange !== undefined) {
         data += `&date_range=${tableElement.dataset.dateRange}`;
     }
 
-    // loading
-    e.target.classList.add('btn--disabled');
-    e.target.nextElementSibling.classList.remove('d-none');
+    // show loading
+    loadingElement.classList.remove('d-none');
 
-    fetch('/admin/hapus_transaksi', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: data
-    })
-    .finally(() => {
-        // loading
-        e.target.classList.remove('btn--disabled');
-        e.target.nextElementSibling.classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
+    try {
+        const responseJson = await postData(`${baseUrl}/admin/transactions/delete`, data);
+
         // set new csrf hash to table tag
-        if (responseJson.csrfValue !== undefined) {
-            tableElement.dataset.csrfValue = responseJson.csrfValue;
+        if (responseJson.csrf_value != undefined) {
+            tableElement.dataset.csrfValue = responseJson.csrf_value;
         }
 
-        // if remove transaction success
-        if (responseJson.status === 'success') {
-            checkboxs_checked.forEach(val => {
-                // if exists detail transaction in table
-                const table_row_detail = val.parentElement.parentElement.parentElement.nextElementSibling;
-                if (table_row_detail !== null && table_row_detail.classList.contains('table__row-detail')) {
+        // if delete transaction success
+        if (responseJson.status == 'success') {
+            checkedCheckboxElements.forEach(val => {
+                // if transaction detail exist in table
+                const tableRowDetailElement = val.parentElement.parentElement.parentElement.nextElementSibling;
+                if (tableRowDetailElement != null && tableRowDetailElement.classList.contains('table__row-detail')) {
                     // remove detail transaction
-                    table_row_detail.remove();
+                    tableRowDetailElement.remove();
                 }
 
-                // remove transaction checklist
+                // remove transaction checked
                 val.parentElement.parentElement.parentElement.remove();
             });
 
-            // if longer transaction exists
+            // if longer transactions exist
             if (responseJson.longer_transactions.length > 0) {
                 responseJson.longer_transactions.forEach((t, i) => {
-                    const tr = document.createElement('tr');
+                    const trElement = document.createElement('tr');
 
                     // if i is odd number
-                    if ((i+1)%2 !== 0) {
-                        tr.classList.add('table__row-odd');
+                    if ((i + 1) % 2 != 0) {
+                        trElement.classList.add('table__row-odd');
                     }
                     let td = '<td width="10">';
 
                     // if transaction is allow for delete
-                    if (t.permission_delete === true) {
+                    if (t.delete_permission == true) {
                         td += `<div class="form-check">
-                                <input type="checkbox" name="transaction_id" data-create-time="${t.waktu_buat}" class="form-check-input" value="${t.transaksi_id}">
+                                <input type="checkbox" name="transaction_id" data-edited-at="${t.edited_at}" class="form-check-input" value="${t.transaction_id}">
                             </div>`;
                     }
 
                     td += `</td>
-                        <td width="10"><a href="#" id="show-transaction-detail" data-transaction-id="${t.transaksi_id}" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
+                        <td width="10"><a href="#" id="show-transaction-details" data-transaction-id="${t.transaction_id}" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
-                        <td>${t.product_total||0}</td>
-                        <td>${number_formatter_to_currency(parseInt(t.payment_total||0))}</td>`;
+                        <td>${t.total_product || 0}</td>
+                        <td>${numberFormatterToCurrency(parseInt(t.total_payment || 0))}</td>`;
 
-                    if (t.status_transaksi === 'selesai') {
+                    if (t.transaction_status == 'selesai') {
                         td += '<td><span class="text-green">Selesai</span></td>';
                     } else {
                         td += '<td><span class="text-red">Belum</span></td>';
                     }
 
-                    td += `<td>${t.nama_lengkap}</td><td>${t.indo_create_time}</td></tr>`;
+                    td += `<td>${t.full_name}</td><td>${t.created_at}</td><td>${t.indo_edited_at}</td></tr>`;
 
                     // inner td to tr
-                    tr.innerHTML = td;
+                    trElement.innerHTML = td;
                     // append tr to tbody
-                    tableElement.querySelector('tbody').append(tr);
+                    tableElement.querySelector('tbody').append(trElement);
                 });
             }
 
-            const count_transaction_in_table = tableElement.querySelectorAll('tbody tr').length;
-            // if transaction total = 0
-            if (responseJson.transaction_total === 0) {
+            const resultStatusElement = document.querySelector('span#result-status');
+            const countTransactionInTable = tableElement.querySelectorAll('tbody tr').length;
+            // if total transaction = 0
+            if (responseJson.total_transaction == 0) {
                 // inner html message
                 tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="7">Transaksi tidak ada.</td></tr>`;
 
                 // if dataset type-show and dataset date-range exists in table tag
-                if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.dateRange !== undefined) {
+                if (tableElement.dataset.typeShow != undefined && tableElement.dataset.dateRange != undefined) {
                     // show result status
-                    result_status.innerText = '0 Total transaksi hasil pencarian';
+                    resultStatusElement.innerText = '0 Total transaksi hasil pencarian';
                 } else {
                     // show result status
-                    result_status.innerText = '0 Total transaksi';
+                    resultStatusElement.innerText = '0 Total transaksi';
                 }
 
             } else {
                 // if dataset type-show and dataset date-range exists in table tag
-                if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.dateRange !== undefined) {
+                if (tableElement.dataset.typeShow != undefined && tableElement.dataset.dateRange != undefined) {
                     // show result status
-                    result_status.innerText = `1 - ${count_transaction_in_table} dari ${responseJson.transaction_total} Total transaksi hasil pencarian`;
+                    resultStatusElement.innerText = `1 - ${countTransactionInTable} dari ${responseJson.total_transaction} Total transaksi hasil pencarian`;
                 } else {
                     // show result status
-                    result_status.innerText = `1 - ${count_transaction_in_table} dari ${responseJson.transaction_total} Total transaksi`;
+                    resultStatusElement.innerText = `1 - ${countTransactionInTable} dari ${responseJson.total_transaction} Total transaksi`;
                 }
             }
 
-            // if total transaction in table < transaction limit and limit message exists
+            // if total transaction in table <= transaction limit and limit message exist
             const limitMessageElement = document.querySelector('span#limit-message');
-            if (count_transaction_in_table < responseJson.transaction_limit && limitMessageElement !== null) {
+            if (responseJson.total_transaction <= responseJson.transaction_limit && limitMessageElement != null) {
                 limitMessageElement.remove();
             }
         }
         // else if password sign in user is wrong
-        else if (responseJson.status === 'wrong_password') {
-            const small = document.createElement('small');
-            small.classList.add('form-message');
-            small.classList.add('form-message--danger');
-            small.innerText = responseJson.message;
+        else if (responseJson.status == 'wrong_password') {
+            const smallElement = document.createElement('small');
+            smallElement.classList.add('form-message');
+            smallElement.classList.add('form-message--danger');
+            smallElement.innerText = responseJson.message;
 
             // append message to modal
-            modal_content.querySelector('div.modal__body').append(small);
+            modalContentElement.querySelector('div.modal__body').append(smallElement);
         }
         // else if fail remove transaction
-        else if (responseJson.status === 'fail') {
-            const alert = create_alert_node(['alert--warning', 'mb-3'], responseJson.message);
-            // append alert to before div.main__box element
-            document.querySelector('main.main > div').insertBefore(alert, document.querySelector('div.main__box'));
+        else if (responseJson.status == 'fail') {
+            const parentElement = document.querySelector('main.main');
+            const referenceElement = document.querySelector('div.main__box');
+            renderAlert(parentElement, referenceElement, responseJson.message, [
+                'alert--warning',
+                'mb-3'
+            ]);
 
-            // reset input checkboxs checked
-            checkboxs_checked.forEach(val => {
-                val.checked = false;
-            });
+            // reset checked checkboxs
+            checkedCheckboxElements.forEach(val => val.checked = false);
         }
 
-        if (responseJson.status === 'success' || responseJson.status === 'fail') {
+        if (responseJson.status == 'success' || responseJson.status == 'fail') {
             // hide modal
-            hide_modal(modal, modal_content);
+            hideModal(modalElement, modalContentElement);
             // reset modal
-            modal_content.querySelector('input[name="password"]').value = '';
+            modalContentElement.querySelector('input[name="user_sign_in_password"]').value = '';
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error(error);
-    });
+    }
+
+    // hide loading
+    loadingElement.classList.add('d-none');
 });
 
 // export transactions to excel
@@ -415,7 +414,7 @@ export_transaction_excel.addEventListener('click', e => {
     // loading
     export_transaction_excel.nextElementSibling.classList.remove('d-none');
     // disabled button search
-    searchTransactionElement.classList.add('btn--disabled');
+    searchElement.classList.add('btn--disabled');
     // disabled action in table
     const table_loading = tableElement.parentElement.nextElementSibling;
     table_loading.querySelector('.loading').classList.add('d-none');
@@ -433,7 +432,7 @@ export_transaction_excel.addEventListener('click', e => {
         // loading
         export_transaction_excel.nextElementSibling.classList.add('d-none');
         // disabled button search
-        searchTransactionElement.classList.remove('btn--disabled');
+        searchElement.classList.remove('btn--disabled');
         // disabled action in table
         const table_loading = tableElement.parentElement.nextElementSibling;
         table_loading.querySelector('.loading').classList.remove('d-none');

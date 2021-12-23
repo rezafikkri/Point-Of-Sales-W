@@ -9,10 +9,10 @@ const tbodyElement = table.querySelector('tbody');
 tbodyElement.addEventListener('click', (e) => {
     let targetElement = e.target;
 
-    if (targetElement.getAttribute('id') !== 'delete-user') targetElement = targetElement.parentElement;
-    if (targetElement.getAttribute('id') !== 'delete-user') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'show-modal-delete') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'show-modal-delete') targetElement = targetElement.parentElement;
 
-    if (targetElement.getAttribute('id') == 'delete-user') {
+    if (targetElement.getAttribute('id') == 'show-modal-delete') {
         e.preventDefault();
 
         // show modal
@@ -33,14 +33,14 @@ modalContentElement.querySelector('#btn-close').addEventListener('click', (e) =>
 
     // reset modal
     modalContentElement.querySelector('input[name="user_sign_in_password"]').value = '';
-    const smallElement = modalContentElement.querySelector('small.form-message')
+    const smallElement = modalContentElement.querySelector('small.form-message');
     if (smallElement != null) {
         smallElement.remove();
     }
 });
 
 // delete user
-modalContentElement.querySelector('#delete-user').addEventListener('click', async (e) => {
+modalContentElement.querySelector('#delete').addEventListener('click', async (e) => {
     e.preventDefault();
 
     const loadingElement = document.querySelector('#loading');
@@ -52,12 +52,11 @@ modalContentElement.querySelector('#delete-user').addEventListener('click', asyn
 
     // reset message form
     const small = modalContentElement.querySelector('small.form-message');
-    if (small !== null) {
+    if (small != null) {
         small.remove();
     }
 
-    // loading
-    e.target.classList.add('btn--disabled');
+    // show loading
     loadingElement.classList.remove('d-none');
     
     try {
@@ -77,13 +76,13 @@ modalContentElement.querySelector('#delete-user').addEventListener('click', asyn
         }
         // else if password sign in user is wrong
         else if (responseJson.status == 'wrong_password') {
-            const small = document.createElement('small');
-            small.classList.add('form-message');
-            small.classList.add('form-message--danger');
-            small.innerText = responseJson.message;
+            const smallElement = document.createElement('small');
+            smallElement.classList.add('form-message');
+            smallElement.classList.add('form-message--danger');
+            smallElement.innerText = responseJson.message;
 
             // append message to modal
-            modalContentElement.querySelector('div.modal__body').append(small);
+            modalContentElement.querySelector('div.modal__body').append(smallElement);
         }
         // else if fail remove user
         else if (responseJson.status == 'fail') {
@@ -106,7 +105,6 @@ modalContentElement.querySelector('#delete-user').addEventListener('click', asyn
     }
 
     // hide loading
-    e.target.classList.remove('btn--disabled');
     loadingElement.classList.add('d-none');
 });
 

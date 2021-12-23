@@ -82,4 +82,19 @@ class BaseController extends Controller
 
         return $newMessages;
     }
+
+    protected function validateUserSignInPassword($userSignInPassword): bool
+    {
+        if (empty(trim($userSignInPassword))) {
+            $this->userSignInPasswordErrorMessage = 'Bidang Password Mu diperlukan.';
+            return false;
+        }
+        
+        $passwordHash = $this->usersModel->getOne($_SESSION['sign_in_user_id'], 'password')['password'];
+        if (!password_verify($userSignInPassword, $passwordHash)) {
+            $this->userSignInPasswordErrorMessage = 'Password salah.';
+            return false;
+        }       
+        return true;
+    }
 }

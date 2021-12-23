@@ -73,65 +73,66 @@ class Transactions extends BaseController
         return json_encode(['transaction_details' => $transactionDetails]);
     }
 
-    public function removeTransactionsInDB()
+    public function delete()
     {
-        // check password sign in user
-        $password = $this->request->getPost('password', FILTER_SANITIZE_STRING);
-        $password_db = $this->user_model->findUser($_SESSION['posw_user_id'], 'password')['password'];
-        $check_password = check_password_sign_in_user($password, $password_db);
-        if ($check_password !== 'yes') {
+        helper('is_allowed_delete_transaction');
+
+        // check user sign in password
+        $userSignInPassword = $this->request->getPost('user_sign_in_password', FILTER_SANITIZE_STRING);        
+        if (!$this->validateUserSignInPassword($userSignInPassword)) {
             return json_encode([
                 'status' => 'wrong_password',
-                'message' => $check_password,
+                'message' => $this->userSignInPasswordErrorMessage,
                 'csrf_value' => csrf_hash()
             ]);
         }
 
-        // remove transaction
-        $transaction_ids = explode(',', $this->request->getPost('transaction_ids', FILTER_SANITIZE_STRING));
-        if ($this->transaction_model->removeTransactions($transaction_ids) > 0) {
-            $count_transaction_id = count($transaction_ids);
-            $smallest_create_time = $this->request->getPost('smallest_create_time');
-            $date_range = $this->request->getPost('date_range', FILTER_SANITIZE_STRING);
+        // delete transaction
+        $transactionIds = explode(',', $this->request->getPost('transaction_ids', FILTER_SANITIZE_STRING));
+        if ($this->transactionsModel->delete($transactionIds)) {
+            $countTransactionId = count($transactionIds);
+            $smallestEditedAt = $this->request->getPost('smallest_edited_at');
+            $dateRange = $this->request->getPost('date_range', FILTER_SANITIZE_STRING);
 
             // if exists date_range
-            if ($date_range !== null) {
-                $arr_date_range = explode(' - ', $date_range);
-                $date_start = $arr_date_range[0].' 00:00:00';
-                $date_end = ($arr_date_range[1] ?? $arr_date_range[0]).' 23:59:59';
+            if ($dateRange != null) {
+                $arrDateRange = explode(' - ', $dateRange);
+                $dateStart = $arrDateRange[0] . ' 00:00:00';
+                $dateEnd = ($arrDateRange[1] ?? $arrDateRange[0]) . ' 23:59:59';
 
-                // transaction total
-                $transaction_total = $this->transaction_model->countAllTransactionSearch($date_start, $date_end);
+                // total transaction
+                $totalTransaction = $this->transactionsModel->getTotalSearch($dateStart, $dateEnd);
                 // get longer transaction
-                $longer_transactions = $this->transaction_model->getLongerTransactionSearches(
-                    $count_transaction_id,
-                    $smallest_create_time,
-                    $date_start,
-                    $date_end
+                $longerTransactions = $this->transactionsModel->searchLonger(
+                    $countTransactionId,
+                    $smallestEditedAt,
+                    $dateStart,
+                    $dateEnd
                 );
 
             } else {
-                // transaction total
-                $transaction_total = $this->transaction_model->countAllTransaction();
+                // total transaction
+                $totalTransaction = $this->transactionsModel->getTotal();
                 // longer transaction
-                $longer_transactions = $this->transaction_model->getLongerTransactions($count_transaction_id, $smallest_create_time);
+                $longerTransactions = $this->transactionsModel->getAllLonger($countTransactionId, $smallestEditedAt);
             }
 
-            $count_longer_transactions = count($longer_transactions);
-            for ($i = 0; $i < $count_longer_transactions; $i++) {
-                // convert timestamp
-                $longer_transactions[$i]['indo_create_time'] = $this->indo_time->toIndoLocalizedString($longer_transactions[$i]['waktu_buat']);
-                // generate permission for delete
-                $longer_transactions[$i]['permission_delete'] = is_transaction_allowed_delete(
-                    $longer_transactions[$i]['waktu_buat'],
-                    $longer_transactions[$i]['status_transaksi']
-                );
+            // convert timestamp
+            foreach ($longerTransactions as $key => $value) {
+                $createdAt = Time::createFromFormat('Y-m-d H:i:s', $value['created_at']);
+                $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
+
+                $longerTransactions[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM yyyy HH:mm');
+                $longerTransactions[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM yyyy HH:mm');
+
+                // check permission to delete
+                $longerTransactions[$key]['delete_permission'] = is_allowed_delete_transaction($value['edited_at']);
             }
 
             return json_encode([
                 'status' => 'success',
-                'longer_transactions' => $longer_transactions,
-                'transaction_total' => $transaction_total,
+                'longer_transactions' => $longerTransactions,
+                'total_transaction' => $totalTransaction,
                 'transaction_limit' => static::TRANSACTION_LIMIT,
                 'csrf_value' => csrf_hash()
             ]);

@@ -21,26 +21,26 @@ const tbodyElement = tableElement.querySelector('tbody');
 tbodyElement.addEventListener('click', (e) => {
     // find true target
     let targetDeleteElement = e.target;
-    if (targetDeleteElement.getAttribute('id') != 'delete-user') targetDeleteElement = targetDeleteElement.parentElement;
-    if (targetDeleteElement.getAttribute('id') != 'delete-user') targetDeleteElement = targetDeleteElement.parentElement;
+    if (targetDeleteElement.getAttribute('id') != 'show-modal-delete') targetDeleteElement = targetDeleteElement.parentElement;
+    if (targetDeleteElement.getAttribute('id') != 'show-modal-delete') targetDeleteElement = targetDeleteElement.parentElement;
 
     let targetRestoreElement = e.target;
-    if (targetRestoreElement.getAttribute('id') != 'restore-user') targetRestoreElement = targetRestoreElement.parentElement;
-    if (targetRestoreElement.getAttribute('id') != 'restore-user') targetRestoreElement = targetRestoreElement.parentElement;
+    if (targetRestoreElement.getAttribute('id') != 'show-modal-restore') targetRestoreElement = targetRestoreElement.parentElement;
+    if (targetRestoreElement.getAttribute('id') != 'show-modal-restore') targetRestoreElement = targetRestoreElement.parentElement;
 
     // if delete user button clicked
-    if (targetDeleteElement.getAttribute('id') == 'delete-user') {
+    if (targetDeleteElement.getAttribute('id') == 'show-modal-delete') {
         e.preventDefault();
 
-        const modalElement = document.querySelector('#permanently-delete-user-modal');
+        const modalElement = document.querySelector('#permanently-delete-modal');
         const modalContentElement = modalElement.querySelector('.modal__content');
         openModal(targetDeleteElement, modalElement, modalContentElement);
     }
     // if restore user button clicked
-    else if (targetRestoreElement.getAttribute('id') == 'restore-user') {
+    else if (targetRestoreElement.getAttribute('id') == 'show-modal-restore') {
         e.preventDefault();
 
-        const modalElement = document.querySelector('#restore-user-modal');
+        const modalElement = document.querySelector('#restore-modal');
         const modalContentElement = modalElement.querySelector('.modal__content');
         openModal(targetRestoreElement, modalElement, modalContentElement);
     }
@@ -80,7 +80,6 @@ async function RDUser(targetElement, path, action)
     }
 
     // show loading
-    targetElement.classList.add('btn--disabled');
     loadingElement.classList.remove('d-none');
    
     try {
@@ -145,11 +144,9 @@ async function RDUser(targetElement, path, action)
     }
 
     // hide loading
-    targetElement.classList.remove('btn--disabled');
     loadingElement.classList.add('d-none');
 }
 
-// close modal
 document.querySelector('#modals').addEventListener('click', (e) => {
     // find true target
     let targetCloseModalElement = e.target;
@@ -161,12 +158,12 @@ document.querySelector('#modals').addEventListener('click', (e) => {
     if (targetShowPasswordElement.getAttribute('id') != 'show-password') targetShowPasswordElement = targetShowPasswordElement.parentElement;
 
     let targetRestoreElement = e.target;
-    if (targetRestoreElement.getAttribute('id') != 'restore-user') targetRestoreElement = targetRestoreElement.parentElement;
-    if (targetRestoreElement.getAttribute('id') != 'restore-user') targetRestoreElement = targetRestoreElement.parentElement;
+    if (targetRestoreElement.getAttribute('id') != 'restore') targetRestoreElement = targetRestoreElement.parentElement;
+    if (targetRestoreElement.getAttribute('id') != 'restore') targetRestoreElement = targetRestoreElement.parentElement;
 
     let targetDeleteElement = e.target;
-    if (targetDeleteElement.getAttribute('id') != 'delete-user') targetDeleteElement = targetDeleteElement.parentElement;
-    if (targetDeleteElement.getAttribute('id') != 'delete-user') targetDeleteElement = targetDeleteElement.parentElement;
+    if (targetDeleteElement.getAttribute('id') != 'delete') targetDeleteElement = targetDeleteElement.parentElement;
+    if (targetDeleteElement.getAttribute('id') != 'delete') targetDeleteElement = targetDeleteElement.parentElement;
     
     // if btn close modal clicked
     if (targetCloseModalElement.getAttribute('id') == 'btn-close') {
@@ -182,12 +179,12 @@ document.querySelector('#modals').addEventListener('click', (e) => {
         changeInputTypeLockIcon(targetShowPasswordElement);
     }
     // if btn restore user clicked
-    else if (targetRestoreElement.getAttribute('id') == 'restore-user') {
+    else if (targetRestoreElement.getAttribute('id') == 'restore') {
         e.preventDefault();
         RDUser(targetRestoreElement, '/admin/user/restore', 'restore');
     }
     // if btn delete user clicked
-    else if (targetDeleteElement.getAttribute('id') == 'delete-user') {
+    else if (targetDeleteElement.getAttribute('id') == 'delete') {
         e.preventDefault();
         RDUser(targetDeleteElement, '/admin/user/delete/hard', 'delete');
     }

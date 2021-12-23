@@ -201,21 +201,6 @@ class Users extends BaseController
         return redirect()->to('/admin/user/edit/' . $userId);
     }
 
-    private function validateUserSignInPassword($userSignInPassword): bool
-    {
-        if (empty(trim($userSignInPassword))) {
-            $this->userSignInPasswordErrorMessage = 'Bidang Password Mu diperlukan.';
-            return false;
-        }
-        
-        $passwordHash = $this->usersModel->getOne($_SESSION['sign_in_user_id'], 'password')['password'];
-        if (!password_verify($userSignInPassword, $passwordHash)) {
-            $this->userSignInPasswordErrorMessage = 'Password salah.';
-            return false;
-        }       
-        return true;
-    }
-
     public function delete(string $type)
     {
         // check user sign in password

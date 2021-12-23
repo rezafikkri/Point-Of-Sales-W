@@ -6,10 +6,10 @@ const tbodyElement = tableElement.querySelector('tbody');
 tbodyElement.addEventListener('click', async (e) => {
     let targetElement = e.target;
 
-    if (targetElement.getAttribute('id') != 'delete-product-category') targetElement = targetElement.parentElement;
-    if (targetElement.getAttribute('id') != 'delete-product-category') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'delete') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'delete') targetElement = targetElement.parentElement;
 
-    if (targetElement.getAttribute('id') == 'delete-product-category') {
+    if (targetElement.getAttribute('id') == 'delete') {
         e.preventDefault();
 
         const loadingElement = document.querySelector('#loading');
