@@ -124,7 +124,7 @@ $this->extend('admin_layout');
         // if product show total = transaction limit
         if ($countTransaction == $transactionLimit) :
     ?>
-        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $transactionLimit ?> transaksi yang ditampilkan, Pakai fitur
+        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $transactionLimit ?> transaksi terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>
     <?php endif ?>
 

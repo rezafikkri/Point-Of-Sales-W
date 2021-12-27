@@ -98,13 +98,14 @@ searchElement.addEventListener('click', async (e) => {
             resultStatusElement.innerText = '0 Total transaksi hasil pencarian';
         }
 
-        // add dataset show-type and dataset date-range
-        tableElement.dataset.showType = 'date-range';
-        tableElement.dataset.dateRange = dateRange;
-
         const limitMessageElement = document.querySelector('span#limit-message');
         // add limit message if total transaction search > transaction limit && limit message not exists
-        if (responseJson.total_transaction > responseJson.transaction_limit && limitMessageElement == null) {
+        if (responseJson.total_transaction > responseJson.transaction_limit && (limitMessageElement == null || tableElement.dataset.showType == undefined)) {
+            if (limitMessageElement != null) {
+                // delete old limit message
+                limitMessageElement.remove();
+            }
+
             const spanElement = document.createElement('span');
             spanElement.classList.add('text-muted');
             spanElement.classList.add('d-block');
@@ -120,6 +121,11 @@ searchElement.addEventListener('click', async (e) => {
         else if (responseJson.total_transaction <= responseJson.transaction_limit && limitMessageElement != null) {
             limitMessageElement.remove();
         }
+
+        // add dataset show-type and dataset date-range
+        tableElement.dataset.showType = 'date-range';
+        tableElement.dataset.dateRange = dateRange;
+
     } catch (error) {
         console.error(error);
     }

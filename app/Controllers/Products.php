@@ -8,7 +8,7 @@ use CodeIgniter\I18n\Time;
 
 class Products extends BaseController
 {
-    private const PRODUCT_LIMIT = 5;
+    private const PRODUCT_LIMIT = 50;
 
     public function __construct()
     {
