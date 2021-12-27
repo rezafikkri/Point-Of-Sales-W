@@ -106,7 +106,7 @@ $this->extend('admin_layout');
         // if total product > product limit
         if ($totalProduct > $productLimit) :
     ?>
-        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit ?> Produk terbaru yang ditampilkan, Pakai fitur
+        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit ?> produk terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>
     <?php endif ?>
 

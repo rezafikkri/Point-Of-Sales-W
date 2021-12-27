@@ -42,7 +42,7 @@ class ProductsModel extends Model
     {
         return $this->select('product_id, product_name, product_category_name, product_status, products.created_at, products.edited_at')
                     ->join('product_categories', 'product_categories.product_category_id = products.product_category_id', 'INNER')
-                    ->orderBy('edited_at', 'DESC')->limit($limit)
+                    ->orderBy('product_name', 'ASC')->limit($limit)
                     ->like('product_name', $keyword)->get()->getResultArray();
     }
 

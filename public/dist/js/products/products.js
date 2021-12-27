@@ -121,13 +121,6 @@ searchElement.addEventListener('click', async (e) => {
 
             // show result status
             resultStatusElement.innerText = `1 - ${responseJson.products.length} dari ${responseJson.total_product} Total produk hasil pencarian`;
-
-            /**
-             * add dataset show-type and dataset keyword
-             * showType used for show longer product when remove product
-             */
-            tableElement.dataset.showType = 'search';
-            tableElement.dataset.keyword = keyword;
         }
         // if product not exists
         else {
@@ -139,14 +132,19 @@ searchElement.addEventListener('click', async (e) => {
 
         const limitMessageElement = document.querySelector('#limit-message');
         // add limit message if total product search > product limit && limit message not exists
-        if (responseJson.total_product > responseJson.product_limit && limitMessageElement == null) {
+        if (responseJson.total_product > responseJson.product_limit && (limitMessageElement == null || tableElement.dataset.showType == undefined)) {
+            if (limitMessageElement != null) {
+                // delete old limit message
+                limitMessageElement.remove();
+            }
+
             const spanElement = document.createElement('span');
             spanElement.classList.add('text-muted');
             spanElement.classList.add('d-block');
             spanElement.classList.add('mt-3');
             spanElement.setAttribute('id', 'limit-message');
             spanElement.innerHTML = `
-                Hanya ${responseJson.product_limit} Produk terbaru yang ditampilkan,
+                Hanya ${responseJson.product_limit} produk yang ditampilkan,
                 Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!
             `;
             tableElement.after(spanElement);
@@ -155,6 +153,13 @@ searchElement.addEventListener('click', async (e) => {
         else if (responseJson.total_product <= responseJson.product_limit && limitMessageElement != null) {
             limitMessageElement.remove();
         }
+
+        /**
+         * add dataset show-type and dataset keyword
+         * showType used for show longer product when remove product
+         */
+        tableElement.dataset.showType = 'search';
+        tableElement.dataset.keyword = keyword;
     } catch (error) {
         console.error(error);
     }

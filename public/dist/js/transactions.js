@@ -98,8 +98,8 @@ searchElement.addEventListener('click', async (e) => {
             resultStatusElement.innerText = '0 Total transaksi hasil pencarian';
         }
 
-        // add dataset type-show and dataset date-range
-        tableElement.dataset.typeShow = 'date-range';
+        // add dataset show-type and dataset date-range
+        tableElement.dataset.showType = 'date-range';
         tableElement.dataset.dateRange = dateRange;
 
         const limitMessageElement = document.querySelector('span#limit-message');
@@ -259,8 +259,8 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
     const allCheckboxElements = document.querySelectorAll('input[type="checkbox"][name="transaction_id"]');
     data += `&smallest_edited_at=${allCheckboxElements[allCheckboxElements.length-1].dataset.editedAt}`;
 
-    // if dataset type-show and dataset date-range exists in table tag
-    if (tableElement.dataset.typeShow != undefined && tableElement.dataset.dateRange != undefined) {
+    // if dataset show-type and dataset date-range exists in table tag
+    if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
         data += `&date_range=${tableElement.dataset.dateRange}`;
     }
 
@@ -335,8 +335,8 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
                 // inner html message
                 tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="7">Transaksi tidak ada.</td></tr>`;
 
-                // if dataset type-show and dataset date-range exists in table tag
-                if (tableElement.dataset.typeShow != undefined && tableElement.dataset.dateRange != undefined) {
+                // if dataset show-type and dataset date-range exists in table tag
+                if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
                     // show result status
                     resultStatusElement.innerText = '0 Total transaksi hasil pencarian';
                 } else {
@@ -345,8 +345,8 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
                 }
 
             } else {
-                // if dataset type-show and dataset date-range exists in table tag
-                if (tableElement.dataset.typeShow != undefined && tableElement.dataset.dateRange != undefined) {
+                // if dataset show-type and dataset date-range exists in table tag
+                if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
                     // show result status
                     resultStatusElement.innerText = `1 - ${countTransactionInTable} dari ${responseJson.total_transaction} Total transaksi hasil pencarian`;
                 } else {
@@ -414,8 +414,8 @@ exportExcelElement.addEventListener('click', async (e) => {
     const csrfValue = tableElement.dataset.csrfValue;
     data += `${csrfName}=${csrfValue}`;
 
-    // if dataset type-show and dataset date-range exists in table tag
-    if (tableElement.dataset.typeShow != undefined && tableElement.dataset.dateRange != undefined) {
+    // if dataset show-type and dataset date-range exists in table tag
+    if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
         data += `&date_range=${tableElement.dataset.dateRange}`;
     }
 
