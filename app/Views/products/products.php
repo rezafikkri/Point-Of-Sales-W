@@ -90,8 +90,8 @@ $this->extend('admin_layout');
                         <td><span class="text-red">Tiada</span></td>
                     <?php endif ?>
 
-                    <td><?= $createdAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
-                    <td><?= $editedAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
+                    <td><?= $createdAt->toLocalizedString('dd MMM y HH:mm') ?></td>
+                    <td><?= $editedAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                 </tr>
             <?php $i++; endforeach; else : ?>
                 <tr class="table__row-odd">

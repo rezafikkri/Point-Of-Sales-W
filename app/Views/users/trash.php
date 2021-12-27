@@ -50,7 +50,7 @@ $this->extend('admin_layout');
                     </td>
                     <td><?= $u['full_name'] ?></td>
                     <td><?= $u['level'] == 'admin' ? 'Admin' : 'Kasir' ?></td>
-                    <td><?= $deletedAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
+                    <td><?= $deletedAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                 </tr>
             <?php endforeach; else : ?>
                 <tr>

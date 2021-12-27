@@ -160,8 +160,8 @@ class Products extends BaseController
             $createdAt = Time::createFromFormat('Y-m-d H:i:s', $value['created_at']);
             $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
 
-            $products[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM yyyy HH:mm');
-            $products[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM yyyy HH:mm');
+            $products[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM y HH:mm');
+            $products[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM y HH:mm');
         }
 
         return json_encode([
@@ -369,8 +369,8 @@ class Products extends BaseController
                 $createdAt = Time::createFromFormat('Y-m-d H:i:s', $value['created_at']);
                 $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
 
-                $longerProducts[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM yyyy HH:mm');
-                $longerProducts[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM yyyy HH:mm');
+                $longerProducts[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM y HH:mm');
+                $longerProducts[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM y HH:mm');
             }
 
             return json_encode([

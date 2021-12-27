@@ -30,7 +30,7 @@
         <div class="col-sm-4 col-lg-6 pe-sm-1 mb-3">
         <div class="info-box info-box--blue">
             <div class="info-box__data">
-            <h4 class="mb-2"><?= number_to_amount($totalTransaction, 1) ?></h4>
+            <h4 class="mb-2"><?= number_to_amount($totalTransaction, 2) ?></h4>
                 <p class="mb-0">Total Transaksi</p>
             </div>
             <div class="info-box__icon">

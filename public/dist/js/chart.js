@@ -33,7 +33,7 @@ function renderChart(transactionsTwoMonthsAgo)
                     fontFamily: 'roboto-regular'
                 },
                 datetimeFormatter: {
-                    year: 'yyyy',
+                    year: 'y',
                     month: 'MMM',
                     day: 'dd MMM',
                     hour: ''
@@ -61,7 +61,7 @@ function renderChart(transactionsTwoMonthsAgo)
                 fontFamily: 'roboto-regular'
             },
             x: {
-                format: 'dd MMMM yyyy'
+                format: 'dd MMMM y'
             }
         }
     };

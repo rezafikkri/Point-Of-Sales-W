@@ -56,12 +56,12 @@ $this->extend('admin_layout');
                     if ($u['last_sign_in']) :
                         $lastSignIn = Time::createFromFormat('Y-m-d H:i:s', $u['last_sign_in']);
                 ?>
-                    <td><?= $lastSignIn->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
+                    <td><?= $lastSignIn->toLocalizedString('dd MMM y HH:mm') ?></td>
                 <?php else : ?>
                     <td></td>
                 <?php endif ?>
-                    <td><?= $createdAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
-                    <td><?= $editedAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
+                    <td><?= $createdAt->toLocalizedString('dd MMM y HH:mm') ?></td>
+                    <td><?= $editedAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                 </tr>
             <?php endforeach ?>
             </tbody>
