@@ -162,4 +162,4 @@ public/dist/images/product-photos/*.jpeg
 
 # ignore transction backup json file and transaction export file
 writable/transaction-backup/*.json
-writable/transaction-exports/*.xlsx
+writable/export-transactions/*.xlsx

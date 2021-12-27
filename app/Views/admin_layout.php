@@ -35,12 +35,10 @@
         <li><a href="/admin/transactions" class="<?= active_menu(['transactions']) ?>">Transaksi</a></li>
         <li><a href="/admin/users" class="<?= active_menu(['users', 'user']) ?>">Pengguna</a></li>
 
-        <li class="dropdown"><a href="" class="dropdown-toggle" target=".dropdown-menu"><?= $_SESSION['sign_in_user_full_name']  ?></a>
-            <ul class="dropdown-menu dropdown-menu--end d-none">
+        <li class="dropdown"><a href="" class="dropdown-toggle" target="#user-settings"><?= $_SESSION['sign_in_user_full_name']  ?></a>
+            <ul class="dropdown-menu dropdown-menu--end d-none" id="user-settings">
                 <li><a href="/admin/user/edit/<?= $_SESSION['sign_in_user_id'] ?>">Pengaturan</a></li>
-                <li>
-                    <hr>
-                </li>
+                <li><hr></li>
                 <li><a href="/sign_out" class="text-hover-red">Keluar</a></li>
             </ul>
         </li>

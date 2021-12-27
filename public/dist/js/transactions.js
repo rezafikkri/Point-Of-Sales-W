@@ -12,8 +12,7 @@ const tableElement = document.querySelector('#table');
 const searchElement = document.querySelector('a#search');
 const modalElement = document.querySelector('.modal');
 const modalContentElement = modalElement.querySelector('.modal__content');
-
-const export_transaction_excel = document.querySelector('a#export-transaction-excel');
+const exportExcelElement = document.querySelector('a#export-excel');
 
 // flatpickr setting
 flatpickr('input[name="date_range"]', {
@@ -38,9 +37,11 @@ searchElement.addEventListener('click', async (e) => {
         return false;
     }
 
-    // show loading and disable button search
+    // show loading, disable button search, button export and dropdown toggle
     loadingElement.classList.remove('d-none');
     searchElement.classList.add('btn--disabled');
+    exportExcelElement.classList.add('btn--disabled');
+    exportExcelElement.nextElementSibling.classList.add('btn--disabled');
     
     try {
         const resultStatusElement = document.querySelector('span#result-status');
@@ -87,10 +88,6 @@ searchElement.addEventListener('click', async (e) => {
 
             // show result status
             resultStatusElement.innerText = `1 - ${responseJson.transactions.length} dari ${responseJson.total_transaction} Total transaksi hasil pencarian`;
-
-            // add dataset type-show and dataset date-range
-            tableElement.dataset.typeShow = 'date-range';
-            tableElement.dataset.dateRange = dateRange;
         }
         // if transactions not exists
         else {
@@ -101,6 +98,10 @@ searchElement.addEventListener('click', async (e) => {
             resultStatusElement.innerText = '0 Total transaksi hasil pencarian';
         }
 
+        // add dataset type-show and dataset date-range
+        tableElement.dataset.typeShow = 'date-range';
+        tableElement.dataset.dateRange = dateRange;
+
         const limitMessageElement = document.querySelector('span#limit-message');
         // add limit message if total transaction search > transaction limit && limit message not exists
         if (responseJson.total_transaction > responseJson.transaction_limit && limitMessageElement == null) {
@@ -110,7 +111,7 @@ searchElement.addEventListener('click', async (e) => {
             spanElement.classList.add('mt-3');
             spanElement.setAttribute('id', 'limit-message');
             spanElement.innerHTML = `
-                Hanya ${responseJson.transaction_limit} Transaksi terbaru yang ditampilkan,
+                Hanya ${responseJson.transaction_limit} transaksi yang ditampilkan,
                 Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!
             `;
             tableElement.after(spanElement);
@@ -123,9 +124,11 @@ searchElement.addEventListener('click', async (e) => {
         console.error(error);
     }
 
-    // hide loading and enable button search
+    // hide loading, enable button search, button export and dropdown toggle
     loadingElement.classList.add('d-none');
     searchElement.classList.remove('btn--disabled');
+    exportExcelElement.classList.remove('btn--disabled');
+    exportExcelElement.nextElementSibling.classList.remove('btn--disabled');
 });
 
 // show hide transaction details
@@ -257,7 +260,7 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
     data += `&smallest_edited_at=${allCheckboxElements[allCheckboxElements.length-1].dataset.editedAt}`;
 
     // if dataset type-show and dataset date-range exists in table tag
-    if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.dateRange !== undefined) {
+    if (tableElement.dataset.typeShow != undefined && tableElement.dataset.dateRange != undefined) {
         data += `&date_range=${tableElement.dataset.dateRange}`;
     }
 
@@ -396,71 +399,87 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
 });
 
 // export transactions to excel
-export_transaction_excel.addEventListener('click', e => {
+exportExcelElement.addEventListener('click', async (e) => {
     e.preventDefault();
+
+    const loadingElement = document.querySelector('#loading');
+    const exportLoadingElement = document.querySelector('#export-loading');
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
+    const type = e.target.dataset.type;
 
     // generate data
     let data = '';
 
-    const csrf_name = tableElement.dataset.csrfName;
+    const csrfName = tableElement.dataset.csrfName;
     const csrfValue = tableElement.dataset.csrfValue;
-    data += `${csrf_name}=${csrfValue}`;
+    data += `${csrfName}=${csrfValue}`;
 
     // if dataset type-show and dataset date-range exists in table tag
-    if (tableElement.dataset.typeShow !== undefined && tableElement.dataset.dateRange !== undefined) {
+    if (tableElement.dataset.typeShow != undefined && tableElement.dataset.dateRange != undefined) {
         data += `&date_range=${tableElement.dataset.dateRange}`;
     }
 
-    // loading
-    export_transaction_excel.nextElementSibling.classList.remove('d-none');
-    // disabled button search
+    // show loading, disable button search and disable action in table
+    exportLoadingElement.classList.remove('d-none');
     searchElement.classList.add('btn--disabled');
-    // disabled action in table
-    const table_loading = tableElement.parentElement.nextElementSibling;
-    table_loading.querySelector('.loading').classList.add('d-none');
-    table_loading.classList.remove('d-none');
+    loadingElement.querySelector('.loading').classList.add('d-none');
+    loadingElement.classList.remove('d-none');
 
-    fetch('/admin/ekspor_transaksi_ke_excel', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: data
-    })
-    .finally(() => {
-        // loading
-        export_transaction_excel.nextElementSibling.classList.add('d-none');
-        // disabled button search
-        searchElement.classList.remove('btn--disabled');
-        // disabled action in table
-        const table_loading = tableElement.parentElement.nextElementSibling;
-        table_loading.querySelector('.loading').classList.remove('d-none');
-        table_loading.classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
+    try {
+        const responseJson = await postData(`${baseUrl}/admin/transactions/export/excel/${type}`, data);
+
         // set new csrf hash to table tag
-        if (responseJson.csrfValue !== undefined) {
-            tableElement.dataset.csrfValue = responseJson.csrfValue;
+        if (responseJson.csrf_value != undefined) {
+            tableElement.dataset.csrfValue = responseJson.csrf_value;
         }
-
+        
+        let alertClass;
         // if export transactions success
-        if (responseJson.status === 'success') {
-             const alert = create_alert_node(['alert--success', 'mb-3'], responseJson.message);
-            // append alert to before div.main__box element
-            document.querySelector('main.main > div').insertBefore(alert, document.querySelector('div.main__box'));
+        if (responseJson.status == 'success') {
+            alertClass = 'alert--success';
         }
         // else if export transactions fail
-        else if (responseJson.status === 'fail') {
-            const alert = create_alert_node(['alert--warning', 'mb-3'], responseJson.message);
-            // append alert to before div.main__box element
-            document.querySelector('main.main > div').insertBefore(alert, document.querySelector('div.main__box'));
+        else if (responseJson.status == 'fail') {
+            alertClass = 'alert--warning';
         }
-    })
-    .catch(error => {
+
+        // show alert
+        const parentElement = document.querySelector('main.main');
+        const referenceElement = document.querySelector('div.main__box');
+        renderAlert(parentElement, referenceElement, responseJson.message, [
+            alertClass,
+            'mb-3'
+        ]);
+    } catch (error) {
         console.error(error);
-    });
+    }
+
+    // hide loading, enable button search and enable action in table
+    exportLoadingElement.classList.add('d-none');
+    searchElement.classList.remove('btn--disabled');
+    loadingElement.querySelector('.loading').classList.remove('d-none');
+    loadingElement.classList.add('d-none');
+});
+
+// dropdown btn
+document.querySelector('#dropdown-menu-options').addEventListener('click', (e) => {
+    const targetElement = e.target;
+
+    if (targetElement.getAttribute('id') == 'dropdown-menu-option') {
+        e.preventDefault();
+        
+        const targetBtnId = targetElement.parentElement.parentElement.getAttribute('target');
+        const type = targetElement.dataset.type;
+        const title = targetElement.title;
+        const text = targetElement.textContent;
+        
+        // change data in button target
+        const targetBtnElement = document.querySelector(targetBtnId);
+        targetBtnElement.dataset.type = type;
+        targetBtnElement.title = title;
+        targetBtnElement.textContent = text;
+        
+        // hide dropdown btn
+        targetElement.parentElement.parentElement.classList.add('d-none');
+    } 
 });

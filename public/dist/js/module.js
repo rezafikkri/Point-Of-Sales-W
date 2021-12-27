@@ -86,7 +86,7 @@ function renderAlert(parentElement, referenceElement, message, alertClasses)
 // number formatter currency
 function numberFormatterToCurrency(number)
 {
-    return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0});
+    return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 2});
 }
 
 async function postData(url = '', data = '')

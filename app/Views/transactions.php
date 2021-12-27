@@ -9,7 +9,7 @@ $this->extend('admin_layout');
 <?= $this->section('main') ?>
 <div class="container-xl">
 <header class="header d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-start">
-    <h4 class="mb-4 mb-sm-0 me-2">Transaksi</h4>
+    <h4 class="mb-4 mb-sm-0 me-4">Transaksi</h4>
 
     <div class="d-flex flex-column-reverse flex-sm-row justify-content-start justify-content-sm-end align-items-sm-start flex-fill">
         <div class="input-group me-0 me-sm-2">
@@ -17,17 +17,23 @@ $this->extend('admin_layout');
            <a class="btn btn--blue" href="#" id="search">
                <svg xmlns="http://www.w3.org/2000/svg" width="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/><path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/></svg>
            </a>
-       </div><!-- input-group -->
+        </div><!-- input-group -->
 
-        <div class="position-relative mb-3 mb-sm-0">
-            <a href="#" id="export-transaction-excel"  class="btn btn--blue d-block text-center" title="Ekspor ke excel"><svg xmlns="http://www.w3.org/2000/svg" width="17" fill="currentColor" viewBox="0 0 16 16"><path d="M6 12v-2h3v2H6z"/><path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM3 9h10v1h-3v2h3v1h-3v2H9v-2H6v2H5v-2H3v-1h2v-2H3V9z"/></svg></a>
-
-            <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none" id="export-loading">
+        <div class="dropdown dropdown--btn mb-3 mb-sm-0"> 
+            <a href="#" id="export-excel" data-type="summary" class="btn btn--blue d-block text-center" title="Ekspor rangkuman transaksi ke excel">Ekspor Rangkuman</a>
+            <a class="btn btn--blue dropdown-toggle" target="#dropdown-menu-options" href="#"></a>
+            <div class="loading-bg position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none" id="export-loading">
                 <div class="loading">
                     <div></div>
                 </div>
             </div>
-        </div><!-- position relative -->
+
+            <ul class="dropdown-menu dropdown-menu--end d-none" id="dropdown-menu-options" target="#export-excel">
+                <li><a href="#" id="dropdown-menu-option" data-type="summary" title="Ekspor rangkuman transaksi ke excel">Ekspor Rangkuman</a></li>
+                <li><hr></li>
+                <li><a href="#" id="dropdown-menu-option" data-type="details" title="Ekspor rincian transaksi ke excel">Ekspor Rincian</a></li>
+            </ul>
+        </div><!-- dropdown -->
     </div><!-- d-flex -->
 </header>
 
@@ -67,7 +73,7 @@ $this->extend('admin_layout');
             <tbody>
             <?php
                 $fmt = new \NumberFormatter('id_ID', \NumberFormatter::CURRENCY);
-                $fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, 0);
+                $fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, 2);
 
                 // if exists transaction
                 if ($countTransaction > 0) :
@@ -103,8 +109,8 @@ $this->extend('admin_layout');
                     <?php endif ?>
 
                     <td><?= $t['full_name'] ?></td>
-                    <td><?= $createdAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
-                    <td><?= $editedAt->toLocalizedString('dd MMM yyyy HH:mm') ?></td>
+                    <td><?= $createdAt->toLocalizedString('dd MMM y HH:mm') ?></td>
+                    <td><?= $editedAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                 </tr>
             <?php $i++; endforeach; else : ?>
                 <tr class="table__row-odd">
@@ -118,7 +124,7 @@ $this->extend('admin_layout');
         // if product show total = transaction limit
         if ($countTransaction == $transactionLimit) :
     ?>
-        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $transactionLimit ?> Transaksi terbaru yang ditampilkan, Pakai fitur
+        <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $transactionLimit ?> transaksi yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>
     <?php endif ?>
 

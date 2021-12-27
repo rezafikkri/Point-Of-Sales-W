@@ -64,7 +64,7 @@ class TransactionsModel extends Model
                     ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
                     ->join('users', 'transactions.user_id = users.user_id', 'INNER')
                     ->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
-                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'DESC')
+                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'ASC')
                     ->get()->getResultArray();
     }
 
@@ -106,7 +106,7 @@ class TransactionsModel extends Model
                     ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
                     ->join('users', 'transactions.user_id = users.user_id', 'INNER')
                     ->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
-                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'DESC')
+                    ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'ASC')
                     ->getWhere(['transactions.edited_at <' => $smallestEditedAt])->getResultArray();
     }
 
