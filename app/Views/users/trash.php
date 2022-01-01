@@ -30,33 +30,33 @@ $this->extend('admin_layout');
                 </tr>
             </thead>
             <tbody>
-            <?php
-                // if exists users
-                if (count($users) > 0) :
-                foreach ($users as $u) :
-                    $deletedAt = Time::createFromFormat('Y-m-d H:i:s', $u['deleted_at']);
-            ?>
-                <tr id="user<?= $u['user_id'] ?>">
                 <?php
-                    // if user id = user id sign in
-                    if ($u['user_id'] != $_SESSION['sign_in_user_id']) :
+                    // if exists users
+                    if (count($users) > 0) :
+                    foreach ($users as $u) :
+                        $deletedAt = Time::createFromFormat('Y-m-d H:i:s', $u['deleted_at']);
                 ?>
+                <tr id="user<?= $u['user_id'] ?>">
+                    <?php
+                        // if user id = user id sign in
+                        if ($u['user_id'] != $_SESSION['sign_in_user_id']) :
+                    ?>
                     <td width="10"><a href="#" data-user-id="<?= $u['user_id'] ?>" data-full-name="<?= $u['full_name'] ?>" title="Mengapus pengguna" class="text-hover-red" id="show-modal-delete"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg></a></td>
                     <td width="10">
-                <?php else : ?>
+                    <?php else : ?>
                     <td width="10" colspan="2" class="text-center">
-                <?php endif ?>
+                    <?php endif ?>
                         <a href="#" data-user-id="<?= $u['user_id'] ?>" data-full-name="<?= $u['full_name'] ?>" title="Memulihkan pengguna" id="show-modal-restore"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" class="bi bi-arrow-return-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 0 0 1 2v4.8a2.5 2.5 0 0 0 2.5 2.5h9.793l-3.347 3.346a.5.5 0 0 0 .708.708l4.2-4.2a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 8.3H3.5A1.5 1.5 0 0 1 2 6.8V2a.5.5 0 0 0-.5-.5z"/></svg></a>
                     </td>
                     <td><?= $u['full_name'] ?></td>
                     <td><?= $u['level'] == 'admin' ? 'Admin' : 'Kasir' ?></td>
                     <td><?= $deletedAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                 </tr>
-            <?php endforeach; else : ?>
+                <?php endforeach; else : ?>
                 <tr>
                     <td colspan="5">Pengguna tidak ada.</td>
                 </tr>
-            <?php endif; ?>
+                <?php endif; ?>
             </tbody>
         </table>
         </div><!-- table-responsive -->

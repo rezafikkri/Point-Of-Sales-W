@@ -109,7 +109,6 @@ class Transactions extends BaseController
                     $dateStart,
                     $dateEnd
                 );
-
             } else {
                 // total transaction
                 $totalTransaction = $this->transactionsModel->getTotal();

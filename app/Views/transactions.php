@@ -52,7 +52,7 @@ $this->extend('admin_layout');
             ?>
             <span class="text-muted me-1" id="result-status">1 - <?= $countTransaction ?> dari <?= $totalTransaction ?> Total transaksi</span>
             <?php else : ?>
-                <span class="text-muted me-1" id="result-status">0 Total transaksi</span>
+            <span class="text-muted me-1" id="result-status">0 Total transaksi</span>
             <?php endif ?>
             </div>
         </div><!-- d-flex -->
@@ -71,31 +71,31 @@ $this->extend('admin_layout');
                 </tr>
             </thead>
             <tbody>
-            <?php
-                $fmt = new \NumberFormatter('id_ID', \NumberFormatter::CURRENCY);
-                $fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, 2);
+                <?php
+                    $fmt = new \NumberFormatter('id_ID', \NumberFormatter::CURRENCY);
+                    $fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, 2);
+    
+                    // if exists transaction
+                    if ($countTransaction > 0) :
+                        $i = 1;
+                    foreach($transactions as $t) :
+                        $createdAt = Time::createFromFormat('Y-m-d H:i:s', $t['created_at']);
+                        $editedAt = Time::createFromFormat('Y-m-d H:i:s', $t['edited_at']);
 
-                // if exists transaction
-                if ($countTransaction > 0) :
-                    $i = 1;
-                foreach($transactions as $t) :
-                    $createdAt = Time::createFromFormat('Y-m-d H:i:s', $t['created_at']);
-                    $editedAt = Time::createFromFormat('Y-m-d H:i:s', $t['edited_at']);
-
-                // if $i is prime number
-                if (($i%2) != 0) :
-            ?>
+                    // if $i is prime number
+                    if (($i%2) != 0) :
+                ?>
                 <tr class="table__row-odd">
-            <?php else: ?>
+                <?php else: ?>
                 <tr>
-            <?php endif ?>
+                <?php endif ?>
                     <td width="10">
-                    <?php if (is_allowed_delete_transaction($t['edited_at'])) : ?>
+                        <?php if (is_allowed_delete_transaction($t['edited_at'])) : ?>
                         <div class="form-check">
                             <input type="checkbox" name="transaction_id" data-edited-at="<?= $t['edited_at'] ?>"
                             class="form-check-input" value="<?= $t['transaction_id'] ?>">
                         </div>
-                    <?php endif ?>
+                        <?php endif ?>
                     </td>
                         <td width="10"><a href="#" id="show-transaction-details" data-transaction-id="<?= $t['transaction_id'] ?>" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
 
@@ -103,31 +103,31 @@ $this->extend('admin_layout');
                     <td><?= $fmt->formatCurrency($t['total_payment'] ?? 0, 'IDR') ?></td>
 
                     <?php if ($t['transaction_status'] == 'selesai') : ?>
-                        <td><span class="text-green">Selesai</span></td>
+                    <td><span class="text-green">Selesai</span></td>
                     <?php else : ?>
-                        <td><span class="text-red">Berlangsung</span></td>
+                    <td><span class="text-red">Berlangsung</span></td>
                     <?php endif ?>
 
                     <td><?= $t['full_name'] ?></td>
                     <td><?= $createdAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                     <td><?= $editedAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                 </tr>
-            <?php $i++; endforeach; else : ?>
+                <?php $i++; endforeach; else : ?>
                 <tr class="table__row-odd">
                     <td colspan="6">Transaksi tidak ada.</td>
                 </tr>
-            <?php endif ?>
+                <?php endif ?>
             </tbody>
         </table>
         </div><!-- table-reponsive -->
-    <?php
-        // if product show total = transaction limit
-        if ($countTransaction == $transactionLimit) :
-    ?>
+        <?php
+            // if product show total = transaction limit
+            if ($countTransaction == $transactionLimit) :
+        ?>
         <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $transactionLimit ?> transaksi terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik! atau kamu bisa klik <a href="#" id="show-remaining">Tampilkan sisa transaksi</a>,
         untuk menampilkan sisa transaksi yang ada.</span>
-    <?php endif ?>
+        <?php endif ?>
 
         <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none" id="loading">
             <div class="loading mt-5">

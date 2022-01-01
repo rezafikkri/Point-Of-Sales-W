@@ -31,16 +31,16 @@ $this->extend('admin_layout');
                 <a href="#" id="delete" class="btn btn--red-outline" title="Menghapus produk"><svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg></a>
             </div>
             <div>
-            <?php
-                $countProduct = count($products);
+                <?php
+                    $countProduct = count($products);
 
-                // if exists product
-                if ($countProduct > 0) :
-            ?>
+                    // if exists product
+                    if ($countProduct > 0) :
+                ?>
                 <span class="text-muted me-1" id="result-status">1 - <?= $countProduct;  ?> dari <?= $totalProduct ?> Total produk</span>
-            <?php else : ?>
+                <?php else : ?>
                 <span class="text-muted me-1" id="result-status">0 Total produk</span>
-            <?php endif ?>
+                <?php endif ?>
             </div>
         </div><!-- d-flex -->
 
@@ -57,21 +57,21 @@ $this->extend('admin_layout');
                 </tr>
             </thead>
             <tbody>
-            <?php
-                // if exists product
-                if ($countProduct > 0) :
-                    $i = 1;
-                foreach ($products as $p) :
-                    $createdAt = Time::createFromFormat('Y-m-d H:i:s', $p['created_at']);
-                    $editedAt = Time::createFromFormat('Y-m-d H:i:s', $p['edited_at']);
+                <?php
+                    // if exists product
+                    if ($countProduct > 0) :
+                        $i = 1;
+                    foreach ($products as $p) :
+                        $createdAt = Time::createFromFormat('Y-m-d H:i:s', $p['created_at']);
+                        $editedAt = Time::createFromFormat('Y-m-d H:i:s', $p['edited_at']);
 
-                // if $i is prime number
-                if (($i%2) != 0) :
-            ?>
+                    // if $i is prime number
+                    if (($i%2) != 0) :
+                ?>
                 <tr class="table__row-odd">
-            <?php else : ?>
+                <?php else : ?>
                 <tr>
-            <?php endif ?>
+                <?php endif ?>
                     <td width="10">
                         <div class="form-check">
                             <input type="checkbox" name="product_id" data-edited-at="<?= $p['edited_at'] ?>"
@@ -85,30 +85,30 @@ $this->extend('admin_layout');
                     <td><?= $p['product_category_name'] ?></td>
 
                     <?php if ($p['product_status'] == 'ada') : ?>
-                        <td><span class="text-green">Ada</span></td>
+                    <td><span class="text-green">Ada</span></td>
                     <?php else : ?>
-                        <td><span class="text-red">Tiada</span></td>
+                    <td><span class="text-red">Tiada</span></td>
                     <?php endif ?>
 
                     <td><?= $createdAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                     <td><?= $editedAt->toLocalizedString('dd MMM y HH:mm') ?></td>
                 </tr>
-            <?php $i++; endforeach; else : ?>
+                <?php $i++; endforeach; else : ?>
                 <tr class="table__row-odd">
                     <td colspan="8">Produk tidak ada.</td>
                 </tr>
-            <?php endif ?>
+                <?php endif ?>
             </tbody>
         </table>
         </div><!-- table-reponsive -->
 
-    <?php
-        // if total product > product limit
-        if ($totalProduct > $productLimit) :
-    ?>
+        <?php
+            // if total product > product limit
+            if ($totalProduct > $productLimit) :
+        ?>
         <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $productLimit ?> produk terbaru yang ditampilkan, Pakai fitur
         <i>Pencarian</i> untuk hasil lebih spesifik!</span>
-    <?php endif ?>
+        <?php endif ?>
 
         <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none" id="loading">
             <div class="loading mt-5">

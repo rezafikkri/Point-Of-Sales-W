@@ -36,9 +36,9 @@ class SignIn extends BaseController
         $userSignIn = $usersModel->getSignIn($username);
 
         // if username is exist
-        if($userSignIn) {
+        if ($userSignIn) {
             // if password is valid
-            if(password_verify($password, $userSignIn['password'])) {
+            if (password_verify($password, $userSignIn['password'])) {
                 $this->session->set([
                     'sign_in_status' => true,
                     'sign_in_user_id' => $userSignIn['user_id'],
@@ -47,7 +47,7 @@ class SignIn extends BaseController
                 ]);
 
                 // if user level is admin
-                if($_SESSION['sign_in_user_level'] == 'admin') {
+                if ($_SESSION['sign_in_user_level'] == 'admin') {
                     return redirect()->to('/admin');
                 }
 

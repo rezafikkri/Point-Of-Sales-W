@@ -28,15 +28,15 @@
                 <div class="mb-3">
                     <label class="form-label" for="level">Tingkat</label>
                     <select class="form-select" name="level" id="level">
-                    <?php
-                        $levels = ['cashier', 'admin'];
-                        for ($i = 0; $i < 2; $i++) :
-                    ?>
+                        <?php
+                            $levels = ['cashier', 'admin'];
+                            for ($i = 0; $i < 2; $i++) :
+                        ?>
                         <option value="<?= $levels[$i] ?>"
                         <?= $levels[$i] == ($user['level'] ?? null) ? 'selected' : '' ?>>
                             <?= $levels[$i] == 'cashier' ? 'Kasir' : 'Admin' ?>
                         </option>
-                    <?php endfor ?>
+                        <?php endfor ?>
                     </select>
                     <?= $_SESSION['errors']['level'] ?? null ?>
                 </div>

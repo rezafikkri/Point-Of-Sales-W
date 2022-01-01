@@ -15,7 +15,7 @@ document.querySelector('a#add-form-input-magnitude-price').addEventListener('cli
 
 // remove form input magnitude and price
 magnitudePriceElement.addEventListener('click', (e) => {
-    if(e.target.getAttribute('id') === 'remove-form-input-magnitude-price') {
+    if (e.target.getAttribute('id') === 'remove-form-input-magnitude-price') {
         e.preventDefault();
         e.target.parentElement.parentElement.remove();
     }

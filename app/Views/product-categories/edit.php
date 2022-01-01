@@ -18,7 +18,7 @@
                 <div class="mb-3">
                     <label class="form-label" for="product_category_name">Nama Kategori</label>
                     <input class="form-input" id="product_category_name" type="text"
-                            name="product_category_name" value="<?= $productCategoryDB['product_category_name'] ?? null ?>">
+                    name="product_category_name" value="<?= $productCategoryDB['product_category_name'] ?? null ?>">
                     <?= $_SESSION['errors']['product_category_name'] ?? null ?>
                 </div>
                <button class="btn btn--blue" type="submit">Simpan</button>

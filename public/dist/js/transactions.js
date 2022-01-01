@@ -143,9 +143,9 @@ searchElement.addEventListener('click', async (e) => {
 // show hide transaction details
 tableElement.querySelector('tbody').addEventListener('click', async (e) => {
     let targetElement = e.target;
-    if(targetElement.getAttribute('id') != 'show-transaction-details') targetElement = targetElement.parentElement;
-    if(targetElement.getAttribute('id') != 'show-transaction-details') targetElement = targetElement.parentElement;
-    if(targetElement.getAttribute('id') == 'show-transaction-details') {
+    if (targetElement.getAttribute('id') != 'show-transaction-details') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'show-transaction-details') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') == 'show-transaction-details') {
         e.preventDefault();
 
         /**
@@ -153,7 +153,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
          * is element with table__row-detail class, or is mean product detail exists in table
          */
         const tableRowDetailElement = targetElement.parentElement.parentElement.nextElementSibling;
-        if(tableRowDetailElement !== null && tableRowDetailElement.classList.contains('table__row-detail')) {
+        if (tableRowDetailElement !== null && tableRowDetailElement.classList.contains('table__row-detail')) {
             tableRowDetailElement.classList.toggle('table__row-detail--show');
         // else, is mean transaction detail not exists in table
         } else {

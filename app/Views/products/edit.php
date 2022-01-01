@@ -18,12 +18,12 @@
                 <div class="mb-3">
                     <label class="form-label" for="product-category">Kategori Produk</label>
                     <select class="form-select" name="product_category" id="product-category">
-                    <?php foreach ($productCategories as $cp) : ?>
+                        <?php foreach ($productCategories as $cp) : ?>
                         <option value="<?= $cp['product_category_id'] ?>"
                         <?= $cp['product_category_id'] == ($product['product_category_id'] ?? null) ? 'selected' : '' ?>>
                             <?= $cp['product_category_name'] ?>
                         </option>
-                    <?php endforeach ?>
+                        <?php endforeach ?>
                     </select>
                     <?= $_SESSION['errors']['product_category'] ?? null ?>
                 </div>
@@ -45,58 +45,58 @@
                 <div class="mb-3">
                     <label class="form-label" for="product-status">Status Produk</label>
                     <select class="form-select" name="product_status" id="product-status">
-                    <?php
-                        $productStatuses = ['ada' => 'Ada', 'tiada' => 'Tiada'];
-                        foreach ($productStatuses as $key => $value) :
-                    ?>
+                        <?php
+                            $productStatuses = ['ada' => 'Ada', 'tiada' => 'Tiada'];
+                            foreach ($productStatuses as $key => $value) :
+                        ?>
                         <option value="<?= $key ?>"
                         <?= $key == ($product['product_status'] ?? null) ? 'selected' : '' ?>>
                             <?= $value ?>
                         </option>
-                    <?php endforeach ?>
+                        <?php endforeach ?>
                     </select>
                     <?= $_SESSION['errors']['product_status'] ?? null ?>
                 </div>
                 <div id="magnitude-price">
                     <label class="form-label">Harga Produk</label>
-                <?php
-                    $countProductPrice = count($productPrices);
-                    $countOldProductMagnitude = count(old('product_magnitudes', []));
+                    <?php
+                        $countProductPrice = count($productPrices);
+                        $countOldProductMagnitude = count(old('product_magnitudes', []));
+    
+                        if ($countProductPrice > 0) :
+                        for ($i = 0; $i < $countProductPrice; $i++) :
 
-                    if ($countProductPrice > 0) :
-                    for ($i = 0; $i < $countProductPrice; $i++) :
-
-                    // if not first loop
-                    if ($i != 0) :
-                ?>
+                        // if not first loop
+                        if ($i != 0) :
+                    ?>
                     <div class="mt-3">
-                <?php else: ?>
+                    <?php else: ?>
                     <div>
-                <?php endif ?>
+                    <?php endif ?>
                         <input type="hidden" name="product_price_ids[]" value="<?= $productPrices[$i]['product_price_id'] ?>">
                         <div class="input-group">
                             <input class="form-input" type="text" placeholder="Besaran..."
                             name="product_magnitudes[]" value="<?= $productPrices[$i]['product_magnitude'] ?? null ?>">
                             <input class="form-input" type="number" placeholder="Harga..."
                             name="product_prices[]" value="<?= $productPrices[$i]['product_price'] ?? null ?>">
-                    <?php
-                        // if not first looping
-                        if ($i > 0) : ?>
+                        <?php
+                            // if not first looping
+                            if ($i > 0) : ?>
                             <a class="btn btn--gray-outline" data-product-price-id="<?= $productPrices[$i]['product_price_id'] ?>"
                                id="remove-form-input-magnitude-price" href="">Hapus</a>
-                    <?php endif ?>
+                        <?php endif ?>
                         </div>
                         <small class="form-message form-message--danger"><?= $_SESSION['errors']['product_magnitudes'][$i] ?? null ?></small>
                         <small class="form-message form-message--danger"><?= $_SESSION['errors']['product_prices'][$i] ?? null ?></small>
                     </div><!-- mb-3 -->
 
-                <?php
-                    endfor; endif;
+                    <?php
+                        endfor; endif;
 
-                    // if product magnitude old > product price
-                    if ($countOldProductMagnitude > $countProductPrice) :
-                    for ($j = $i; $j < $countOldProductMagnitude; $j++) :
-                ?>
+                        // if product magnitude old > product price
+                        if ($countOldProductMagnitude > $countProductPrice) :
+                        for ($j = $i; $j < $countOldProductMagnitude; $j++) :
+                    ?>
                     <div class="mt-3">
                         <div class="input-group">
                             <input class="form-input" type="text" placeholder="Besaran..."
@@ -108,7 +108,7 @@
                         <small class="form-message form-message--danger"><?= $_SESSION['errors']['product_magnitudes'][$j] ?? null ?></small>
                         <small class="form-message form-message--danger"><?= $_SESSION['errors']['product_prices'][$j] ?? null ?></small>
                     </div><!-- mb-3 -->
-                <?php endfor; endif ?>
+                    <?php endfor; endif ?>
                 </div><!-- magnitude-price -->
                 <small class="form-message form-message--info
                 mb-3">Pelajari lebih lanjut <a href="https://github.com/rezafikkri/Point-Of-Sales-W/wiki/Produk#harga-produk"
