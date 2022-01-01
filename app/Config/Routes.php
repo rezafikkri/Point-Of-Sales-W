@@ -66,6 +66,7 @@ $routes->group('admin', function ($routes) {
     $routes->get('transaction/show-details/(:segment)', 'Transactions::showDetails/$1');
     $routes->post('transactions/delete', 'Transactions::delete');
     $routes->post('transactions/export/excel/summary', 'Transactions::exportExcelSummary');
+    $routes->get('transactions/show-remaining/(:segment)(:any)', 'Transactions::showRemaining/$1$2');
 });
 
 $routes->get('sign_out', 'SignOut::index');

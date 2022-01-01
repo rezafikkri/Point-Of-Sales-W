@@ -91,7 +91,7 @@ class Transactions extends BaseController
         $transactionIds = explode(',', $this->request->getPost('transaction_ids', FILTER_SANITIZE_STRING));
         if ($this->transactionsModel->delete($transactionIds)) {
             $countTransactionId = count($transactionIds);
-            $smallestEditedAt = $this->request->getPost('smallest_edited_at');
+            $smallestEditedAt = $this->request->getPost('smallest_edited_at', FILTER_SANITIZE_STRING);
             $dateRange = $this->request->getPost('date_range', FILTER_SANITIZE_STRING);
 
             // if exists date_range
@@ -341,7 +341,7 @@ class Transactions extends BaseController
             // set start row
             $startRow = 5;
         } else {
-            $transactions = $this->transactionsModel->getAll(static::TRANSACTION_LIMIT);
+            $transactions = $this->transactionsModel->getAll(0);
             $startRow = 4;
         }
 
@@ -361,6 +361,57 @@ class Transactions extends BaseController
             'status' => 'success',
             'message' => 'Ekspor sukses, Cek file pada folder writable/export-transactions.',
             'csrf_value' => csrf_hash(),
+        ]);
+    }
+
+    public function showRemaining(string $smallestEditedAt, string $dateRange = null)
+    {
+        helper('is_allowed_delete_transaction');
+
+        $smallestEditedAt = filter_var($smallestEditedAt, FILTER_SANITIZE_STRING);
+        $dateRange = filter_var($dateRange, FILTER_SANITIZE_STRING);
+
+        // if exists date_range
+        if ($dateRange != null) {
+            $arrDateRange = explode(' - ', $dateRange);
+
+            $dateStart = $arrDateRange[0] . ' 00:00:00';
+            $dateEnd = ($arrDateRange[1] ?? $arrDateRange[0]) . ' 23:59:59';
+
+            // total transaction
+            $totalTransaction = $this->transactionsModel->getTotalSearch($dateStart, $dateEnd);
+            // get longer transaction
+            $longerTransactions = $this->transactionsModel->searchLonger(
+                0,
+                $smallestEditedAt,
+                $dateStart,
+                $dateEnd
+            );
+        } else {
+            // total transaction
+            $totalTransaction = $this->transactionsModel->getTotal();
+            // longer transaction
+            $longerTransactions = $this->transactionsModel->getAllLonger(0, $smallestEditedAt);
+        }
+
+        // convert timestamp
+        foreach ($longerTransactions as $key => $value) {
+            $createdAt = Time::createFromFormat('Y-m-d H:i:s', $value['created_at']);
+            $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
+
+            $longerTransactions[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM y HH:mm');
+            $longerTransactions[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM y HH:mm');
+
+            // check permission to delete
+            $longerTransactions[$key]['delete_permission'] = is_allowed_delete_transaction($value['edited_at']);
+        }
+
+        return json_encode([
+            'status' => 'success',
+            'longer_transactions' => $longerTransactions,
+            'total_transaction' => $totalTransaction,
+            'transaction_limit' => static::TRANSACTION_LIMIT,
+            'csrf_value' => csrf_hash()
         ]);
     }
 }

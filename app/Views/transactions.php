@@ -125,7 +125,8 @@ $this->extend('admin_layout');
         if ($countTransaction == $transactionLimit) :
     ?>
         <span id="limit-message" class="text-muted d-block mt-3">Hanya <?= $transactionLimit ?> transaksi terbaru yang ditampilkan, Pakai fitur
-        <i>Pencarian</i> untuk hasil lebih spesifik!</span>
+        <i>Pencarian</i> untuk hasil lebih spesifik! atau kamu bisa klik <a href="#" id="show-remaining">Tampilkan sisa transaksi</a>,
+        untuk menampilkan sisa transaksi yang ada.</span>
     <?php endif ?>
 
         <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center d-none" id="loading">

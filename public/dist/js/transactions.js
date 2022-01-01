@@ -37,9 +37,10 @@ searchElement.addEventListener('click', async (e) => {
         return false;
     }
 
-    // show loading, disable button search, button export and dropdown toggle
+    // show loading, disable button and input search, button export and dropdown toggle
     loadingElement.classList.remove('d-none');
     searchElement.classList.add('btn--disabled');
+    searchElement.previousElementSibling.setAttribute('disabled', '');
     exportExcelElement.classList.add('btn--disabled');
     exportExcelElement.nextElementSibling.classList.add('btn--disabled');
     
@@ -113,7 +114,9 @@ searchElement.addEventListener('click', async (e) => {
             spanElement.setAttribute('id', 'limit-message');
             spanElement.innerHTML = `
                 Hanya ${responseJson.transaction_limit} transaksi yang ditampilkan,
-                Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!
+                Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik! atau kamu bisa
+                klik <a href="#" id="show-remaining">Tampilkan sisa transaksi</a>,
+                untuk menampilkan sisa transaksi yang ada.
             `;
             tableElement.after(spanElement);
         }
@@ -125,14 +128,14 @@ searchElement.addEventListener('click', async (e) => {
         // add dataset show-type and dataset date-range
         tableElement.dataset.showType = 'date-range';
         tableElement.dataset.dateRange = dateRange;
-
     } catch (error) {
         console.error(error);
     }
 
-    // hide loading, enable button search, button export and dropdown toggle
+    // hide loading, enable button an input search, button export and dropdown toggle
     loadingElement.classList.add('d-none');
     searchElement.classList.remove('btn--disabled');
+    searchElement.previousElementSibling.removeAttribute('disabled');
     exportExcelElement.classList.remove('btn--disabled');
     exportExcelElement.nextElementSibling.classList.remove('btn--disabled');
 });
@@ -158,9 +161,10 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
             const baseUrl = document.querySelector('html').dataset.baseUrl;
             const transactionId = targetElement.dataset.transactionId;
 
-            // show loading and disable button search
+            // show loading, disable button an input search
             loadingElement.classList.remove('d-none');
             searchElement.classList.add('btn--disabled');
+            searchElement.previousElementSibling.setAttribute('disabled', '');
 
             try {
                 const response = await fetch(`${baseUrl}/admin/transaction/show-details/${transactionId}`);
@@ -190,9 +194,10 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
                 console.error(error);
             }
 
-            // hide loading and enable button search
+            // hide loading, enable button an input search
             loadingElement.classList.add('d-none');
             searchElement.classList.remove('btn--disabled');
+            searchElement.previousElementSibling.removeAttribute('disabled');
         }
     }
 });
@@ -227,6 +232,78 @@ modalContentElement.querySelector('a#btn-close').addEventListener('click', (e) =
 
 // show password
 document.querySelector('.modal a#show-password').addEventListener('click', showPassword);
+
+function showLongerTransactions(responseJson, tableElement)
+{
+    // if longer transactions exist
+    if (responseJson.longer_transactions.length > 0) {
+        responseJson.longer_transactions.forEach((t, i) => {
+            const trElement = document.createElement('tr');
+
+            // if i is odd number
+            if ((i + 1) % 2 != 0) {
+                trElement.classList.add('table__row-odd');
+            }
+            let td = '<td width="10">';
+
+            // if transaction is allow for delete
+            if (t.delete_permission == true) {
+                td += `<div class="form-check">
+                        <input type="checkbox" name="transaction_id" data-edited-at="${t.edited_at}" class="form-check-input" value="${t.transaction_id}">
+                    </div>`;
+            }
+
+            td += `</td>
+                <td width="10"><a href="#" id="show-transaction-details" data-transaction-id="${t.transaction_id}" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
+
+                <td>${t.total_product || 0}</td>
+                <td>${numberFormatterToCurrency(parseInt(t.total_payment || 0))}</td>`;
+
+            if (t.transaction_status == 'selesai') {
+                td += '<td><span class="text-green">Selesai</span></td>';
+            } else {
+                td += '<td><span class="text-red">Belum</span></td>';
+            }
+
+            td += `<td>${t.full_name}</td><td>${t.created_at}</td><td>${t.indo_edited_at}</td></tr>`;
+
+            // inner td to tr
+            trElement.innerHTML = td;
+            // append tr to tbody
+            tableElement.querySelector('tbody').append(trElement);
+        });
+    }
+}
+
+// show result status after delete or show remaining transactions
+function showResultStatus(responseJson, tableElement)
+{
+    const resultStatusElement = document.querySelector('span#result-status');
+    const countTransactionInTable = tableElement.querySelectorAll('tbody tr').length;
+    // if total transaction = 0
+    if (responseJson.total_transaction == 0) {
+        // inner html message
+        tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="7">Transaksi tidak ada.</td></tr>`;
+
+        // if dataset show-type and dataset date-range exists in table tag
+        if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
+            // show result status
+            resultStatusElement.innerText = '0 Total transaksi hasil pencarian';
+        } else {
+            // show result status
+            resultStatusElement.innerText = '0 Total transaksi';
+        }
+    } else {
+        // if dataset show-type and dataset date-range exists in table tag
+        if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
+            // show result status
+            resultStatusElement.innerText = `1 - ${countTransactionInTable} dari ${responseJson.total_transaction} Total transaksi hasil pencarian`;
+        } else {
+            // show result status
+            resultStatusElement.innerText = `1 - ${countTransactionInTable} dari ${responseJson.total_transaction} Total transaksi`;
+        }
+    }
+}
 
 // delete transactions and automatic delete transaction details
 document.querySelector('a#delete').addEventListener('click', async (e) => {
@@ -270,8 +347,9 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
         data += `&date_range=${tableElement.dataset.dateRange}`;
     }
 
-    // show loading
+    // show loading and disable button close modal
     loadingElement.classList.remove('d-none');
+    modalContentElement.querySelector('a#btn-close').classList.add('btn--disabled');
 
     try {
         const responseJson = await postData(`${baseUrl}/admin/transactions/delete`, data);
@@ -295,71 +373,8 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
                 val.parentElement.parentElement.parentElement.remove();
             });
 
-            // if longer transactions exist
-            if (responseJson.longer_transactions.length > 0) {
-                responseJson.longer_transactions.forEach((t, i) => {
-                    const trElement = document.createElement('tr');
-
-                    // if i is odd number
-                    if ((i + 1) % 2 != 0) {
-                        trElement.classList.add('table__row-odd');
-                    }
-                    let td = '<td width="10">';
-
-                    // if transaction is allow for delete
-                    if (t.delete_permission == true) {
-                        td += `<div class="form-check">
-                                <input type="checkbox" name="transaction_id" data-edited-at="${t.edited_at}" class="form-check-input" value="${t.transaction_id}">
-                            </div>`;
-                    }
-
-                    td += `</td>
-                        <td width="10"><a href="#" id="show-transaction-details" data-transaction-id="${t.transaction_id}" title="Lihat detail transaksi"><svg xmlns="http://www.w3.org/2000/svg" width="21" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></a></td>
-
-                        <td>${t.total_product || 0}</td>
-                        <td>${numberFormatterToCurrency(parseInt(t.total_payment || 0))}</td>`;
-
-                    if (t.transaction_status == 'selesai') {
-                        td += '<td><span class="text-green">Selesai</span></td>';
-                    } else {
-                        td += '<td><span class="text-red">Belum</span></td>';
-                    }
-
-                    td += `<td>${t.full_name}</td><td>${t.created_at}</td><td>${t.indo_edited_at}</td></tr>`;
-
-                    // inner td to tr
-                    trElement.innerHTML = td;
-                    // append tr to tbody
-                    tableElement.querySelector('tbody').append(trElement);
-                });
-            }
-
-            const resultStatusElement = document.querySelector('span#result-status');
-            const countTransactionInTable = tableElement.querySelectorAll('tbody tr').length;
-            // if total transaction = 0
-            if (responseJson.total_transaction == 0) {
-                // inner html message
-                tableElement.querySelector('tbody').innerHTML = `<tr class="table__row-odd"><td colspan="7">Transaksi tidak ada.</td></tr>`;
-
-                // if dataset show-type and dataset date-range exists in table tag
-                if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
-                    // show result status
-                    resultStatusElement.innerText = '0 Total transaksi hasil pencarian';
-                } else {
-                    // show result status
-                    resultStatusElement.innerText = '0 Total transaksi';
-                }
-
-            } else {
-                // if dataset show-type and dataset date-range exists in table tag
-                if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
-                    // show result status
-                    resultStatusElement.innerText = `1 - ${countTransactionInTable} dari ${responseJson.total_transaction} Total transaksi hasil pencarian`;
-                } else {
-                    // show result status
-                    resultStatusElement.innerText = `1 - ${countTransactionInTable} dari ${responseJson.total_transaction} Total transaksi`;
-                }
-            }
+            showLongerTransactions(responseJson, tableElement); 
+            showResultStatus(responseJson, tableElement);
 
             // if total transaction in table <= transaction limit and limit message exist
             const limitMessageElement = document.querySelector('span#limit-message');
@@ -377,7 +392,7 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
             // append message to modal
             modalContentElement.querySelector('div.modal__body').append(smallElement);
         }
-        // else if fail remove transaction
+        // else if fail delete transaction
         else if (responseJson.status == 'fail') {
             const parentElement = document.querySelector('main.main');
             const referenceElement = document.querySelector('div.main__box');
@@ -400,8 +415,9 @@ document.querySelector('a#delete').addEventListener('click', async (e) => {
         console.error(error);
     }
 
-    // hide loading
+    // show loading and disable button close modal
     loadingElement.classList.add('d-none');
+    modalContentElement.querySelector('a#btn-close').classList.remove('btn--disabled');
 });
 
 // export transactions to excel
@@ -425,9 +441,10 @@ exportExcelElement.addEventListener('click', async (e) => {
         data += `&date_range=${tableElement.dataset.dateRange}`;
     }
 
-    // show loading, disable button search and disable action in table
+    // show loading, disable button and input search, and action in table
     exportLoadingElement.classList.remove('d-none');
     searchElement.classList.add('btn--disabled');
+    searchElement.previousElementSibling.setAttribute('disabled', '');
     loadingElement.querySelector('.loading').classList.add('d-none');
     loadingElement.classList.remove('d-none');
 
@@ -460,9 +477,10 @@ exportExcelElement.addEventListener('click', async (e) => {
         console.error(error);
     }
 
-    // hide loading, enable button search and enable action in table
+    // show loading, disable button and input search, and action in table
     exportLoadingElement.classList.add('d-none');
     searchElement.classList.remove('btn--disabled');
+    searchElement.previousElementSibling.removeAttribute('disabled');
     loadingElement.querySelector('.loading').classList.remove('d-none');
     loadingElement.classList.add('d-none');
 });
@@ -488,4 +506,61 @@ document.querySelector('#dropdown-menu-options').addEventListener('click', (e) =
         // hide dropdown btn
         targetElement.parentElement.parentElement.classList.add('d-none');
     } 
+});
+
+// show remaining
+document.querySelector('div.main__box').addEventListener('click', async (e) => {
+    const targetElement = e.target;
+
+    if (targetElement.getAttribute('id') == 'show-remaining') {
+        e.preventDefault();
+
+        const loadingElement = document.querySelector('#loading');
+        const baseUrl = document.querySelector('html').dataset.baseUrl;
+        const dateRange = document.querySelector('input[name="date_range"]').value;
+        const allCheckboxElements = document.querySelectorAll('input[type="checkbox"][name="transaction_id"]');
+        const smallestEditedAt = allCheckboxElements[allCheckboxElements.length-1].dataset.editedAt;
+
+        // generate url
+        let url = `${baseUrl}/admin/transactions/show-remaining/${smallestEditedAt}`;
+
+        // if dataset show-type and dataset date-range exists in table tag
+        if (tableElement.dataset.showType != undefined && tableElement.dataset.dateRange != undefined) {
+            url += `/${tableElement.dataset.dateRange}`;
+        }
+
+        // show loading and make loading position to bottom, disable button and input search, button export and dropdown toggle
+        loadingElement.classList.remove('d-none');
+        loadingElement.classList.add('align-items-end');
+        loadingElement.children[0].classList.add('mb-5');
+        searchElement.classList.add('btn--disabled');
+        searchElement.previousElementSibling.setAttribute('disabled', '');
+        exportExcelElement.classList.add('btn--disabled');
+        exportExcelElement.nextElementSibling.classList.add('btn--disabled');
+
+        try {
+            const response = await fetch(url);
+            const responseJson = await response.json();
+
+            showLongerTransactions(responseJson, tableElement); 
+            showResultStatus(responseJson, tableElement);
+
+            // if total transaction in table > transaction limit and limit message exist
+            const limitMessageElement = document.querySelector('span#limit-message');
+            if (responseJson.total_transaction > responseJson.transaction_limit && limitMessageElement != null) {
+                limitMessageElement.remove();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
+        // hide loading and make loading position to top, enable button and input search, button export and dropdown toggle
+        loadingElement.classList.add('d-none');
+        loadingElement.classList.remove('align-items-end');
+        loadingElement.children[0].classList.remove('mb-5');
+        searchElement.classList.remove('btn--disabled');
+        searchElement.previousElementSibling.removeAttribute('disabled');
+        exportExcelElement.classList.remove('btn--disabled');
+        exportExcelElement.nextElementSibling.classList.remove('btn--disabled');
+    }
 });
