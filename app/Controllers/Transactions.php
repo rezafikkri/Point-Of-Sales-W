@@ -6,6 +6,7 @@ use CodeIgniter\Controller;
 use App\Models\{TransactionsModel, UsersModel, TransactionDetailsModel};
 use PhpOffice\PhpSpreadsheet\{Spreadsheet, Writer\Xlsx};
 use CodeIgniter\I18n\Time;
+use Box\Spout\Writer\Common\{Creator\WriterEntityFactory, Entity\Row};
 
 class Transactions extends BaseController
 {
@@ -66,11 +67,15 @@ class Transactions extends BaseController
     public function showDetails(string $transactionId)
     {
         $transactionId = filter_var($transactionId, FILTER_SANITIZE_STRING);
+        $customerMoney = $this->transactionsModel->getOne($transactionId, 'customer_money')['customer_money'] ?? null;
         $transactionDetails = $this->transactionDetailsModel->getAll(
             $transactionId,
             'product_name, product_price, product_magnitude, product_quantity'
         );
-        return json_encode(['transaction_details' => $transactionDetails]);
+        return json_encode([
+            'customer_money' => $customerMoney,
+            'transaction_details' => $transactionDetails
+        ]);
     }
 
     public function delete()
@@ -164,10 +169,10 @@ class Transactions extends BaseController
         // set width column
         $worksheet->getColumnDimension('A')->setWidth(18);
         $worksheet->getColumnDimension('B')->setWidth(18);
-        $worksheet->getColumnDimension('C')->setWidth(10);
-        $worksheet->getColumnDimension('D')->setWidth(20);
-        $worksheet->getColumnDimension('E')->setWidth(13);
-        $worksheet->getColumnDimension('F')->setWidth(24);
+        $worksheet->getColumnDimension('C')->setWidth(13);
+        $worksheet->getColumnDimension('D')->setWidth(24);
+        $worksheet->getColumnDimension('E')->setWidth(10);
+        $worksheet->getColumnDimension('F')->setWidth(20);
 
         // set header
         $createdAt = Time::now();
@@ -190,32 +195,9 @@ class Transactions extends BaseController
         ];
         $worksheet->getStyle('A1:F1')->applyFromArray($styleTitle);
         // set row height for title
-        $worksheet->getRowDimension('1')->setRowHeight(24); 
+        $worksheet->getRowDimension('1')->setRowHeight(24);
 
-        // make table head
-        $worksheet->setCellValue('A3', 'Dibuat');
-        $worksheet->setCellValue('B3', 'Diedit');
-        $worksheet->setCellValue('C3', "Total\nProduk");
-        $worksheet->setCellValue('D3', 'Total Bayaran');
-        $worksheet->setCellValue('E3', 'Status');
-        $worksheet->setCellValue('F3', 'Kasir');
-        // set row height for table head
-        $worksheet->getRowDimension('3')->setRowHeight(29);
-        // set style table head
-        $styleTableHead = [
-            'font' => [
-                'bold' => true,
-            ],
-            'alignment' => [
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-            ],
-            'borders' => [
-                'allBorders' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
-            ],
-        ];
-        $worksheet->getStyle('A3:F3')->applyFromArray($styleTableHead);
-
+        $tableHeadRow = 3;
         // if date range exists
         if ($dateStart != null) {
             // add description for transaction date range and add new row
@@ -231,22 +213,44 @@ class Transactions extends BaseController
             }
             $worksheet->setCellValue('A2', $dateRangeDescription);
 
-            // insert new row before row 3, for space between table and description
-            $worksheet->insertNewRowBefore(3, 1);
             // merge cell for description
             $worksheet->mergeCells('A2:F2');
             // set alignment
             $worksheet->getStyle('A2:F2')
                       ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            // change table head row
+            $tableHeadRow = 4;
         }
+
+        // make table head
+        $worksheet->setCellValue("A$tableHeadRow", 'Dibuat');
+        $worksheet->setCellValue("B$tableHeadRow", 'Diedit');
+        $worksheet->setCellValue("C$tableHeadRow", 'Status');
+        $worksheet->setCellValue("D$tableHeadRow", 'Kasir');
+        $worksheet->setCellValue("E$tableHeadRow", "Total\nProduk");
+        $worksheet->setCellValue("F$tableHeadRow", 'Total Bayaran');
+        // set row height for table head
+        $worksheet->getRowDimension($tableHeadRow)->setRowHeight(29);
+        // set style table head
+        $styleTableHead = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            ],
+            'borders' => [
+                'horizontal' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                'top' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                'bottom' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ]
+            ],
+        ];
+        $worksheet->getStyle("A$tableHeadRow:F$tableHeadRow")->applyFromArray($styleTableHead);
 
         // add transaction from db to cell
         $i = 1;
         foreach ($transactions as $t) {
             $currentRow = $startRow + $i - 1;
-
-            // set row height
-            $worksheet->getRowDimension($currentRow)->setRowHeight(20);
 
             $createdAt = Time::createFromFormat('Y-m-d H:i:s', $t['created_at']);
             $editedAt = Time::createFromFormat('Y-m-d H:i:s', $t['edited_at']);
@@ -254,69 +258,43 @@ class Transactions extends BaseController
             // set data to cell
             $worksheet->setCellValue("A$currentRow", $createdAt->toLocalizedString('dd-MM-y HH:mm'));
             $worksheet->setCellValue("B$currentRow", $editedAt->toLocalizedString('dd-MM-y HH:mm'));
-            $worksheet->setCellValue("C$currentRow", $t['total_product']);
-            $worksheet->setCellValue("D$currentRow", $t['total_payment']);
-            $worksheet->setCellValue("E$currentRow", $t['transaction_status']);
-            $worksheet->setCellValue("F$currentRow", $t['full_name']);
+            $worksheet->setCellValue("C$currentRow", $t['transaction_status']);
+            $worksheet->setCellValue("D$currentRow", $t['full_name']);
+            $worksheet->setCellValue("E$currentRow", $t['total_product']);
+            $worksheet->setCellValue("F$currentRow", $t['total_payment']);
 
             $i++;
-        } 
+        }
+
+        $tableBodyLastRow = $currentRow;
+        $currentRow += 1;
         // make border for table body
         $styleTableBody = [
             'borders' => [
-                'inside' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
-                'left' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
-                'right' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
-                'bottom' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                'horizontal' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                'top' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                'bottom' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ]
             ]
         ];
         $worksheet->getStyle("A$startRow:F$currentRow")->applyFromArray($styleTableBody);
-        // set number format to currency
-        $worksheet->getStyle("D$startRow:D$currentRow")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
+        // set number format to currency for table body
+        $worksheet->getStyle("F$startRow:F$currentRow")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
 
         // make total amount of product and payment
-        $rowTotalAmountOfProduct = $currentRow + 2;
-        $rowTotalAmountOfPayment = $currentRow + 3;
-
-        $worksheet->getRowDimension($rowTotalAmountOfProduct)->setRowHeight(20);
-        $worksheet->getRowDimension($rowTotalAmountOfPayment)->setRowHeight(20);
-
-        $worksheet->setCellValue("A$rowTotalAmountOfProduct", 'Jumlah Total Produk');
-        $worksheet->setCellValue("A$rowTotalAmountOfPayment", 'Jumlah Total Bayaran');
-
-        $worksheet->setCellValue("C$rowTotalAmountOfProduct", "=SUM(C$startRow:C$currentRow)");
-        $worksheet->setCellValue("C$rowTotalAmountOfPayment", "=SUM(D$startRow:D$currentRow)");
-
-        $worksheet->mergeCells("A$rowTotalAmountOfProduct:B$rowTotalAmountOfProduct");
-        $worksheet->mergeCells("A$rowTotalAmountOfPayment:B$rowTotalAmountOfPayment");
-        $worksheet->mergeCells("C$rowTotalAmountOfProduct:F$rowTotalAmountOfProduct");
-        $worksheet->mergeCells("C$rowTotalAmountOfPayment:F$rowTotalAmountOfPayment");
+        $worksheet->setCellValue("A$currentRow", 'Total');
+        $worksheet->setCellValue("E$currentRow", "=SUM(E$startRow:E$tableBodyLastRow)");
+        $worksheet->setCellValue("F$currentRow", "=SUM(F$startRow:F$tableBodyLastRow)");
+        // set row height for total amount of product and payment
+        $worksheet->getRowDimension($currentRow)->setRowHeight(20);
 
         // set style for total amount of product and payment
-        $styleTotalAmountProductPaymentHead = [
-            'font' => [
-                'bold' => true,
-            ],
+        $worksheet->getStyle("A$currentRow:A$currentRow")->getFont()->setBold(true);
+        $styleTotalAmountProductPayment = [
             'alignment' => [
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-            'borders' => [
-                'allBorders' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
-            ],
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            ]
         ];
-        $worksheet->getStyle("A$rowTotalAmountOfProduct:A$rowTotalAmountOfPayment")->applyFromArray($styleTotalAmountProductPaymentHead);
-
-        $styleTotalAmountProductPaymentBody = [
-            'alignment' => [
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-            'borders' => [
-                'allBorders' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
-            ],
-        ];
-        $worksheet->getStyle("B$rowTotalAmountOfProduct:F$rowTotalAmountOfPayment")->applyFromArray($styleTotalAmountProductPaymentBody);
-        // set number format to currency
-        $worksheet->getStyle("C$rowTotalAmountOfPayment")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
+        $worksheet->getStyle("A$currentRow:F$currentRow")->applyFromArray($styleTotalAmountProductPayment);
 
         $writer = new Xlsx($spreadsheet);
         $writer->save(WRITEPATH . 'export-transactions/Transactions Summary ' . date('d-m-Y H:i:s') . '.xlsx');
@@ -411,6 +389,257 @@ class Transactions extends BaseController
             'total_transaction' => $totalTransaction,
             'transaction_limit' => static::TRANSACTION_LIMIT,
             'csrf_value' => csrf_hash()
+        ]);
+    }
+
+    private function createDetailsExcelFile(
+        array $transactions,
+        int $lastRow,
+        ?string $dateStart,
+        ?string $dateEnd
+    ): bool {
+        $spreadsheet = new Spreadsheet();
+        $worksheet = $spreadsheet->getActiveSheet();
+
+        // set font default
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(12);
+
+        // set width column
+        $worksheet->getColumnDimension('A')->setWidth(20);
+        $worksheet->getColumnDimension('B')->setWidth(10);
+        $worksheet->getColumnDimension('C')->setWidth(19);
+        $worksheet->getColumnDimension('D')->setWidth(8);
+        $worksheet->getColumnDimension('E')->setWidth(19);
+       
+        // set header
+        $createdAt = Time::now();
+        $spreadsheet->getActiveSheet()->getHeaderFooter()
+                                      ->setOddHeader('&L' . $createdAt->toLocalizedString('dd MMMM y HH:mm'));
+
+        // make title
+        $worksheet->setCellValue('A1', 'Laporan Transaksi - Rincian');
+        // merge cell for title
+        $worksheet->mergeCells('A1:E1');
+        // set style for title
+        $styleTitle = [
+            'font' => [
+                'bold' => true,
+                'size' => 16
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ]
+        ];
+        $worksheet->getStyle('A1:E1')->applyFromArray($styleTitle);
+        // set row height for title
+        $worksheet->getRowDimension('1')->setRowHeight(24);
+
+        // if date range exists
+        if ($dateStart != null) {
+            // add description for transaction date range and add new row
+            $dateStart = Time::createFromFormat('Y-m-d H:i:s', $dateStart, 'Asia/Jakarta');
+            $dateEnd = Time::createFromFormat('Y-m-d H:i:s', $dateEnd, 'Asia/Jakarta');
+            $dateStartLocalized = $dateStart->toLocalizedString('dd MMMM y');
+            $dateEndLocalized = $dateEnd->toLocalizedString('dd MMMM y');
+
+            if ($dateStartLocalized == $dateEndLocalized) {
+                $dateRangeDescription = $dateStartLocalized;
+            } else {
+                $dateRangeDescription = $dateStartLocalized . ' - ' . $dateEndLocalized;
+            }
+            $worksheet->setCellValue('A2', $dateRangeDescription);
+
+            // merge cell for description
+            $worksheet->mergeCells('A2:E2');
+            // set alignment
+            $worksheet->getStyle('A2:E2')
+                      ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        }
+        
+        // add transaction from db to cell
+        $i = 0;
+        $lastTransactionId = '';
+        $countTransaction = count($transactions);
+        $totalProductCells = '';
+        $totalPaymentCells = '';
+        foreach ($transactions as $t) {
+            // if last transaction id != current transaction id
+            if ($lastTransactionId != $t['transaction_id']) {
+                // change last transaction id
+                $lastTransactionId = $t['transaction_id'];
+
+                $headerRow1 = $lastRow + 2;
+                $headerRow2 = $lastRow + 3;
+                $tableHeadRow = $lastRow + 4;
+    
+                $createdAt = Time::createFromFormat('Y-m-d H:i:s', $t['created_at']);
+                $editedAt = Time::createFromFormat('Y-m-d H:i:s', $t['edited_at']);
+                
+                // set header to cell
+                $worksheet->setCellValue("A$headerRow1", 'Kasir : ' . $t['full_name']);
+                $worksheet->setCellValue("A$headerRow2", 'Status : ' . $t['transaction_status']);
+                $worksheet->setCellValue("D$headerRow1", 'Dibuat : ' . $createdAt->toLocalizedString('dd-MM-y HH:mm'));
+                $worksheet->setCellValue("D$headerRow2", 'Diedit : ' . $editedAt->toLocalizedString('dd-MM-y HH:mm'));
+                // merge cell for header
+                $worksheet->mergeCells("A$headerRow1:C$headerRow1");
+                $worksheet->mergeCells("A$headerRow2:C$headerRow2");
+                $worksheet->mergeCells("D$headerRow1:E$headerRow1");
+                $worksheet->mergeCells("D$headerRow2:E$headerRow2");
+
+                // make table head
+                $worksheet->setCellValue("A$tableHeadRow", 'Nama Produk');
+                $worksheet->setCellValue("B$tableHeadRow", 'Besaran');
+                $worksheet->setCellValue("C$tableHeadRow", 'Harga');
+                $worksheet->setCellValue("D$tableHeadRow", 'Jumlah');
+                $worksheet->setCellValue("E$tableHeadRow", 'Bayaran');   
+                // set row height for table head
+                $worksheet->getRowDimension($tableHeadRow)->setRowHeight(20);
+                // set style table head
+                $styleTableHead = [
+                    'font' => [
+                        'bold' => true,
+                    ],
+                    'alignment' => [
+                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+                    ],
+                    'borders' => [
+                        'top' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                        'bottom' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ]
+                    ],
+                ];
+                $worksheet->getStyle("A$tableHeadRow:E$tableHeadRow")->applyFromArray($styleTableHead);
+
+                // change last row
+                $lastRow += 5;
+                // set table body first row
+                $tableBodyFirstRow = $lastRow;
+            } else {
+                // change last row
+                $lastRow++;
+            }
+
+            // set data to cell
+            $worksheet->setCellValue("A$lastRow", $t['product_name']);
+            $worksheet->setCellValue("B$lastRow", $t['product_magnitude']);
+            $worksheet->setCellValue("C$lastRow", $t['product_price']);
+            $worksheet->setCellValue("D$lastRow", $t['product_quantity']);
+            $worksheet->setCellValue("E$lastRow", "=C$lastRow*D$lastRow");
+    
+            // make border for table body
+            $styleTableBody = [
+                'borders' => [
+                    'horizontal' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                    'top' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                    'bottom' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ]
+                ]
+            ];
+            $worksheet->getStyle("A$lastRow:E$lastRow")->applyFromArray($styleTableBody);
+
+            $i++;
+            // if $i <= count transaction - 1 and if last transaction id != next transaction id
+            if ($i == $countTransaction || $lastTransactionId != $transactions[$i]['transaction_id']) {
+                $tableBodyLastRow = $lastRow;
+                $lastRow++;
+                // set total to cell
+                $worksheet->setCellValue("A$lastRow", 'Total');
+                $worksheet->setCellValue("D$lastRow", "=SUM(D$tableBodyFirstRow:D$tableBodyLastRow)");
+                $worksheet->setCellValue("E$lastRow", "=SUM(E$tableBodyFirstRow:E$tableBodyLastRow)");
+                $worksheet->mergeCells("A$lastRow:C$lastRow");
+
+                // note total product quantity and and total payment cell
+                $totalProductCells .= 'D' . $lastRow . ',';
+                $totalPaymentCells .= 'E' . $lastRow . ',';
+
+                // set style total
+                $worksheet->getStyle("A$lastRow:C$lastRow")->getFont()->setBold(true);
+                $styleTotal = [
+                    'borders' => [
+                        'top' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                        'bottom' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ]
+                    ]
+                ];
+                $worksheet->getStyle("A$lastRow:E$lastRow")->applyFromArray($styleTotal);
+                // set number format to currency for product price, payment and total payment
+                $worksheet->getStyle("C$tableBodyFirstRow:C$tableBodyLastRow")
+                          ->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
+                $worksheet->getStyle("E$tableBodyFirstRow:E$tableBodyLastRow")
+                          ->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
+                $worksheet->getStyle("E$lastRow")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
+            }
+        }
+
+        // make total amount of product and payment
+        $rowTotalAmountOfProduct = $lastRow + 2;
+        $rowTotalAmountOfPayment = $lastRow + 3;
+
+        $worksheet->setCellValue("A$rowTotalAmountOfProduct", 'Jumlah Total Produk');
+        $worksheet->setCellValue("A$rowTotalAmountOfPayment", 'Jumlah Total Bayaran');
+
+        $worksheet->setCellValue("C$rowTotalAmountOfProduct", "=SUM($totalProductCells)");
+        $worksheet->setCellValue("C$rowTotalAmountOfPayment", "=SUM($totalPaymentCells)");
+
+        $worksheet->mergeCells("A$rowTotalAmountOfProduct:B$rowTotalAmountOfProduct");
+        $worksheet->mergeCells("A$rowTotalAmountOfPayment:B$rowTotalAmountOfPayment");
+        $worksheet->mergeCells("C$rowTotalAmountOfProduct:E$rowTotalAmountOfProduct");
+        $worksheet->mergeCells("C$rowTotalAmountOfPayment:E$rowTotalAmountOfPayment");
+        
+        // set style for total amount of product and payment
+        $worksheet->getStyle("A$rowTotalAmountOfProduct:A$rowTotalAmountOfPayment")->getFont()->setBold(true);
+        $styleTotalAmountProductPayment = [
+            'borders' => [
+                'horizontal' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                'top' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ],
+                'bottom' => [ 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN ]
+            ]
+        ];
+        $worksheet->getStyle("A$rowTotalAmountOfProduct:E$rowTotalAmountOfPayment")->applyFromArray($styleTotalAmountProductPayment);
+        // set number format to currency
+        $worksheet->getStyle("C$rowTotalAmountOfPayment")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save(WRITEPATH . 'export-transactions/Transaction Details ' . date('d-m-Y H:i:s') . '.xlsx');
+
+        return true;
+    }
+
+    public function exportExcelDetails()
+    {
+        $dateRange = $this->request->getPost('date_range', FILTER_SANITIZE_STRING);
+    
+        // if exists date_range
+        if ($dateRange != null) {
+            $arrDateRange = explode(' - ', $dateRange);
+            $dateStart = $arrDateRange[0] . ' 00:00:00';
+            $dateEnd = ($arrDateRange[1] ?? $arrDateRange[0]) . ' 23:59:59';
+            
+            // get transaction from db
+            $transactions = $this->transactionsModel->searchDetails(0, $dateStart, $dateEnd);
+
+            // set last row
+            $lastRow = 2;
+        } else {
+            $transactions = $this->transactionsModel->getAllDetails(0);
+            $lastRow = 1;
+        }
+
+        // if transactions not exist
+        if (count($transactions) <= 0) {
+            return json_encode([
+                'status' => 'fail',
+                'message' => 'Ekspor gagal, Data transaksi tidak ada.',
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        // make excel file transactions
+        $this->createDetailsExcelFile($transactions, $lastRow, $dateStart ?? null, $dateEnd ?? null);
+ 
+        return json_encode([
+            'status' => 'success',
+            'message' => 'Ekspor sukses, Cek file pada folder writable/export-transactions.',
+            'csrf_value' => csrf_hash(),
+            'transactions' => $transactions
         ]);
     }
 }

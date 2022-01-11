@@ -122,13 +122,13 @@ class ProductsSeeder extends Seeder
                 'product_price_id' => 'ce966275-fa43-4181-a4f6-729892fad007',
                 'product_id' => $productIds[0],
                 'product_magnitude' => '1 Gelas',
-                'product_price' => '30000'
+                'product_price' => '10000'
             ],
             [
                 'product_price_id' => 'a1e5c85c-6a67-4697-aea1-2bd0a69f1a65',
                 'product_id' => $productIds[0],
                 'product_magnitude' => '3 Gelas',
-                'product_price' => '80000'
+                'product_price' => '20500'
             ],
             [
                 'product_price_id' => '9114068c-8607-47ca-ab0e-fad8704e46f7',

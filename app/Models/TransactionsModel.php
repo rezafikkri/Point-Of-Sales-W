@@ -40,6 +40,13 @@ class TransactionsModel extends Model
                     ->get()->getResultArray();
     }
 
+    public function getOne(string $transactionId, string $column): ?array
+    {
+        return $this->select($column)
+                    ->getWhere(['transaction_id' => $transactionId])
+                    ->getRowArray();
+    }
+
     public function getTwoMonthsAgo(): array
     {
         $startDate = date('Y-m-d H:i:s', mktime(0, 0, 0, date('m')-1, 1, date('Y')));
@@ -110,6 +117,47 @@ class TransactionsModel extends Model
                     ->getWhere(['transactions.edited_at >' => $smallestEditedAt])->getResultArray();
     }
 
+    public function getAllDetails(int $limit): array
+    {
+         return $this->select('
+                        transactions.transaction_id,
+                        transaction_status,
+                        transactions.created_at,
+                        transactions.edited_at,
+                        customer_money,
+                        full_name,
+                        product_quantity,
+                        product_name,
+                        product_price,
+                        product_magnitude 
+                    ')
+                    ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
+                    ->join('users', 'transactions.user_id = users.user_id', 'INNER')
+                    ->limit($limit)->orderBy('transactions.edited_at', 'DESC')
+                    ->get()->getResultArray();       
+    }
+
+    public function searchDetails(int $limit, string $dateStart, string $dateEnd): array
+    {
+         return $this->select('
+                        transactions.transaction_id,
+                        transaction_status,
+                        transactions.created_at,
+                        transactions.edited_at,
+                        customer_money,
+                        full_name,
+                        product_quantity,
+                        product_name,
+                        product_price,
+                        product_magnitude
+                    ')
+                    ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
+                    ->join('users', 'transactions.user_id = users.user_id', 'INNER')
+                    ->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
+                    ->limit($limit)->orderBy('transactions.edited_at', 'ASC')
+                    ->get()->getResultArray();
+    }
+
     public function getNotTransactionYetId(): ?string
     {
         return $this->select('transaksi_id')
@@ -123,12 +171,5 @@ class TransactionsModel extends Model
                     ->orderBy('waktu_buat', 'desc')
                     ->getWhere(['waktu_buat >=' => $timestamp_three_days_ago, 'pengguna_id' => $_SESSION['posw_user_id']])
                     ->getResultArray();
-    }
-
-    public function findTransaction(string $transaction_id, string $column): ?array
-    {
-        return $this->select($column)
-                    ->getWhere(['transaksi_id' => $transaction_id])
-                    ->getRowArray();
-    }
+    } 
 }

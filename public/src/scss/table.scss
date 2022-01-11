@@ -58,13 +58,22 @@
             padding: 8px 0;
             border-bottom: 1px solid var(--border-color);
 
+            &:first-child {
+                border-bottom-style: dashed;
+
+                span.table__title {
+                    margin-right: .5rem;
+                }
+            }
+
             &:last-child {
                 border-bottom: 0;
             }
         }
 
         span.table__title {
-            font-family: 'roboto-bold';
+            font-weight: 700;
+            color: var(--gray);
             margin-right: 1.5rem;
         }
 

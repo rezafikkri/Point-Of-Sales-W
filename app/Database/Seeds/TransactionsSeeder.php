@@ -25,13 +25,13 @@ class TransactionsSeeder extends Seeder
                 'product_name' => 'Lemon Juice',
                 'product_price_id' => 'ce966275-fa43-4181-a4f6-729892fad007',
                 'product_magnitude' => '1 Gelas',
-                'product_price' => '30000'
+                'product_price' => '10000'
             ],
             [
                 'product_name' => 'Lemon Juice',
                 'product_price_id' => 'a1e5c85c-6a67-4697-aea1-2bd0a69f1a65',
                 'product_magnitude' => '3 Gelas',
-                'product_price' => '80000'
+                'product_price' => '20500'
             ],
             [
                 'product_name' => 'Pomegranate Juice',
@@ -62,6 +62,7 @@ class TransactionsSeeder extends Seeder
             '90b86b53-4bc8-436f-8919-c709d8026471',
             '8ca354cb-f0fc-47dd-8b5e-8d88e460c6c7'
         ];
+        $customerMonies = [ 50000, 60000, 80000 ];
 
         for ($i = $startTimestamp; $i <= $endTimestamp; $i += (3600 * 24)) {
             $maxTransaction = rand(1, 50);
@@ -69,25 +70,37 @@ class TransactionsSeeder extends Seeder
             for ($n = 1; $n <= $maxTransaction; $n++) {
                 $dateTime = date('Y-m-d', $i) . ' ' . rand(1, 8) . ':' . rand(0, 23) . ':' . rand(0, 23);
                 $transactionId = generate_uuid();
-                $productRandomInt = rand(0, 5);
+                $productRandomInt1 = rand(0, 5);
+                $productRandomInt2 = rand(0, 5);
 
                 $transactionData[] = [
                     'transaction_id' => $transactionId,
                     'user_id' => $userIds[rand(0, 1)],
                     'transaction_status' => 'selesai',
-                    'customer_money' => 80000,
+                    'customer_money' => $customerMonies[rand(0, 2)],
                     'created_at' => $dateTime,
                     'edited_at' => $dateTime
                 ];
                 $transactionDetailData[] = [
                     'transaction_detail_id' => generate_uuid(),
                     'transaction_id' => $transactionId,
-                    'product_price_id' => $products[$productRandomInt]['product_price_id'],
+                    'product_price_id' => $products[$productRandomInt1]['product_price_id'],
                     'product_quantity' => 1,
-                    'product_name' => $products[$productRandomInt]['product_name'],
-                    'product_magnitude' => $products[$productRandomInt]['product_magnitude'],
-                    'product_price' => $products[$productRandomInt]['product_price']
+                    'product_name' => $products[$productRandomInt1]['product_name'],
+                    'product_magnitude' => $products[$productRandomInt1]['product_magnitude'],
+                    'product_price' => $products[$productRandomInt1]['product_price']
                 ];
+                if ($productRandomInt1 != $productRandomInt2) {
+                    $transactionDetailData[] = [
+                        'transaction_detail_id' => generate_uuid(),
+                        'transaction_id' => $transactionId,
+                        'product_price_id' => $products[$productRandomInt2]['product_price_id'],
+                        'product_quantity' => 1,
+                        'product_name' => $products[$productRandomInt2]['product_name'],
+                        'product_magnitude' => $products[$productRandomInt2]['product_magnitude'],
+                        'product_price' => $products[$productRandomInt2]['product_price']
+                    ];
+                }
             }
         }
 

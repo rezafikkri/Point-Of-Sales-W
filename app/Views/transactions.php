@@ -114,7 +114,7 @@ $this->extend('admin_layout');
                 </tr>
                 <?php $i++; endforeach; else : ?>
                 <tr class="table__row-odd">
-                    <td colspan="6">Transaksi tidak ada.</td>
+                    <td colspan="8">Transaksi tidak ada.</td>
                 </tr>
                 <?php endif ?>
             </tbody>

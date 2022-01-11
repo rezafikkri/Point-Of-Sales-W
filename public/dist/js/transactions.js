@@ -172,16 +172,30 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
 
                 // if exists transaction details
                 if (responseJson.transaction_details.length > 0) {
-                    let li = '';
-                    responseJson.transaction_details.forEach(val => {
-                        li += `<li><span class="table__title">${val.product_name}</span>
-                            <span class="table__information">Harga :</span><span class="table__data">
-                                ${numberFormatterToCurrency(parseInt(val.product_price))} / ${val.product_magnitude}
+                    let li = `
+                        <li>
+                            <span class="table__title">Uang pelanggan :</span><span class="table__data">
+                                ${responseJson.customer_money}
                             </span>
-                            <span class="table__information">Jumlah :</span><span class="table__data">${val.product_quantity}</span>
-                            <span class="table__information">Bayaran :</span><span class="table__data">
-                                ${numberFormatterToCurrency(parseInt(val.product_price * val.product_quantity))}
-                            </span></li>`;
+                        </li>
+                        <li class="border-bottom-0"><span class="table__title">Daftar produk :</span></li>
+                    `;
+                    responseJson.transaction_details.forEach((val) => {
+                        li += `
+                            <li>
+                                <span class="table__data">${val.product_name}</span>
+                                <span class="table__information">Besaran :</span><span class="table__data">
+                                    ${val.product_magnitude}
+                                </span>
+                                <span class="table__information">Harga :</span><span class="table__data">
+                                    ${numberFormatterToCurrency(parseInt(val.product_price))}
+                                </span>
+                                <span class="table__information">Jumlah :</span><span class="table__data">${val.product_quantity}</span>
+                                <span class="table__information">Bayaran :</span><span class="table__data">
+                                    ${numberFormatterToCurrency(parseInt(val.product_price * val.product_quantity))}
+                                </span>
+                            </li>
+                        `;
                     });
 
                     const trElement = document.createElement('tr');
@@ -449,7 +463,7 @@ exportExcelElement.addEventListener('click', async (e) => {
     loadingElement.classList.remove('d-none');
 
     try {
-        const responseJson = await postData(`${baseUrl}/admin/transactions/export/excel/${type}`, data);
+        const responseJson = await postData(`${baseUrl}/admin/transaction/export/excel/${type}`, data);
 
         // set new csrf hash to table tag
         if (responseJson.csrf_value != undefined) {
