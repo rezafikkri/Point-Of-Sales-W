@@ -26,7 +26,7 @@
     <ul class="navbar__right">
         <li class="dropdown"><a href="#" class="dropdown-toggle" target="#user-settings"><?= $_SESSION['sign_in_user_full_name'] ?></a>
             <ul class="dropdown-menu dropdown-menu--end d-none" id="user-settings">
-                <li><a href="/sign_out" class="text-hover-red">Sign Out</a></li>
+                <li><a href="/sign_out" class="text-hover-red">Keluar</a></li>
             </ul>
         </li>
     </ul>
