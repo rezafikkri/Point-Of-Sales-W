@@ -3,50 +3,64 @@
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 12px;
 
-    &__image, &__info, &__action a {
-        background-color: #fff;
-    }
-
     &__image {
-        border: 1px solid var(--border-color);
-        border-bottom-style: none;
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
-        overflow: hidden;
+        display: none;
+        position: fixed;
+        z-index: 100;
+        top: 5px;
+        bottom: 5px;
+        left: 0;
+        right: 0;
+        overflow: auto;
+        background-color: rgba(255,255,255,.9);
+        opacity: 0;
+
+        &:hover {
+            cursor: zoom-out;
+        }
 
         img {
             width: 100%;
+            display: block;
+            margin: auto;
+
+            @media (min-width: 768px) {
+                width: 80%;
+            }
         }
-   }
+
+        &--show {
+            opacity: 1;
+        }
+
+        &--fade-in {
+            animation: fade_in .25s ease-in-out forwards;
+        }
+
+        &--fade-out {
+            animation: fade_out .1s ease-in-out forwards;
+        }
+    }
 
     &__info {
         padding: 15px;
         border: 1px solid var(--border-color);
-        border-top-style: none;
         border-bottom-style: none;
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+        background-color: #fff;
     }
 
-    &__name {
+    &__name a {
         font-family: 'roboto-bold';
         margin-bottom: 0;
         font-size: 18px;
         color: #4c4c4c;
+        text-decoration: none;
 
-        span {
-            font-family: 'roboto-regular';
-            font-size: 17px;
-            color: #fff;
-            background-color: #fe5c19;
+        &:hover {
+            color: var(--blue);
         }
-    }
-
-    &__category, &__sale {
-        color: var(--gray);
-        font-size: 17px;
-    }
-
-    &__category {
-        margin-bottom: 0;
     }
 
     &__price {
@@ -93,6 +107,7 @@
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
             position: relative;
+            background-color: #fff;
 
             &:hover {
                 background-color: var(--blue);

@@ -31,6 +31,10 @@ $routes->setAutoRoute(false);
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
+$routes->group('kasir', function ($routes) {
+    $routes->get('', 'Cashier::index');
+});
+
 $routes->group('admin', function ($routes) {
     $routes->get('', 'Admin::index');
     $routes->get('show-transactions-two-months-ago', 'Admin::showTransactionsTwoMonthsAgo');

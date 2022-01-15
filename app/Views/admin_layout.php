@@ -51,7 +51,7 @@
 <footer class="footer">
 <div class="container-xl">
     <ul>
-        <li>&copy; 2021 <a href="https://rezafikkri.github.io/" target="_blank" rel="noreferrer noopener">Reza Sariful Fikri</a>
+        <li>&copy; 2022 <a href="https://rezafikkri.github.io/" target="_blank" rel="noreferrer noopener">Reza Sariful Fikri</a>
     </li>
         <li>
             <a href="https://github.com/rezafikkri/Point-Of-Sales-W/wiki" target="_blank" rel="noreferrer noopener">Bantuan</a>

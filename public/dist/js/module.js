@@ -7,6 +7,8 @@ function showModal(modal, modalContent)
     }, 50);
 
     setTimeout(() => {
+        modal.classList.remove('modal--fade-in');
+        modal.classList.add('modal--show');
         modalContent.classList.add('modal__content--animate-show');
     }, 200);
 }
@@ -17,7 +19,7 @@ function hideModal(modal, modalContent)
     modalContent.classList.replace('modal__content--animate-show', 'modal__content--animate-hide');
     setTimeout(() => {
         modalContent.classList.remove('modal__content--animate-hide');
-        modal.classList.replace('modal--fade-in', 'modal--fade-out');
+        modal.classList.add('modal--fade-out');
     }, 100);
 
     setTimeout(() => {

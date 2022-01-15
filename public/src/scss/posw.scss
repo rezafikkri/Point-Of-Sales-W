@@ -1,6 +1,6 @@
 /*!
  * Point Of Sales Warung
- * Licensed under GPL (https://github.com/rezafikkri/Point-Of-Sales-Warung/blob/master/LICENSE)
+ * Licensed under GPL (https://github.com/rezafikkri/Point-Of-Sales-W/blob/master/LICENSE)
  */
 
 @import 'font.scss';
@@ -56,3 +56,24 @@ h1, h2, h3, h4, h5, h6 {
 @import 'alert.scss';
 
 @import 'utilities.scss';
+
+
+@keyframes fade_in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fade_out {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}

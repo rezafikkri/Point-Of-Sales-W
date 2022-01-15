@@ -18,15 +18,14 @@
 
     &--show {
         opacity: 1;
-        transform: translateY(0);
     }
 
     &--fade-in {
-        animation: fade_in_modal_content .25s ease-in-out forwards;
+        animation: fade_in .25s ease-in-out forwards;
     }
 
     &--fade-out {
-        animation: fade_out_modal_content .1s ease-in-out forwards;
+        animation: fade_out .1s ease-in-out forwards;
     }
 
     &__content {
@@ -38,11 +37,6 @@
         position: relative;
         opacity: 0;
         transform: translateY(-150px);
-
-        &--show {
-            opacity: 1;
-            transform: translateY(0);
-        }
 
         &--animate-show {
             animation: show_modal_content .5s cubic-bezier(.42,0,0,1) forwards;
@@ -100,25 +94,5 @@
     100% {
         opacity: 0;
         transform: translateY(-150px);
-    }
-}
-
-@keyframes fade_in_modal_content {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-@keyframes fade_out_modal_content {
-    0% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
     }
 }

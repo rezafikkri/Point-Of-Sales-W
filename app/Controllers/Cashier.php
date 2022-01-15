@@ -8,6 +8,10 @@ class Cashier extends Controller
 {
     public function index()
     {
-        echo 'kasir';
+        helper('active_menu');
+
+        $data['title'] = 'Home . POSW';
+
+        return view('cashier', $data);
     }
 }

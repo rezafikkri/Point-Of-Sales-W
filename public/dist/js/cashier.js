@@ -1,20 +1,59 @@
-import {create_alert_node, number_formatter_to_currency, show_modal, hide_modal} from './module.posw.js';
+import { 
+    renderAlert,
+    numberFormatterToCurrency,
+    showModal,
+    hideModal
+} from './module.js';
 
-const main = document.querySelector('main.main');
+const mainElement = document.querySelector('main.main');
+
 const btn_show_cart = document.querySelector('a#show-cart');
 const btn_search_product = document.querySelector('a#search-product');
 const btn_cancel_transaction = document.querySelector('a#cancel-transaction');
 const btn_finish_transaction = document.querySelector('a#finish-transaction');
 const cart_table = document.querySelector('aside.cart table.table');
 
-// update qty total and payment total in cart table
-function update_qty_total_payment(cart_table, qty_total, payment_total)
-{
-    cart_table.querySelector('td#qty-total').innerText = qty_total;
-    cart_table.querySelector('td#qty-total').dataset.qtyTotal = qty_total;
-    cart_table.querySelector('td#payment-total').innerText = number_formatter_to_currency(payment_total);
-    cart_table.querySelector('td#payment-total').dataset.paymentTotal = payment_total;
-}
+// change product price info
+mainElement.addEventListener('change', (e) => {
+    let targetElement = e.target;
+    // if magnitude in product item is changed
+    if (targetElement.getAttribute('name') == 'magnitude') {
+        const productPrice = targetElement.selectedOptions[0].dataset.productPrice;
+        targetElement.previousElementSibling.previousElementSibling.innerText = numberFormatterToCurrency(parseInt(productPrice));
+    }
+});
+
+// show and hide product image
+mainElement.addEventListener('click', (e) => {
+    // find true target
+    const targetShowElement = e.target;
+    let targetHideElement = e.target;
+    if (targetHideElement.getAttribute('id') != 'product-image') targetHideElement = targetHideElement.parentElement;
+
+    // if product name is clicked
+    if (targetShowElement.getAttribute('id') == 'product-name') {
+        const productImageElement = targetShowElement.parentElement.parentElement.previousElementSibling;
+        productImageElement.classList.add('d-flex');
+        setTimeout(() => {
+            productImageElement.classList.add('product__image--fade-in');
+        }, 50);
+
+        setTimeout(() => {
+            productImageElement.classList.remove('product__image--fade-in');
+            productImageElement.classList.add('product__image--show');
+        }, 250);
+    }
+
+    // if product image is clicked
+    if (targetHideElement.getAttribute('id') == 'product-image') {
+        targetHideElement.classList.add('product__image--fade-out');
+        setTimeout(() => {
+            targetHideElement.classList.remove('product__image--fade-out');
+            targetHideElement.classList.remove('product__image--show');
+            targetHideElement.classList.remove('d-flex');
+        }, 100);
+    }
+});
 
 // show transaction detail in cart table
 function show_transaction_details(cart_table, transaction_details)
@@ -154,16 +193,6 @@ btn_close_cart.addEventListener('click', (e) => {
 
     // remove class overflow hidden in tag body
     document.querySelector('body').classList.remove('overflow-hidden');
-});
-
-// change product price info
-main.addEventListener('change', (e) => {
-    // if changed is select magnitude in product item
-    let target = e.target;
-    if (target.getAttribute('name') === 'magnitude') {
-        const product_price = target.selectedOptions[0].dataset.productPrice;
-        target.previousElementSibling.previousElementSibling.innerText = number_formatter_to_currency(parseInt(product_price));
-    }
 });
 
 // search product
