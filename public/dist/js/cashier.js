@@ -32,6 +32,8 @@ mainElement.addEventListener('click', (e) => {
 
     // if product name is clicked
     if (targetShowElement.getAttribute('id') == 'product-name') {
+        e.preventDefault();
+
         const productImageElement = targetShowElement.parentElement.parentElement.previousElementSibling;
         productImageElement.classList.add('d-flex');
         setTimeout(() => {
