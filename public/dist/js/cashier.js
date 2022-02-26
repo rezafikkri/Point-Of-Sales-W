@@ -7,8 +7,8 @@ import {
 
 const mainElement = document.querySelector('main.main');
 
+const searchElement = document.querySelector('a#search');
 const btn_show_cart = document.querySelector('a#show-cart');
-const btn_search_product = document.querySelector('a#search-product');
 const btn_cancel_transaction = document.querySelector('a#cancel-transaction');
 const btn_finish_transaction = document.querySelector('a#finish-transaction');
 const cart_table = document.querySelector('aside.cart table.table');
@@ -55,6 +55,123 @@ mainElement.addEventListener('click', (e) => {
             targetHideElement.classList.remove('d-flex');
         }, 100);
     }
+});
+
+// search product
+btn_search_product.addEventListener('click', e => {
+    e.preventDefault();
+
+    const container = main.querySelector('div.container-xl');
+    const product_name = document.querySelector('input[name="product_name_search"]').value;
+    const csrf_name = main.dataset.csrfName;
+    const csrf_value = main.dataset.csrfValue;
+
+    // if empty product_name
+    if (product_name.trim() === '') {
+        return false;
+    }
+
+    // loading
+    container.innerHTML = `<div id="search-loading" class="d-flex justify-content-center align-items-center mt-4">
+    <div class="loading"><div></div></div>
+</div>`;
+    // disabled button search
+    btn_search_product.classList.add('btn--disabled');
+
+    fetch('/kasir/cari_produk', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `product_name=${product_name}&${csrf_name}=${csrf_value}`
+    })
+    .finally(() => {
+        // loading
+        container.querySelector('div#search-loading').remove();
+        // enabled button search
+        btn_search_product.classList.remove('btn--disabled');
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(json => {
+        // set new csrf hash to main tag
+        if (json.csrf_value !== undefined) {
+            main.dataset.csrfValue = json.csrf_value;
+        }
+
+        // if product exists
+        if (json.products_db.length > 0) {
+            const base_url = main.dataset.baseUrl;
+            let product = `<span class="text-muted me-1 d-block mb-3" id="result-status">
+                    1 - ${json.products_db.length} dari ${json.product_search_total} Total produk hasil pencarian</span>`;
+
+            product += '<h5 class="mb-2 main__title">Produk</h5><div class="product mb-4">';
+
+            json.products_db.forEach (p => {
+                product += `<div class="product__item" data-product-id="${p.product_id}">
+                    <div class="product__image">
+                        <img src="${base_url}/dist/images/product_photo/${p.product_photo}" alt="${p.product_name}">
+                    </div>
+                    <div class="product__info">
+                        <p class="product__name">${p.product_name}</p>
+                        <p class="product__category">${p.category_name}</p>
+                        <p class="product__sale" data-product-sale="${p.product_sale||0}">Terjual ${p.product_sale||0}</p>
+
+                        <div class="product__price">
+                            <h5>${p.product_price[0].product_price_formatted}</h5><span>/</span>
+                            <select name="magnitude">`;
+
+                            p.product_price.forEach (pp => {
+                                product += `<option data-product-price="${pp.product_price}" value="${pp.product_price_id}">
+                                        ${pp.product_magnitude}</option>`;
+                            });
+
+                product += `</select>
+                        </div>
+                    </div>
+                    <div class="product__action">
+                        <input type="number" class="form-input" name="product_qty" placeholder="Jumlah..." min="1">
+                        <a class="btn" href="#" id="buy-rollback" title="Tambah ke keranjang belanja">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
+                        </a>
+                    </div>
+                </div><!-- product__item -->`;
+            });
+
+            product += '</div><!-- product -->';
+
+            // inner html product to container
+            container.innerHTML = product;
+        }
+        // if product not exists
+        else {
+            let product = `<span class="text-muted me-1 d-block mb-3" id="result-status">0 Total produk hasil pencarian</span>
+                <h5 class="mb-2 main__title">Produk</h5>
+                <p>Produk tidak ada.</p>`;
+            container.innerHTML = product;
+        }
+
+        const limit_message = document.querySelector('span#limit-message');
+        // add limit message if product search total = product limit && limit message not exists
+        if (json.products_db.length === json.product_limit && limit_message === null) {
+            const span = document.createElement('span');
+            span.classList.add('text-muted');
+            span.classList.add('d-block');
+            span.classList.add('mb-5');
+            span.setAttribute('id', 'limit-message');
+            span.innerHTML = `Hanya ${json.product_limit} Produk terbaru yang ditampilkan, Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!`;
+            document.querySelector('div.product').after(span);
+        }
+        // else if product search total != product limit and limit message exists
+        else if (json.products_db.length !== json.product_limit && limit_message !== null) {
+            limit_message.remove();
+        }
+    })
+    .catch(error => {
+        console.error(error);
+    });
 });
 
 // show transaction detail in cart table
@@ -195,123 +312,6 @@ btn_close_cart.addEventListener('click', (e) => {
 
     // remove class overflow hidden in tag body
     document.querySelector('body').classList.remove('overflow-hidden');
-});
-
-// search product
-btn_search_product.addEventListener('click', e => {
-    e.preventDefault();
-
-    const container = main.querySelector('div.container-xl');
-    const product_name = document.querySelector('input[name="product_name_search"]').value;
-    const csrf_name = main.dataset.csrfName;
-    const csrf_value = main.dataset.csrfValue;
-
-    // if empty product_name
-    if (product_name.trim() === '') {
-        return false;
-    }
-
-    // loading
-    container.innerHTML = `<div id="search-loading" class="d-flex justify-content-center align-items-center mt-4">
-    <div class="loading"><div></div></div>
-</div>`;
-    // disabled button search
-    btn_search_product.classList.add('btn--disabled');
-
-    fetch('/kasir/cari_produk', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `product_name=${product_name}&${csrf_name}=${csrf_value}`
-    })
-    .finally(() => {
-        // loading
-        container.querySelector('div#search-loading').remove();
-        // enabled button search
-        btn_search_product.classList.remove('btn--disabled');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
-        // set new csrf hash to main tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
-        }
-
-        // if product exists
-        if (json.products_db.length > 0) {
-            const base_url = main.dataset.baseUrl;
-            let product = `<span class="text-muted me-1 d-block mb-3" id="result-status">
-                    1 - ${json.products_db.length} dari ${json.product_search_total} Total produk hasil pencarian</span>`;
-
-            product += '<h5 class="mb-2 main__title">Produk</h5><div class="product mb-4">';
-
-            json.products_db.forEach (p => {
-                product += `<div class="product__item" data-product-id="${p.product_id}">
-                    <div class="product__image">
-                        <img src="${base_url}/dist/images/product_photo/${p.product_photo}" alt="${p.product_name}">
-                    </div>
-                    <div class="product__info">
-                        <p class="product__name">${p.product_name}</p>
-                        <p class="product__category">${p.category_name}</p>
-                        <p class="product__sale" data-product-sale="${p.product_sale||0}">Terjual ${p.product_sale||0}</p>
-
-                        <div class="product__price">
-                            <h5>${p.product_price[0].product_price_formatted}</h5><span>/</span>
-                            <select name="magnitude">`;
-
-                            p.product_price.forEach (pp => {
-                                product += `<option data-product-price="${pp.product_price}" value="${pp.product_price_id}">
-                                        ${pp.product_magnitude}</option>`;
-                            });
-
-                product += `</select>
-                        </div>
-                    </div>
-                    <div class="product__action">
-                        <input type="number" class="form-input" name="product_qty" placeholder="Jumlah..." min="1">
-                        <a class="btn" href="#" id="buy-rollback" title="Tambah ke keranjang belanja">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
-                        </a>
-                    </div>
-                </div><!-- product__item -->`;
-            });
-
-            product += '</div><!-- product -->';
-
-            // inner html product to container
-            container.innerHTML = product;
-        }
-        // if product not exists
-        else {
-            let product = `<span class="text-muted me-1 d-block mb-3" id="result-status">0 Total produk hasil pencarian</span>
-                <h5 class="mb-2 main__title">Produk</h5>
-                <p>Produk tidak ada.</p>`;
-            container.innerHTML = product;
-        }
-
-        const limit_message = document.querySelector('span#limit-message');
-        // add limit message if product search total = product limit && limit message not exists
-        if (json.products_db.length === json.product_limit && limit_message === null) {
-            const span = document.createElement('span');
-            span.classList.add('text-muted');
-            span.classList.add('d-block');
-            span.classList.add('mb-5');
-            span.setAttribute('id', 'limit-message');
-            span.innerHTML = `Hanya ${json.product_limit} Produk terbaru yang ditampilkan, Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!`;
-            document.querySelector('div.product').after(span);
-        }
-        // else if product search total != product limit and limit message exists
-        else if (json.products_db.length !== json.product_limit && limit_message !== null) {
-            limit_message.remove();
-        }
-    })
-    .catch(error => {
-        console.error(error);
-    });
 });
 
 // calculate change money

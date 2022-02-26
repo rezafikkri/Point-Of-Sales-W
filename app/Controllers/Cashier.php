@@ -7,7 +7,7 @@ use App\Models\{ProductsModel};
 class Cashier extends BaseController
 {
     private const BESTSELLER_PRODUCT_LIMIT = 8;
-    private const PRODUCT_LIMIT = 50;
+    private const PRODUCT_LIMIT = 2;
 
     public function __construct()
     {
@@ -82,6 +82,8 @@ class Cashier extends BaseController
         $data['totalProduct'] = $this->productsModel->getTotalForCashier();
         $data['bestSellerProducts'] = $bestSellerProducts;
         $data['remainderProducts'] = $remainderProducts;
+        $data['bestSellerProductLimit'] = static::BESTSELLER_PRODUCT_LIMIT;
+        $data['remainderProductLimit'] = static::PRODUCT_LIMIT;
 
         return view('cashier', $data);
     }

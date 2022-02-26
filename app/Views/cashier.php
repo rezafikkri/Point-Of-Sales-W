@@ -130,6 +130,15 @@
         </div><!-- product__item -->
         <?php endforeach ?>
     </div><!-- product -->
+
+    <?php
+        // if total product > product showed
+        $totalProductShowed = $countBestSellerProducts + $countRemainderProducts;
+        if ($totalProduct > $totalProductShowed) :
+    ?>
+    <span id="limit-message" class="text-muted d-block mb-5">Hanya <?= $totalProductShowed ?> produk yang ditampilkan, Pakai fitur
+    <i>Pencarian</i> untuk hasil lebih spesifik!</span>
+    <?php endif ?>
 </div><!-- container-xl -->
 
 <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center align-items-center d-none" id="transaction-loading">
