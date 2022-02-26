@@ -52,22 +52,39 @@
 
 <main class="main" data-csrf-name="<?= csrf_token() ?>" data-csrf-value="<?= csrf_hash() ?>" data-base-url="<?= base_url() ?>">
 <div class="container-xl">
+    <?php
+        $countBestSellerProducts = count($bestSellerProducts);
+        $countRemainderProducts = count($remainderProducts);
+
+        // if exists product
+        if ($countBestSellerProducts > 0 || $countRemainderProducts > 0) :
+    ?>
+    <span class="text-muted me-1 d-block mb-3" id="result-status">
+    1 - <?= $countBestSellerProducts + $countRemainderProducts; ?> dari <?= $totalProduct; ?> Total produk</span>
+    <?php else : ?>
     <span class="text-muted me-1 d-block mb-3" id="result-status">0 Total produk</span>
+    <?php endif; ?>
 
     <h5 class="mb-3 main__title">Produk Terlaris</h5>
     <div class="product mb-5">
-        <div class="product__item" data-product-id="">
+        <?php
+            foreach ($bestSellerProducts as $p) :
+        ?>
+        <div class="product__item" data-product-id="<?= $p['product_id'] ?>">
             <div class="product__image" id="product-image">
-                <img src="<?= base_url('dist/images/product-photos/HP.jpg') ?>" alt="" loading="lazy">
+                <img src="<?= base_url('dist/images/product-photos/' . $p['product_photo']) ?>" alt="<?= $p['product_name'] ?>" loading="lazy">
             </div>
             <div class="product__info">
-                <p class="product__name mb-0"><a href="#" id="product-name">Apple M1 Max</a></p>
+                <p class="product__name mb-0"><a href="#" id="product-name"><?= $p['product_name'] ?></a></p>
 
                 <div class="product__price">
-                    <h5>Rp 60.000.000,00</h5><span>/</span>
+                    <span class="me-2"><?= $p['product_prices'][0]['product_price_formatted'] ?></span><span>/</span>
                     <select name="magnitude">
-                        <option data-product-price="60000000" value="">1 Buah</option>
-                        <option data-product-price="120000000" value="">2 Buah</option>
+                    <?php
+                        foreach ($p['product_prices'] as $pp) :
+                    ?>
+                        <option data-product-price="<?= $pp['product_price'] ?>" value="<?= $pp['product_price_id'] ?>"><?= $pp['product_magnitude'] ?></option>
+                    <?php endforeach ?>
                     </select>
                 </div>
             </div>
@@ -78,32 +95,41 @@
                 </a>
             </div>
         </div><!-- product__item -->
-
-        <div class="product__item" data-product-id="">
-            <div class="product__image" id="product-image">
-                <img src="<?= base_url('dist/images/product-photos/Asus.jpg') ?>" alt="" loading="lazy">
-            </div>
-            <div class="product__info">
-                <p class="product__name mb-0"><a href="#" id="product-name">Asus ZenBook</a></p>
-
-                <div class="product__price">
-                    <h5>Rp 10.000.000,00</h5><span>/</span>
-                    <select name="magnitude">
-                        <option data-product-price="10000000" value="">1 Buah</option>
-                        <option data-product-price="20000000" value="">2 Buah</option>
-                    </select>
-                </div>
-            </div>
-            <div class="product__action">
-                <input type="number" class="form-input" name="product_qty" placeholder="Jumlah..." min="1">
-                <a class="btn" href="#" id="buy-rollback" title="Tambah ke keranjang belanja">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
-                </a>
-            </div>
-        </div><!-- product__item -->
+        <?php endforeach ?>
     </div><!-- product -->
 
     <h5 class="mb-2 main__title">Produk Lainnya</h5>
+    <div class="product mb-5">
+        <?php
+            foreach ($remainderProducts as $p) :
+        ?>
+        <div class="product__item" data-product-id="<?= $p['product_id'] ?>">
+            <div class="product__image" id="product-image">
+                <img src="<?= base_url('dist/images/product-photos/' . $p['product_photo']) ?>" alt="<?= $p['product_name'] ?>" loading="lazy">
+            </div>
+            <div class="product__info">
+                <p class="product__name mb-0"><a href="#" id="product-name"><?= $p['product_name'] ?></a></p>
+
+                <div class="product__price">
+                    <span class="me-2"><?= $p['product_prices'][0]['product_price_formatted'] ?></span><span>/</span>
+                    <select name="magnitude">
+                    <?php
+                        foreach ($p['product_prices'] as $pp) :
+                    ?>
+                        <option data-product-price="<?= $pp['product_price'] ?>" value="<?= $pp['product_price_id'] ?>"><?= $pp['product_magnitude'] ?></option>
+                    <?php endforeach ?>
+                    </select>
+                </div>
+            </div>
+            <div class="product__action">
+                <input type="number" class="form-input" name="product_qty" placeholder="Jumlah..." min="1">
+                <a class="btn" href="#" id="buy-rollback" title="Tambah ke keranjang belanja">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
+                </a>
+            </div>
+        </div><!-- product__item -->
+        <?php endforeach ?>
+    </div><!-- product -->
 </div><!-- container-xl -->
 
 <div class="loading-bg position-absolute top-0 end-0 bottom-0 start-0 d-flex justify-content-center align-items-center d-none" id="transaction-loading">

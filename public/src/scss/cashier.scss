@@ -52,8 +52,7 @@
     }
 
     &__name a {
-        font-family: 'roboto-bold';
-        margin-bottom: 0;
+        font-family: 'roboto-black';
         font-size: 18px;
         color: #4c4c4c;
         text-decoration: none;
@@ -63,25 +62,10 @@
         }
     }
 
-    &__price {
-        display: flex;
-        align-items: flex-start;
-
-        h5 {
-            font-family: 'roboto-black';
-            margin-right: 5px;
-            margin-bottom: 0;
-        }
-
-        select, p {
-            flex: 1;
-        }
-
-        select {
-            border: 0;
-            background-color: #fff;
-            width: auto;
-        }
+    &__price select {
+        border: 0;
+        background-color: #fff;
+        width: auto;
     }
 
     &__action {
