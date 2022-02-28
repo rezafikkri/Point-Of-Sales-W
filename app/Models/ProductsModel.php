@@ -145,39 +145,39 @@ class ProductsModel extends Model
 
     public function getTotalForCashier(): int
     {
-        return $this->select('product_id')->where('product_status', 'ada')->get()->getNumRows();
+        return $this->select('product_id')->where('product_status', 'ada')->countAllResults();;
     }
 
-    public function getProductSearchesForCashier(int $limit, string $keyword): array
+    public function searchForCashier(int $limit, string $keyword): array
     {
-        $table = "(SELECT p.waktu_buat, p.nama_produk, p.foto_produk, p.produk_id,
-                          (SELECT kp.nama_kategori_produk FROM kategori_produk kp WHERE kp.kategori_produk_id=p.kategori_produk_id) nama_kategori_produk,
-                          SUM(td.jumlah_produk) jumlah_produk
-                  FROM produk p
-                  INNER JOIN harga_produk hp USING(produk_id)
-                  LEFT JOIN transaksi_detail td USING(harga_produk_id)
-                  WHERE p.status_produk='ada' AND p.produk_id IS NOT NULL AND p.nama_produk LIKE '".$this->db->escapeLikeString($keyword)."%'
-                  GROUP BY p.produk_id ORDER BY p.waktu_buat DESC LIMIT ".$this->db->escape($limit).") p";
-
+        $table = "
+            (SELECT p.product_name, p.product_photo, p.product_id, p.edited_at
+            FROM products p
+            INNER JOIN product_prices pp USING(product_id)
+            WHERE p.product_status='ada' AND p.product_name LIKE '%".$this->db->escapeLikeString($keyword)."%'
+        ";
+    
+        $table .= " GROUP BY p.product_id ORDER BY p.edited_at DESC LIMIT " . $this->db->escape($limit) . ") p";
         $builder = $this->db->table($table);
+
         return $builder->select("
-            p.produk_id,
-            p.waktu_buat,
-            p.nama_produk,
-            p.foto_produk,
-            p.nama_kategori_produk,
-            hp.harga_produk_id,
-            hp.harga_produk,
-            hp.besaran_produk,
-            p.jumlah_produk
+            p.product_id,
+            p.product_name,
+            p.product_photo,
+            pp.product_price_id,
+            pp.product_price,
+            pp.product_magnitude
         ")
-        ->join('harga_produk hp', 'hp.produk_id = p.produk_id', 'INNER')
-        ->orderBy('p.waktu_buat', 'DESC')
+        ->join('product_prices pp', 'pp.product_id = p.product_id', 'INNER')
+        ->orderBy('p.edited_at', 'DESC')
         ->get()->getResultArray();
     } 
 
-    public function countAllProductSearchForCashier(string $match): int
+    public function getTotalSearchForCashier(string $keyword)//: int
     {
-        return $this->select('produk_id')->where('status_produk', 'ada')->like('nama_produk',$match,'after')->get()->getNumRows();
+        return $this->select('product_name')
+                    ->where('product_status', 'ada')
+                    ->like('product_name', $keyword)
+                    ->countAllResults();
     }
 }

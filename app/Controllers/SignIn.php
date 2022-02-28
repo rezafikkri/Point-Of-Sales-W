@@ -51,7 +51,7 @@ class SignIn extends BaseController
                     return redirect()->to('/admin');
                 }
 
-                return redirect()->to('/kasir');
+                return redirect()->to('/cashier');
             }
 
             // if password is wrong

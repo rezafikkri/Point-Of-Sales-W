@@ -6,8 +6,8 @@ import {
 } from './module.js';
 
 const mainElement = document.querySelector('main.main');
-
 const searchElement = document.querySelector('a#search');
+
 const btn_show_cart = document.querySelector('a#show-cart');
 const btn_cancel_transaction = document.querySelector('a#cancel-transaction');
 const btn_finish_transaction = document.querySelector('a#finish-transaction');
@@ -58,77 +58,60 @@ mainElement.addEventListener('click', (e) => {
 });
 
 // search product
-btn_search_product.addEventListener('click', e => {
+searchElement.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    const container = main.querySelector('div.container-xl');
-    const product_name = document.querySelector('input[name="product_name_search"]').value;
-    const csrf_name = main.dataset.csrfName;
-    const csrf_value = main.dataset.csrfValue;
+    const containerElement = mainElement.querySelector('div.container-xl');
+    const keyword = document.querySelector('input[name="product_name_search"]').value;
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
 
-    // if empty product_name
-    if (product_name.trim() === '') {
+    // if empty keyword
+    if (keyword.trim() == '') {
         return false;
     }
 
-    // loading
-    container.innerHTML = `<div id="search-loading" class="d-flex justify-content-center align-items-center mt-4">
-    <div class="loading"><div></div></div>
-</div>`;
-    // disabled button search
-    btn_search_product.classList.add('btn--disabled');
+    // loading and disable button search
+    containerElement.innerHTML = `
+        <div id="search-loading" class="d-flex justify-content-center align-items-center mt-4">
+            <div class="loading"><div></div></div>
+        </div>
+    `;
+    searchElement.classList.add('btn--disabled');
 
-    fetch('/kasir/cari_produk', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `product_name=${product_name}&${csrf_name}=${csrf_value}`
-    })
-    .finally(() => {
-        // loading
-        container.querySelector('div#search-loading').remove();
-        // enabled button search
-        btn_search_product.classList.remove('btn--disabled');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
-        // set new csrf hash to main tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
-        }
-
+    try {
+        const response = await fetch(`${baseUrl}/cashier/search/products/${keyword}`);
+        const responseJson = await response.json();
+        
+        let product = '';
         // if product exists
-        if (json.products_db.length > 0) {
-            const base_url = main.dataset.baseUrl;
-            let product = `<span class="text-muted me-1 d-block mb-3" id="result-status">
-                    1 - ${json.products_db.length} dari ${json.product_search_total} Total produk hasil pencarian</span>`;
+        if (responseJson.products.length > 0) {
+            product += `<span class="text-muted me-1 d-block mb-3" id="result-status">
+                    1 - ${responseJson.products.length} dari ${responseJson.total_product} Total produk hasil pencarian</span>`;
 
             product += '<h5 class="mb-2 main__title">Produk</h5><div class="product mb-4">';
 
-            json.products_db.forEach (p => {
-                product += `<div class="product__item" data-product-id="${p.product_id}">
-                    <div class="product__image">
-                        <img src="${base_url}/dist/images/product_photo/${p.product_photo}" alt="${p.product_name}">
+            responseJson.products.forEach((p) => {
+                product += `
+                    <div class="product__item" data-product-id="${p.product_id}">
+                    <div class="product__image" id="product-image">
+                        <img src="${baseUrl}/dist/images/product-photos/${p.product_photo}" alt="${p.product_name}" loading="lazy">
                     </div>
                     <div class="product__info">
-                        <p class="product__name">${p.product_name}</p>
-                        <p class="product__category">${p.category_name}</p>
-                        <p class="product__sale" data-product-sale="${p.product_sale||0}">Terjual ${p.product_sale||0}</p>
+                        <p class="product__name mb-0"><a href="#" id="product-name">${p.product_name}</a></p>
 
                         <div class="product__price">
-                            <h5>${p.product_price[0].product_price_formatted}</h5><span>/</span>
-                            <select name="magnitude">`;
+                        <span class="me-2">${p.product_prices[0].product_price_formatted}</span><span>/</span>
+                        <select name="magnitude">
+                `;
+                
+                p.product_prices.forEach((pp) => {
+                    product += ` 
+                        <option data-product-price="${pp.product_price}" value="${pp.product_price_id}">${pp.product_magnitude}</option>
+                    `;
+                });
 
-                            p.product_price.forEach (pp => {
-                                product += `<option data-product-price="${pp.product_price}" value="${pp.product_price_id}">
-                                        ${pp.product_magnitude}</option>`;
-                            });
-
-                product += `</select>
+                product += `
+                        </select>
                         </div>
                     </div>
                     <div class="product__action">
@@ -137,41 +120,51 @@ btn_search_product.addEventListener('click', e => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
                         </a>
                     </div>
-                </div><!-- product__item -->`;
+                    </div><!-- product__item -->
+                `;
             });
-
-            product += '</div><!-- product -->';
-
-            // inner html product to container
-            container.innerHTML = product;
         }
         // if product not exists
         else {
-            let product = `<span class="text-muted me-1 d-block mb-3" id="result-status">0 Total produk hasil pencarian</span>
+            product += `
+                <span class="text-muted me-1 d-block mb-3" id="result-status">0 Total produk hasil pencarian</span>
                 <h5 class="mb-2 main__title">Produk</h5>
-                <p>Produk tidak ada.</p>`;
-            container.innerHTML = product;
+                <p>Produk tidak ada.</p>
+            `;
         }
 
-        const limit_message = document.querySelector('span#limit-message');
-        // add limit message if product search total = product limit && limit message not exists
-        if (json.products_db.length === json.product_limit && limit_message === null) {
-            const span = document.createElement('span');
-            span.classList.add('text-muted');
-            span.classList.add('d-block');
-            span.classList.add('mb-5');
-            span.setAttribute('id', 'limit-message');
-            span.innerHTML = `Hanya ${json.product_limit} Produk terbaru yang ditampilkan, Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!`;
-            document.querySelector('div.product').after(span);
+        // inner html product to container
+        containerElement.innerHTML = product;
+
+        const limitMessageElement = document.querySelector('span#limit-message');
+        // add limit message if total product search > product limit && limit message not exists
+        if (responseJson.total_product > responseJson.product_limit && (limitMessageElement == null || tableElement.dataset.showType == undefined)) {
+            if (limitMessageElement != null) {
+                // delete old limit message
+                limitMessageElement.remove();
+            }
+
+            const spanElement = document.createElement('span');
+            spanElement.classList.add('text-muted');
+            spanElement.classList.add('d-block');
+            spanElement.classList.add('mb-5');
+            spanElement.setAttribute('id', 'limit-message');
+            spanElement.innerHTML = `
+                Hanya ${responseJson.product_limit} Produk terbaru yang ditampilkan,
+                Pakai fitur <i>Pencarian</i> untuk hasil lebih spesifik!
+            `;
+            document.querySelector('div.product').after(spanElement);
         }
-        // else if product search total != product limit and limit message exists
-        else if (json.products_db.length !== json.product_limit && limit_message !== null) {
-            limit_message.remove();
+        // else if total product search <= product limit and limit message exists
+        else if (responseJson.total_product <= responseJson.product_limit && limitMessageElement != null) {
+            limitMessage.remove();
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error(error);
-    });
+    }
+    
+    // enable search button
+    searchElement.classList.remove('btn--disabled');
 });
 
 // show transaction detail in cart table

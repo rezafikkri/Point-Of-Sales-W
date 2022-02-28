@@ -34,8 +34,8 @@ class Filters extends BaseConfig
         'before' => [
             // 'honeypot',
             'csrf',
-            'hasSignedIn' => ['except' => ['admin', 'kasir', 'admin/*', 'kasir/*', 'sign_out']],
-            'adminPermission' => ['except' => ['sign_in', '/', 'sign_out', 'kasir', 'kasir/*']],
+            'hasSignedIn' => ['except' => ['admin', 'cashier', 'admin/*', 'cashier/*', 'sign_out']],
+            'adminPermission' => ['except' => ['sign_in', '/', 'sign_out', 'cashier', 'cashier/*']],
             'cashierPermission' => ['except' => ['sign_in', '/', 'sign_out', 'admin', 'admin/*']]
         ],
         'after' => [
@@ -46,7 +46,8 @@ class Filters extends BaseConfig
                     'admin/products/search/*',
                     'admin/transactions/search/*',
                     'admin/transaction/show-details/*',
-                    'admin/transactions/show-remaining/*'
+                    'admin/transactions/show-remaining/*',
+                    'cashier/search/products/*'
                 ]
             ],
             // 'honeypot',

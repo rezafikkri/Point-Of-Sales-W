@@ -31,8 +31,9 @@ $routes->setAutoRoute(false);
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->group('kasir', function ($routes) {
+$routes->group('cashier', function ($routes) {
     $routes->get('', 'Cashier::index');
+    $routes->get('search/products/(:segment)', 'Cashier::searchProducts/$1');
 });
 
 $routes->group('admin', function ($routes) {

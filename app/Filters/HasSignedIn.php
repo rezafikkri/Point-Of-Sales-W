@@ -18,7 +18,7 @@ class HasSignedIn implements FilterInterface
                 return redirect()->to('/admin');
             }
 
-            return redirect()->to('/kasir');
+            return redirect()->to('/cashier');
         }
     }
 

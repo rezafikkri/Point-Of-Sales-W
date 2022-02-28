@@ -6,8 +6,8 @@ use App\Models\{ProductsModel};
 
 class Cashier extends BaseController
 {
-    private const BESTSELLER_PRODUCT_LIMIT = 8;
-    private const PRODUCT_LIMIT = 2;
+    private const BESTSELLER_PRODUCT_LIMIT = 4;
+    private const PRODUCT_LIMIT = 4;
 
     public function __construct()
     {
@@ -86,5 +86,18 @@ class Cashier extends BaseController
         $data['remainderProductLimit'] = static::PRODUCT_LIMIT;
 
         return view('cashier', $data);
+    }
+
+    public function searchProducts(string $keyword)
+    {
+        $keyword = filter_var($keyword, FILTER_SANITIZE_STRING);
+        $totalProduct = $this->productsModel->getTotalSearchForCashier($keyword);
+        $products = $this->remapProducts($this->productsModel->searchForCashier(static::PRODUCT_LIMIT, $keyword));
+
+        return json_encode([
+            'products' => $products,
+            'total_product' => $totalProduct,
+            'product_limit' => static::PRODUCT_LIMIT
+        ]);
     }
 }
