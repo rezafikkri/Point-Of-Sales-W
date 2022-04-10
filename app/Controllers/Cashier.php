@@ -77,7 +77,7 @@ class Cashier extends BaseController
         [
             'products' => $bestSellerProducts,
             'product_ids' => $productIds
-        ] = $this->remapProducts($this->productsModel->getBestsellers(static::BESTSELLER_PRODUCT_LIMIT), true);
+        ] = $this->remapProducts($this->productsModel->getBestSeller(static::BESTSELLER_PRODUCT_LIMIT), true);
         $remainderProducts = $this->remapProducts($this->productsModel->getRemainderForCashier($productIds, static::PRODUCT_LIMIT));
 
         $data['title'] = 'Home . POSW';

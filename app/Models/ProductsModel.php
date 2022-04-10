@@ -88,7 +88,8 @@ class ProductsModel extends Model
                      ])->getResultArray();
     }
 
-    public function getBestSellers(int $limit): array
+    /** Get best seller products for cashier */
+    public function getBestSeller(int $limit): array
     {
         $builder = $this->db->table("
             (SELECT p.product_name, p.product_photo, p.product_id,
@@ -113,7 +114,8 @@ class ProductsModel extends Model
         ->get()->getResultArray();
     }
 
-    public function getRemainderForCashier(array $productIds, int $limit): array
+    /** Get product remainder for cashier */
+    public function getRemainder(array $productIds, int $limit): array
     {
         $table = "
             (SELECT p.product_name, p.product_photo, p.product_id, p.edited_at
