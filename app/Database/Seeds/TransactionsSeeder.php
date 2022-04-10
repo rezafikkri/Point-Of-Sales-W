@@ -64,6 +64,8 @@ class TransactionsSeeder extends Seeder
         ];
         $customerMonies = [ 50000, 60000, 80000 ];
 
+        // set variable $transactionStatus = true, for indicate transaction status = belum for first loop
+        $transactionStatus = true;
         for ($i = $startTimestamp; $i <= $endTimestamp; $i += (3600 * 24)) {
             $maxTransaction = rand(1, 50);
 
@@ -76,19 +78,20 @@ class TransactionsSeeder extends Seeder
                 $transactionData[] = [
                     'transaction_id' => $transactionId,
                     'user_id' => $userIds[rand(0, 1)],
-                    'transaction_status' => 'selesai',
-                    'customer_money' => $customerMonies[rand(0, 2)],
-                    'created_at' => $dateTime,
-                    'edited_at' => $dateTime
+                    'transaction_status' => ($transactionStatus) ? 'belum' : 'selesai',
+                    'customer_money' => ($transactionStatus) ? null : $customerMonies[rand(0, 2)],
+                    'created_at' => ($transactionStatus) ? null : $dateTime,
+                    'edited_at' => ($transactionStatus) ? null : $dateTime
                 ];
+                
                 $transactionDetailData[] = [
                     'transaction_detail_id' => generate_uuid(),
                     'transaction_id' => $transactionId,
                     'product_price_id' => $products[$productRandomInt1]['product_price_id'],
                     'product_quantity' => 1,
-                    'product_name' => $products[$productRandomInt1]['product_name'],
-                    'product_magnitude' => $products[$productRandomInt1]['product_magnitude'],
-                    'product_price' => $products[$productRandomInt1]['product_price']
+                    'product_name' => ($transactionStatus) ? null : $products[$productRandomInt1]['product_name'],
+                    'product_magnitude' => ($transactionStatus) ? null : $products[$productRandomInt1]['product_magnitude'],
+                    'product_price' => ($transactionStatus) ? null : $products[$productRandomInt1]['product_price']
                 ];
                 if ($productRandomInt1 != $productRandomInt2) {
                     $transactionDetailData[] = [
@@ -96,11 +99,13 @@ class TransactionsSeeder extends Seeder
                         'transaction_id' => $transactionId,
                         'product_price_id' => $products[$productRandomInt2]['product_price_id'],
                         'product_quantity' => 1,
-                        'product_name' => $products[$productRandomInt2]['product_name'],
-                        'product_magnitude' => $products[$productRandomInt2]['product_magnitude'],
-                        'product_price' => $products[$productRandomInt2]['product_price']
+                        'product_name' => ($transactionStatus) ? null : $products[$productRandomInt2]['product_name'],
+                        'product_magnitude' => ($transactionStatus) ? null : $products[$productRandomInt2]['product_magnitude'],
+                        'product_price' => ($transactionStatus) ? null : $products[$productRandomInt2]['product_price']
                     ];
                 }
+
+                $transactionStatus = false;
             }
         }
 

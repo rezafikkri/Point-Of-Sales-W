@@ -47,7 +47,8 @@ class Filters extends BaseConfig
                     'admin/transactions/search/*',
                     'admin/transaction/show-details/*',
                     'admin/transactions/show-remaining/*',
-                    'cashier/search/products/*'
+                    'cashier/search/products/*',
+                    'cashier/show-transaction-details'
                 ]
             ],
             // 'honeypot',

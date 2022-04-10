@@ -2,16 +2,16 @@ import {
     renderAlert,
     numberFormatterToCurrency,
     showModal,
-    hideModal
+    hideModal,
+    postData
 } from './module.js';
 
 const mainElement = document.querySelector('main.main');
 const searchElement = document.querySelector('a#search');
-
-const btn_show_cart = document.querySelector('a#show-cart');
-const btn_cancel_transaction = document.querySelector('a#cancel-transaction');
+const showCartElement = document.querySelector('a#show-cart');
+const cartTableElement = document.querySelector('aside.cart table.table');
+const cancelTransactionElement = document.querySelector('a#cancel-transaction');
 const btn_finish_transaction = document.querySelector('a#finish-transaction');
-const cart_table = document.querySelector('aside.cart table.table');
 
 // change product price info
 mainElement.addEventListener('change', (e) => {
@@ -167,16 +167,25 @@ searchElement.addEventListener('click', async (e) => {
     searchElement.classList.remove('btn--disabled');
 });
 
+// update qty total and payment total in cart table
+function updateTotalQtyPayment(cartTableElement, qtyTotal, paymentTotal)
+{
+    cartTableElement.querySelector('td#qty-total').innerText = qtyTotal;
+    cartTableElement.querySelector('td#qty-total').dataset.qtyTotal = qtyTotal;
+    cartTableElement.querySelector('td#payment-total').innerText = numberFormatterToCurrency(paymentTotal);
+    cartTableElement.querySelector('td#payment-total').dataset.paymentTotal = paymentTotal;
+}
+
 // show transaction detail in cart table
-function show_transaction_details(cart_table, transaction_details)
+function showTransactionDetails(cartTableElement, transactionDetails)
 {
     let tr = '';
-    let payment_total = 0;
-    let qty_total = 0;
-    transaction_details.forEach (td => {
-        const payment = parseInt(td.harga_produk) * parseInt(td.jumlah_produk);
-        tr += `<tr data-product-id="${td.produk_id}" data-transaction-detail-id="${td.transaksi_detail_id}">
-            <td width="10"><a href="#" title="Hapus produk" id="remove-product"  class="text-hover-red">
+    let totalPayment = 0;
+    let totalQty = 0;
+    transactionDetails.forEach (td => {
+        const payment = parseInt(td.product_price) * parseInt(td.product_quantity);
+        tr += `<tr data-product-id="${td.product_id}" data-transaction-detail-id="${td.transaction_detail_id}">
+            <td width="10"><a href="#" title="Hapus produk" id="delete-product"  class="text-hover-red">
                 <svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg>
             </a></td>
             <td width="10"><a href="#" title="Tambah jumlah produk" id="add-product-qty">
@@ -185,43 +194,33 @@ function show_transaction_details(cart_table, transaction_details)
             <td width="10"><a href="#" title="Kurangi jumlah produk" id="reduce-product-qty">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>
             </a></td>
-            <td>${td.nama_produk}</td>
-            <td id="price" data-price="${td.harga_produk}">
-                ${number_formatter_to_currency(parseInt(td.harga_produk))} / ${td.besaran_produk}
+            <td>${td.product_name}</td>
+            <td id="price" data-price="${td.product_price}">
+                ${numberFormatterToCurrency(parseInt(td.product_price))} / ${td.product_magnitude}
             </td>
-            <td id="qty" data-qty="${td.jumlah_produk}">${td.jumlah_produk}</td>
-            <td id="payment" data-payment="${payment}">${number_formatter_to_currency(payment)}</td>
+            <td id="qty" data-qty="${td.product_quantity}">${td.product_quantity}</td>
+            <td id="payment" data-payment="${payment}">${numberFormatterToCurrency(payment)}</td>
         </tr>`;
-        payment_total += payment;
-        qty_total += parseInt(td.jumlah_produk);
+        totalPayment += payment;
+        totalQty += parseInt(td.product_quantity);
     });
 
     // inner html transaction detail to cart table tbody
-    cart_table.querySelector('tbody').innerHTML = tr;
+    cartTableElement.querySelector('tbody').innerHTML = tr;
 
-    // update qty total and payment total in cart table
-    update_qty_total_payment(cart_table, qty_total, payment_total);
-}
-
-// get transaction detail
-function get_transaction_details(
-    cart_table,
-    csrf_name,
-    csrf_value,
-    btn_show_cart,
-    main
-) {
+    // update total qty and total payment in cart table
+    updateTotalQtyPayment(cartTableElement, totalQty, totalPayment);
 }
 
 // show cart
-const cart = document.querySelector('aside.cart');
-btn_show_cart.addEventListener('click', (e) => {
+const cartElement = document.querySelector('aside.cart');
+showCartElement.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    cart.classList.add('cart--animate-show');
+    cartElement.classList.add('cart--animate-show');
     setTimeout(() => {
-        cart.classList.remove('cart--animate-show');
-        cart.classList.add('cart--show');
+        cartElement.classList.remove('cart--animate-show');
+        cartElement.classList.add('cart--show');
 
         // if window less than 991.98px add overflow hidden to body tag
         if(window.screen.width <= 991.98) {
@@ -229,86 +228,197 @@ btn_show_cart.addEventListener('click', (e) => {
         }
     }, 500);
 
-    const csrf_name = main.dataset.csrfName;
-    const csrf_value = main.dataset.csrfValue;
+    // if not exists dataset type-show, then show transaction details in cart
+    if (!cartTableElement.dataset.typeShow) {
+        const loadingElement = document.querySelector('div#cart-loading');
+        const baseUrl = document.querySelector('html').dataset.baseUrl;
 
-    // if not exists dataset type-show, then get and show transaction detail in cart
-    if (cart_table.dataset.typeShow === undefined) {
-        // loading
-        document.querySelector('div#cart-loading').classList.remove('d-none');
+        // show loading
+        loadingElement.classList.remove('d-none');
         // disabled button show cart
-        btn_show_cart.classList.add('btn--disabled');
-
-        fetch('/kasir/tampil_transaksi_detail', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: `${csrf_name}=${csrf_value}`
-        })
-        .finally(() => {
-            // loading
-            document.querySelector('div#cart-loading').classList.add('d-none');
-            // enabled button show cart
-            btn_show_cart.classList.remove('btn--disabled');
-        })
-        .then(response => {
-            return response.json();
-        })
-        .then(json => {
-            // set new csrf hash to main tag
-            if (json.csrf_value !== undefined) {
-                main.dataset.csrfValue = json.csrf_value;
-            }
+        showCartElement.classList.add('btn--disabled');
+        
+        try {        
+            const response = await fetch(`${baseUrl}/cashier/show-transaction-details`);
+            const responseJson = await response.json();
 
             /* if transaction detail is not null, this is mean transaction details not exists but
              * transaction is exists
             */
-            if (json.transaction_details !== null) {
+            if (responseJson.transaction_details != null) {
                 // if exists transaction detail
-                if (json.transaction_details.length > 0) {
+                if (responseJson.transaction_details.length > 0) {
                     // show transaction detail in cart table
-                    show_transaction_details(cart_table, json.transaction_details);
+                    showTransactionDetails(cartTableElement, responseJson.transaction_details);
                 }
 
                 // if type = rollback-transaction
-                if (json.type === 'rollback-transaction') {
+                if (responseJson.type == 'rollback-transaction') {
                     // show customer money
-                    const customer_money = parseInt(json.customer_money);
-                    document.querySelector('input[name="customer_money"]').value = customer_money;
+                    const customerMoney = parseInt(responseJson.customer_money);
+                    document.querySelector('input[name="customer_money"]').value = customerMoney;
 
                     // calculate change money
-                    const payment_total = parseInt(cart_table.querySelector('td#payment-total').dataset.paymentTotal);
-                    calculate_change_money(customer_money, payment_total);
+                    const paymentTotal = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
+                    calculateChangeMoney(customerMoney, paymentTotal);
                 }
-
-                // add dataset type-show
-                cart_table.dataset.typeShow = json.type;
+                
+                // if transaction id is not null
+                if (responseJson.transaction_id != null) {
+                    // add dataset type-show
+                    cartTableElement.dataset.typeShow = responseJson.type;
+                }
             }
-        })
-        .catch(error => {
+        } catch (error) {
             console.error(error);
-        });
+        }
+
+        // show loading
+        loadingElement.classList.add('d-none');
+        // disabled button show cart
+        showCartElement.classList.remove('btn--disabled');
     }
 });
 
 // hide cart
-const btn_close_cart = cart.querySelector('a#btn-close');
-btn_close_cart.addEventListener('click', (e) => {
+const closeCartElement = cartElement.querySelector('#btn-close');
+closeCartElement.addEventListener('click', (e) => {
     e.preventDefault();
 
-    cart.classList.replace('cart--show', 'cart--animate-hide');
+    cartElement.classList.replace('cart--show', 'cart--animate-hide');
     setTimeout(() => {
-        cart.classList.remove('cart--animate-hide');
+        cartElement.classList.remove('cart--animate-hide');
     }, 450);
 
     // remove class overflow hidden in tag body
     document.querySelector('body').classList.remove('overflow-hidden');
 });
 
+function resetShoppingCart(cartTableElement)
+{
+    // empty cart
+    cartTableElement.querySelector('tbody').innerHTML = '<tr id="empty-cart-table"><td colspan="7"></td></tr>';
+    cartTableElement.querySelector('td#qty-total').innerText = 0;
+    cartTableElement.querySelector('td#qty-total').dataset.qtyTotal = 0;
+    cartTableElement.querySelector('td#payment-total').innerText = 'Rp 0';
+    cartTableElement.querySelector('td#payment-total').dataset.paymentTotal = 0;
+    document.querySelector('input[name="customer_money"]').value = '';
+    document.querySelector('input[name="change_money"]').value = '';
+
+    const allFormMessage = document.querySelectorAll('aside.cart small.form-message');
+    if (allFormMessage.length > 0) {
+        allFormMessage.forEach(el => el.remove());
+    }
+
+    // remove dataset type-show in cart table
+    delete cartTableElement.dataset.typeShow;
+}
+
+async function cancelTransaction(csrfName, csrfValue, cartTableElement, mainElement, baseUrl)
+{
+    // loading
+    document.querySelector('div#cart-loading').classList.remove('d-none');
+
+    try { 
+        const responseJson = await postData(`${baseUrl}/cashier/cancel-transaction`, `${csrfName}=${csrfValue}`);
+
+        // set new csrf hash to main tag
+        if (responseJson.csrfValue != undefined) {
+            main.dataset.csrfValue = responseJson.csrfValue;
+        }
+
+        // if success
+        if (responseJson.status == 'success') {
+            // reset shopping cart
+            resetShoppingCart(cartTableElement);
+        }
+    } catch (error) {
+        console.error(error)
+    }
+
+    // loading
+    document.querySelector('div#cart-loading').classList.add('d-none');
+}
+
+function cancel_rollback_transaction(csrfName, csrfValue, cart_table, main)
+{
+    const transaction_details_cart_table = cartTableElement.querySelectorAll('tbody tr[data-product-id]');
+    // generate data transaction detail ids for remove transaction detail not exists in backup file
+    const transaction_detail_ids = generate_transaction_detail_ids(transaction_details_cart_table);
+
+    // loading
+    document.querySelector('div#cart-loading').classList.remove('d-none');
+
+    fetch('/kasir/rollback_transaksi_batal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `transaction_detail_ids=${transaction_detail_ids}&${csrfName}=${csrfValue}`
+    })
+    .finally(() => {
+        // loading
+        document.querySelector('div#cart-loading').classList.add('d-none');
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(json => {
+        // set new csrf hash to table tag
+        if (json.csrfValue !== undefined) {
+            main.dataset.csrfValue = json.csrfValue;
+        }
+
+        // if success
+        if (json.status === 'success') {
+            // generate data transaction detail for update product sales
+            const transaction_details = generate_transaction_details_for_update_product_sale(
+                json.transaction_details,
+                transaction_details_cart_table
+            );
+
+            // update product sales in product items
+            transactionDetails.forEach (tdcb => {
+                const product_sale_el = document.querySelector(`div.product__item[data-product-id="${tdcb.product_id}"] p.product__sale`);
+                // if exists product sales el
+                if (product_sale_el !== null) {
+                    // product sale new = product sales old - product qty
+                    const product_sale_new = parseInt(product_sale_el.dataset.productSale) - tdcb.product_qty;
+                    product_sale_el.dataset.productSale = product_sale_new;
+                    product_sale_el.innerText = `Terjual ${product_sale_new}`;
+                }
+            });
+
+            // reset shopping cart
+            reset_shopping_cart(cart_table);
+        }
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
+// cancel transaction
+cancelTransactionElement.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const csrfName = mainElement.dataset.csrfName;
+    const csrfValue = mainElement.dataset.csrfValue;
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
+
+    // if exists dataset type-show = transaction
+    if (cartTableElement.dataset.typeShow == 'transaction') {
+        cancelTransaction(csrfName, csrfValue, cartTableElement, mainElement, baseUrl);
+    }
+    // else if exists dataset = rollback-transaction in cart table
+    else if (cartTableElement.dataset.typeShow === 'rollback-transaction') {
+        cancel_rollback_transaction(csrfName, csrfValue, cart_table, main);
+    }
+});
+
 // calculate change money
-function calculate_change_money(customer_money, payment_total)
+function calculateChangeMoney(customer_money, payment_total)
 {
     const change_money_el = document.querySelector('input[name="change_money"]');
     // if customer money >= payment total
@@ -334,7 +444,7 @@ document.querySelector('aside.cart input[name="customer_money"]').addEventListen
             const customer_money = parseInt(e.target.value);
             const payment_total = parseInt(document.querySelector('aside.cart td#payment-total').dataset.paymentTotal);
 
-            calculate_change_money(customer_money, payment_total);
+            calculateChangeMoney(customer_money, payment_total);
 
             calculate = true;
         }, 300);
@@ -353,8 +463,8 @@ main.querySelector('div.container-xl').addEventListener('click', e => {
 
         const product_price_id = target.parentElement.previousElementSibling.querySelector('select[name="magnitude"]').value;
         const product_qty = target.previousElementSibling.value;
-        const csrf_name = main.dataset.csrfName;
-        const csrf_value = main.dataset.csrfValue;
+        const csrfName = main.dataset.csrfName;
+        const csrfValue = main.dataset.csrfValue;
 
         // if empty product qty
         if (product_qty.trim() === '') {
@@ -374,7 +484,7 @@ main.querySelector('div.container-xl').addEventListener('click', e => {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: `product_price_id=${product_price_id}&product_qty=${product_qty}&${csrf_name}=${csrf_value}`
+            body: `product_price_id=${product_price_id}&product_qty=${product_qty}&${csrfName}=${csrfValue}`
         })
         .finally(() => {
             // loading
@@ -389,8 +499,8 @@ main.querySelector('div.container-xl').addEventListener('click', e => {
         })
         .then(json => {
             // set new csrf hash to main tag
-            if (json.csrf_value !== undefined) {
-                main.dataset.csrfValue = json.csrf_value;
+            if (json.csrfValue !== undefined) {
+                main.dataset.csrfValue = json.csrfValue;
             }
 
             // reset form number of product
@@ -405,10 +515,10 @@ main.querySelector('div.container-xl').addEventListener('click', e => {
                 product_sale_el.dataset.productSale = product_sale_new;
 
                 // if dataset type-show exists in cart table
-                if (cart_table.dataset.typeShow !== undefined) {
+                if (cartTableElement.dataset.typeShow !== undefined) {
                     // if not exists product in cart table
-                    if (cart_table.querySelector('tr#empty-cart-table') !== null) {
-                        cart_table.querySelector('tr#empty-cart-table').remove();
+                    if (cartTableElement.querySelector('tr#empty-cart-table') !== null) {
+                        cartTableElement.querySelector('tr#empty-cart-table').remove();
                     }
 
                     const product_id = target.parentElement.parentElement.dataset.productId;
@@ -423,7 +533,7 @@ main.querySelector('div.container-xl').addEventListener('click', e => {
                     tr.setAttribute('data-product-id', product_id);
                     tr.setAttribute('data-transaction-detail-id', json.transaction_detail_id);
 
-                    tr.innerHTML = `<td width="10"><a href="#" title="Hapus produk" id="remove-product"  class="text-hover-red">
+                    tr.innerHTML = `<td width="10"><a href="#" title="Hapus produk" id="delete-product"  class="text-hover-red">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg>
                         </a></td>
                         <td width="10"><a href="#" title="Tambah jumlah produk" id="add-product-qty">
@@ -441,10 +551,10 @@ main.querySelector('div.container-xl').addEventListener('click', e => {
                         <td id="payment" data-payment="${payment}">${number_formatter_to_currency(payment)}</td>`;
 
                     // append tr to cart table
-                    cart_table.querySelector('tbody').append(tr);
+                    cartTableElement.querySelector('tbody').append(tr);
 
-                    const payment_total_old = cart_table.querySelector('td#payment-total').dataset.paymentTotal;
-                    const qty_total_old = cart_table.querySelector('td#qty-total').dataset.qtyTotal;
+                    const payment_total_old = cartTableElement.querySelector('td#payment-total').dataset.paymentTotal;
+                    const qty_total_old = cartTableElement.querySelector('td#qty-total').dataset.qtyTotal;
                     const payment_total_new = payment + parseInt(payment_total_old);
                     const qty_total_new = parseInt(product_qty) + parseInt(qty_total_old);
 
@@ -453,7 +563,7 @@ main.querySelector('div.container-xl').addEventListener('click', e => {
 
                     // calculate change money
                     const customer_money = parseInt(document.querySelector('input[name="customer_money"]').value);
-                    calculate_change_money(customer_money, payment_total_new);
+                    calculateChangeMoney(customer_money, payment_total_new);
                 }
             } else if (json.status === 'fail') {
                 const alert_node = create_alert_node(
@@ -489,8 +599,8 @@ function update_product_qty(
     product_sale_el,
     product_sale_new,
     transaction_detail_id,
-    csrf_name,
-    csrf_value,
+    csrfName,
+    csrfValue,
     main
 ) {
     if (product_qty_new <= 0) {
@@ -506,7 +616,7 @@ function update_product_qty(
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: `product_qty_new=${product_qty_new}&transaction_detail_id=${transaction_detail_id}&${csrf_name}=${csrf_value}`
+        body: `product_qty_new=${product_qty_new}&transaction_detail_id=${transaction_detail_id}&${csrfName}=${csrfValue}`
     })
     .finally(() => {
         // loading
@@ -517,8 +627,8 @@ function update_product_qty(
     })
     .then(json => {
         // set new csrf hash to main tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
+        if (json.csrfValue !== undefined) {
+            main.dataset.csrfValue = json.csrfValue;
         }
 
         // if update product qty success
@@ -540,7 +650,7 @@ function update_product_qty(
 
             // calculate change money
             const customer_money = parseInt(document.querySelector('input[name="customer_money"]').value);
-            calculate_change_money(customer_money, payment_total_new);
+            calculateChangeMoney(customer_money, payment_total_new);
         }
     })
     .catch(error => {
@@ -557,8 +667,8 @@ function remove_product_from_shopping_cart(
     product_sale_el,
     product_sale_new,
     transaction_detail_id,
-    csrf_name,
-    csrf_value,
+    csrfName,
+    csrfValue,
     main
 ) {
     // loading
@@ -570,7 +680,7 @@ function remove_product_from_shopping_cart(
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: `transaction_detail_id=${transaction_detail_id}&${csrf_name}=${csrf_value}`
+        body: `transaction_detail_id=${transaction_detail_id}&${csrfName}=${csrfValue}`
     })
     .finally(() => {
         // loading
@@ -581,8 +691,8 @@ function remove_product_from_shopping_cart(
     })
     .then(json => {
         // set new csrf hash to main tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
+        if (json.csrfValue !== undefined) {
+            main.dataset.csrfValue = json.csrfValue;
         }
 
         // if remove product success
@@ -602,11 +712,11 @@ function remove_product_from_shopping_cart(
 
             // calculate change money
             const customer_money = parseInt(document.querySelector('input[name="customer_money"]').value);
-            calculate_change_money(customer_money, payment_total_new);
+            calculateChangeMoney(customer_money, payment_total_new);
 
             // if not exists product in cart table
-            if (cart_table.querySelector('tbody tr') === null) {
-                cart_table.querySelector('tbody').innerHTML = '<tr id="empty-cart-table"><td colspan="7"></td></tr>';
+            if (cartTableElement.querySelector('tbody tr') === null) {
+                cartTableElement.querySelector('tbody').innerHTML = '<tr id="empty-cart-table"><td colspan="7"></td></tr>';
             }
         }
     })
@@ -617,8 +727,8 @@ function remove_product_from_shopping_cart(
 
 // add and reduce product qty and remove product from cart
 document.querySelector('aside.cart table.table tbody').addEventListener('click', e => {
-    const csrf_name = main.dataset.csrfName;
-    const csrf_value = main.dataset.csrfValue;
+    const csrfName = main.dataset.csrfName;
+    const csrfValue = main.dataset.csrfValue;
 
     // find true target add, because may be variabel e containing not element a, but element path or svg
     let target_add = e.target;
@@ -632,8 +742,8 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
 
     // find true target remove, because may be variabel e containing not element a, but element path or svg
     let target_remove = e.target;
-    if (target_remove.getAttribute('id') !== 'remove-product') target_remove = target_remove.parentElement;
-    if (target_remove.getAttribute('id') !== 'remove-product') target_remove = target_remove.parentElement;
+    if (target_remove.getAttribute('id') !== 'delete-product') target_remove = target_remove.parentElement;
+    if (target_remove.getAttribute('id') !== 'delete-product') target_remove = target_remove.parentElement;
 
 
     // if user click link for add product qty
@@ -645,10 +755,10 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
 
         // generate product qty new, qty total new, payment new and payment total new
         const product_price = parseInt(target_add.parentElement.parentElement.querySelector('td#price').dataset.price);
-        const payment_total_old = parseInt(cart_table.querySelector('td#payment-total').dataset.paymentTotal);
+        const payment_total_old = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
 
         const product_qty_new = parseInt(target_add.parentElement.parentElement.querySelector('td#qty').dataset.qty)+1;
-        const qty_total_new = parseInt(cart_table.querySelector('td#qty-total').dataset.qtyTotal)+1;
+        const qty_total_new = parseInt(cartTableElement.querySelector('td#qty-total').dataset.qtyTotal)+1;
         const payment_new = product_qty_new * product_price;
         const payment_total_new = payment_total_old + product_price;
 
@@ -671,8 +781,8 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
             product_sale_el,
             product_sale_new,
             transaction_detail_id,
-            csrf_name,
-            csrf_value,
+            csrfName,
+            csrfValue,
             main
         );
     }
@@ -686,10 +796,10 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
 
         // generate product qty new, qty total new, payment new and payment total new
         const product_price = parseInt(target_reduce.parentElement.parentElement.querySelector('td#price').dataset.price);
-        const payment_total_old = parseInt(cart_table.querySelector('td#payment-total').dataset.paymentTotal);
+        const payment_total_old = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
 
         const product_qty_new = parseInt(target_reduce.parentElement.parentElement.querySelector('td#qty').dataset.qty)-1;
-        const qty_total_new = parseInt(cart_table.querySelector('td#qty-total').dataset.qtyTotal)-1;
+        const qty_total_new = parseInt(cartTableElement.querySelector('td#qty-total').dataset.qtyTotal)-1;
         const payment_new = product_qty_new * product_price;
         const payment_total_new = payment_total_old - product_price;
 
@@ -712,14 +822,14 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
             product_sale_el,
             product_sale_new,
             transaction_detail_id,
-            csrf_name,
-            csrf_value,
+            csrfName,
+            csrfValue,
             main
         );
     }
 
     // if user click link for remove product from cart
-    else if (target_remove.getAttribute('id') === 'remove-product') {
+    else if (target_remove.getAttribute('id') === 'delete-product') {
         e.preventDefault();
 
         // get transaction detail id
@@ -727,10 +837,10 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
 
         // generate qty total new and payment total new
         const payment = parseInt(target_remove.parentElement.parentElement.querySelector('td#payment').dataset.payment);
-        const payment_total_old = parseInt(cart_table.querySelector('td#payment-total').dataset.paymentTotal);
+        const payment_total_old = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
         const product_qty = parseInt(target_remove.parentElement.parentElement.querySelector('td#qty').dataset.qty);
 
-        const qty_total_new = parseInt(cart_table.querySelector('td#qty-total').dataset.qtyTotal) - product_qty;
+        const qty_total_new = parseInt(cartTableElement.querySelector('td#qty-total').dataset.qtyTotal) - product_qty;
         const payment_total_new = payment_total_old - payment;
 
         // generate product sales new
@@ -750,32 +860,12 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
             product_sale_el,
             product_sale_new,
             transaction_detail_id,
-            csrf_name,
-            csrf_value,
+            csrfName,
+            csrfValue,
             main
         );
     }
 });
-
-function reset_shopping_cart(cart_table)
-{
-    // empty cart
-    cart_table.querySelector('tbody').innerHTML = '<tr id="empty-cart-table"><td colspan="7"></td></tr>';
-    cart_table.querySelector('td#qty-total').innerText = 0;
-    cart_table.querySelector('td#qty-total').dataset.qtyTotal = 0;
-    cart_table.querySelector('td#payment-total').innerText = 'Rp 0';
-    cart_table.querySelector('td#payment-total').dataset.paymentTotal = 0;
-    document.querySelector('input[name="customer_money"]').value = '';
-    document.querySelector('input[name="change_money"]').value = '';
-
-    const all_form_message = document.querySelectorAll('aside.cart small.form-message');
-    if (all_form_message.length > 0) {
-        all_form_message.forEach(el => el.remove());
-    }
-
-    // remove dataset type-show in cart table
-    delete cart_table.dataset.typeShow;
-}
 
 // show form message in cart
 function show_form_error_message_customer_money(message)
@@ -795,7 +885,7 @@ function show_form_error_message_customer_money(message)
     }
 }
 
-function finish_rollback_transaction(csrf_name, csrf_value, cart_table, main, btn_close_cart, customer_money)
+function finish_rollback_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money)
 {
     // loading
     document.querySelector('div#cart-loading').classList.remove('d-none');
@@ -806,7 +896,7 @@ function finish_rollback_transaction(csrf_name, csrf_value, cart_table, main, bt
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: `customer_money=${customer_money}&${csrf_name}=${csrf_value}`
+        body: `customer_money=${customer_money}&${csrfName}=${csrfValue}`
     })
     .finally(() => {
         // loading
@@ -817,8 +907,8 @@ function finish_rollback_transaction(csrf_name, csrf_value, cart_table, main, bt
     })
     .then(json => {
         // set new csrf hash to table tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
+        if (json.csrfValue !== undefined) {
+            main.dataset.csrfValue = json.csrfValue;
         }
 
         // if success
@@ -839,7 +929,7 @@ function finish_rollback_transaction(csrf_name, csrf_value, cart_table, main, bt
     });
 }
 
-function finish_transaction(csrf_name, csrf_value, cart_table, main, btn_close_cart, customer_money)
+function finish_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money)
 {
     // loading
     document.querySelector('div#cart-loading').classList.remove('d-none');
@@ -850,7 +940,7 @@ function finish_transaction(csrf_name, csrf_value, cart_table, main, btn_close_c
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: `customer_money=${customer_money}&${csrf_name}=${csrf_value}`
+        body: `customer_money=${customer_money}&${csrfName}=${csrfValue}`
     })
     .finally(() => {
         // loading
@@ -861,8 +951,8 @@ function finish_transaction(csrf_name, csrf_value, cart_table, main, btn_close_c
     })
     .then(json => {
         // set new csrf hash to main tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
+        if (json.csrfValue !== undefined) {
+            main.dataset.csrfValue = json.csrfValue;
         }
 
         // if success
@@ -886,18 +976,18 @@ function finish_transaction(csrf_name, csrf_value, cart_table, main, btn_close_c
 btn_finish_transaction.addEventListener('click', e => {
     e.preventDefault();
 
-    const csrf_name = main.dataset.csrfName;
-    const csrf_value = main.dataset.csrfValue;
+    const csrfName = main.dataset.csrfName;
+    const csrfValue = main.dataset.csrfValue;
     const customer_money = document.querySelector('input[name="customer_money"]').value;
 
     // if exists dataset type-show = transaction
-    if (cart_table.dataset.typeShow === 'transaction') {
-        finish_transaction(csrf_name, csrf_value, cart_table, main, btn_close_cart, customer_money);
+    if (cartTableElement.dataset.typeShow === 'transaction') {
+        finish_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money);
     }
 
     // else if exists dataset type-show = rollback-transaction
-    else if (cart_table.dataset.typeShow === 'rollback-transaction') {
-        finish_rollback_transaction(csrf_name, csrf_value, cart_table, main, btn_close_cart, customer_money);
+    else if (cartTableElement.dataset.typeShow === 'rollback-transaction') {
+        finish_rollback_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money);
     }
 });
 
@@ -911,7 +1001,7 @@ function generate_transaction_details_for_update_product_sale(transaction_detail
         let exists = false;
         for (const tdb of transaction_details_backup) {
             // if exists in backup
-            if (el.dataset.productId === tdb.produk_id) {
+            if (el.dataset.productId === tdb.product_id) {
                 exists = true;
                 break;
             }
@@ -928,7 +1018,7 @@ function generate_transaction_details_for_update_product_sale(transaction_detail
         // find right product qty
         let product_qty_cart_table = 0;
         for (const el of transaction_details_cart_table) {
-            if (tdb.produk_id === el.dataset.productId) {
+            if (tdb.product_id === el.dataset.productId) {
                 product_qty_cart_table = el.querySelector('td#qty').dataset.qty;
                 break;
             }
@@ -937,12 +1027,12 @@ function generate_transaction_details_for_update_product_sale(transaction_detail
         let product_qty = 0;
         // if product qty cart table != 0, this mean product not remove yet
         if (product_qty_cart_table !== 0) {
-            product_qty = parseInt(product_qty_cart_table) - tdb.jumlah_produk;
+            product_qty = parseInt(product_qty_cart_table) - tdb.product_quantity;
         } else {
-            product_qty = 0 - tdb.jumlah_produk;
+            product_qty = 0 - tdb.product_quantity;
         }
 
-        transaction_details[i] = {product_id: tdb.produk_id, product_qty: product_qty};
+        transaction_details[i] = {product_id: tdb.product_id, product_qty: product_qty};
         i++;
     }
 
@@ -952,139 +1042,12 @@ function generate_transaction_details_for_update_product_sale(transaction_detail
 function generate_transaction_detail_ids(transaction_details_cart_table)
 {
     let transaction_detail_ids = [];
-    transaction_details_cart_table.forEach((el, i) => {
+    transaction_details_cartTableElement.forEach((el, i) => {
         transaction_detail_ids[i] = el.dataset.transactionDetailId;
     });
 
     return transaction_detail_ids;
 }
-
-function cancel_rollback_transaction(csrf_name, csrf_value, cart_table, main)
-{
-    const transaction_details_cart_table = cart_table.querySelectorAll('tbody tr[data-product-id]');
-    // generate data transaction detail ids for remove transaction detail not exists in backup file
-    const transaction_detail_ids = generate_transaction_detail_ids(transaction_details_cart_table);
-
-    // loading
-    document.querySelector('div#cart-loading').classList.remove('d-none');
-
-    fetch('/kasir/rollback_transaksi_batal', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `transaction_detail_ids=${transaction_detail_ids}&${csrf_name}=${csrf_value}`
-    })
-    .finally(() => {
-        // loading
-        document.querySelector('div#cart-loading').classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
-        // set new csrf hash to table tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
-        }
-
-        // if success
-        if (json.status === 'success') {
-            // generate data transaction detail for update product sales
-            const transaction_details = generate_transaction_details_for_update_product_sale(
-                json.transaction_details,
-                transaction_details_cart_table
-            );
-
-            // update product sales in product items
-            transaction_details.forEach (tdcb => {
-                const product_sale_el = document.querySelector(`div.product__item[data-product-id="${tdcb.product_id}"] p.product__sale`);
-                // if exists product sales el
-                if (product_sale_el !== null) {
-                    // product sale new = product sales old - product qty
-                    const product_sale_new = parseInt(product_sale_el.dataset.productSale) - tdcb.product_qty;
-                    product_sale_el.dataset.productSale = product_sale_new;
-                    product_sale_el.innerText = `Terjual ${product_sale_new}`;
-                }
-            });
-
-            // reset shopping cart
-            reset_shopping_cart(cart_table);
-        }
-    })
-    .catch(error => {
-        console.error(error);
-    });
-}
-
-function cancel_transaction(csrf_name, csrf_value, cart_table, main)
-{
-    // loading
-    document.querySelector('div#cart-loading').classList.remove('d-none');
-
-    fetch('/kasir/transaksi_batal', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `${csrf_name}=${csrf_value}`
-    })
-    .finally(() => {
-        // loading
-        document.querySelector('div#cart-loading').classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
-        // set new csrf hash to main tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
-        }
-
-        // if success
-        if (json.status === 'success') {
-            // update product sales in product item
-            const products_in_cart_table = cart_table.querySelectorAll('tbody tr[data-product-id]');
-            products_in_cart_table.forEach (el => {
-                const product_sale_el = document.querySelector(`div.product__item[data-product-id="${el.dataset.productId}"] p.product__sale`);
-
-                // if exists product item
-                if (product_sale_el !== null) {
-                    // product sale new = product sale old - product qty
-                    const product_sale_new = parseInt(product_sale_el.dataset.productSale) - parseInt(el.querySelector('td#qty').dataset.qty);
-                    product_sale_el.dataset.productSale = product_sale_new;
-                    product_sale_el.innerText = `Terjual ${product_sale_new}`;
-                }
-            });
-
-            // reset shopping cart
-            reset_shopping_cart(cart_table);
-        }
-    })
-    .catch(error => {
-        console.error(error);
-    });
-}
-
-// cancel transaction
-btn_cancel_transaction.addEventListener('click', e => {
-    e.preventDefault();
-
-    const csrf_name = main.dataset.csrfName;
-    const csrf_value = main.dataset.csrfValue;
-
-    // if exists dataset type-show = transaction
-    if (cart_table.dataset.typeShow === 'transaction') {
-        cancel_transaction(csrf_name, csrf_value, cart_table, main);
-    }
-    // else if exists dataset = rollback-transaction in cart table
-    else if (cart_table.dataset.typeShow === 'rollback-transaction') {
-        cancel_rollback_transaction(csrf_name, csrf_value, cart_table, main);
-    }
-});
 
 const modal = document.querySelector('.modal');
 const modal_content = modal.querySelector('.modal__content');
@@ -1093,7 +1056,7 @@ document.querySelector('a#rollback-transaction').addEventListener('click', e => 
     e.preventDefault();
 
     // if exists dataset type-show = transaction in cart table
-    if (cart_table.dataset.typeShow === 'transaction') {
+    if (cartTableElement.dataset.typeShow === 'transaction') {
         const alert_node = create_alert_node(
             ['alert--warning', 'mb-3'],
             'Tidak bisa melakukan rollback transaksi, karena kamu masih melakukan transaksi. Selesaikan atau batalkan transaksi, lalu coba kembali!'
@@ -1103,7 +1066,7 @@ document.querySelector('a#rollback-transaction').addEventListener('click', e => 
     }
 
     // if exists dataset type-show = rollback-transaction in cart table
-    if (cart_table.dataset.typeShow === 'rollback-transaction') {
+    if (cartTableElement.dataset.typeShow === 'rollback-transaction') {
         const alert_node = create_alert_node(
             ['alert--warning', 'mb-3'],
             `Tidak bisa melakukan rollback transaksi lagi, karena kamu masih melakukan rollback transaksi. Selesaikan atau batalkan rollback transkasi, lalu coba kembali!`
@@ -1112,8 +1075,8 @@ document.querySelector('a#rollback-transaction').addEventListener('click', e => 
         return false;
     }
 
-    const csrf_name = main.dataset.csrfName;
-    const csrf_value = main.dataset.csrfValue;
+    const csrfName = main.dataset.csrfName;
+    const csrfValue = main.dataset.csrfValue;
 
     // loading
     document.querySelector('div#cart-loading').classList.remove('d-none');
@@ -1124,7 +1087,7 @@ document.querySelector('a#rollback-transaction').addEventListener('click', e => 
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: `${csrf_name}=${csrf_value}`
+        body: `${csrfName}=${csrfValue}`
     })
     .finally(() => {
         // loading
@@ -1135,8 +1098,8 @@ document.querySelector('a#rollback-transaction').addEventListener('click', e => 
     })
     .then(json => {
         // set new csrf hash to main tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
+        if (json.csrfValue !== undefined) {
+            main.dataset.csrfValue = json.csrfValue;
         }
 
         // if exists transaction
@@ -1179,8 +1142,8 @@ modal_content.querySelector('a#btn-close').addEventListener('click', e => {
 document.querySelector('div.modal a#show-transaction-detail').addEventListener('click', e => {
     e.preventDefault();
 
-    const csrf_name = main.dataset.csrfName;
-    const csrf_value = main.dataset.csrfValue;
+    const csrfName = main.dataset.csrfName;
+    const csrfValue = main.dataset.csrfValue;
     const transaction_id = modal_content.querySelector('select[name="transactions_three_days_ago"]').value;
 
     // if transaction not selected
@@ -1197,7 +1160,7 @@ document.querySelector('div.modal a#show-transaction-detail').addEventListener('
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: `transaction_id=${transaction_id}&${csrf_name}=${csrf_value}`
+        body: `transaction_id=${transaction_id}&${csrfName}=${csrfValue}`
     })
     .finally(() => {
         // loading
@@ -1208,8 +1171,8 @@ document.querySelector('div.modal a#show-transaction-detail').addEventListener('
     })
     .then(json => {
         // set new csrf hash to main tag
-        if (json.csrf_value !== undefined) {
-            main.dataset.csrfValue = json.csrf_value;
+        if (json.csrfValue !== undefined) {
+            main.dataset.csrfValue = json.csrfValue;
         }
 
         // hide and reset modal
@@ -1217,7 +1180,7 @@ document.querySelector('div.modal a#show-transaction-detail').addEventListener('
         modal_content.querySelector('select[name="transactions_three_days_ago"]').innerHTML = '';
 
         // if exists transaction detail
-        if (json.transaction_details.length > 0) {
+        if (json.transactionDetails.length > 0) {
             // show transaction detail in cart table
             show_transaction_details(cart_table, json.transaction_details);
         }
@@ -1227,11 +1190,11 @@ document.querySelector('div.modal a#show-transaction-detail').addEventListener('
         document.querySelector('input[name="customer_money"]').value = customer_money;
 
         // calculate change money
-        const payment_total = parseInt(cart_table.querySelector('td#payment-total').dataset.paymentTotal);
-        calculate_change_money(customer_money, payment_total);
+        const payment_total = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
+        calculateChangeMoney(customer_money, payment_total);
 
         // add dataset type-show = rollback-transaction
-        cart_table.dataset.typeShow = 'rollback-transaction';
+        cartTableElement.dataset.typeShow = 'rollback-transaction';
     })
     .catch(error => {
         console.error(error);

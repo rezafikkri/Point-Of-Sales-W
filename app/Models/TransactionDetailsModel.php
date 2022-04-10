@@ -24,6 +24,15 @@ class TransactionDetailsModel extends Model
         return $this->select($columns)->getWhere(['transaction_id' => $transactionId])->getResultArray();
     }
 
+    public function getAllForCashier(string $transactionId, string $columns): array
+    {
+        return $this->select($columns)
+                    ->join('product_prices pp', 'transaction_details.product_price_id = pp.product_price_id', 'INNER')
+                    ->join('products p', 'p.product_id = pp.product_id', 'INNER')
+                    ->getWhere(['transaction_id' => $transactionId])
+                    ->getResultArray();
+    }
+
     public function updateProductQty(string $transaction_detail_id, int $product_qty_new, string $transactionId): bool
     {
         return $this->where('transaction_id', $transactionId)

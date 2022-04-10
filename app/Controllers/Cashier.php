@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\{ProductsModel};
+use App\Models\{ProductsModel, TransactionsModel, TransactionDetailsModel};
 
 class Cashier extends BaseController
 {
@@ -12,6 +12,8 @@ class Cashier extends BaseController
     public function __construct()
     {
         $this->productsModel = new ProductsModel();
+        $this->transactionsModel = new TransactionsModel();
+        $this->transactionDetailsModel = new TransactionDetailsModel();
     }
 
     /**
@@ -98,6 +100,95 @@ class Cashier extends BaseController
             'products' => $products,
             'total_product' => $totalProduct,
             'product_limit' => static::PRODUCT_LIMIT
+        ]);
+    }
+
+    /**
+     * Get transaction details 
+     * 
+     * This method use for get transcation details for normal transaction process
+     */
+    private function getTransactionDetailsTransaction(): array
+    {
+        $transactionDetails = [];
+        // if exists session transaction id
+        if (isset($_SESSION['transaction_id'])) {
+            $transactionDetails = $this->transactionDetailsModel->getAllForCashier(
+                $_SESSION['transaction_id'],
+                'p.product_id, transaction_detail_id, p.product_name, pp.product_price, pp.product_magnitude, product_quantity'
+            );
+        }
+
+        // get transaction id from unfinished transaction
+        $transactionId = $this->transactionsModel->getUnfinishedTransactionId();
+        // if exists unfinised transaction id
+        if ($transactionId) {
+            $transactionDetails = $this->transactionDetailsModel->getAllForCashier(
+                $transactionId,
+                'p.product_id, transaction_detail_id, p.product_name, pp.product_price, pp.product_magnitude, product_quantity'
+            );
+
+            // create session
+            $this->session->set([
+                'transaction_id' => $transactionId
+            ]);
+
+        }
+        return $transactionDetails;
+    }
+
+    private function getTransactionDetailsRollbackTransaction(string $transactionId): array
+    {
+        // get customer money
+        $customerMoney = $this->transactionsModel->getOne($transactionId, 'customer_money')['customer_money'] ?? null;
+        // get transaction details
+        $transactionDetails = $this->transactionDetailsModel->getAllForCashier(
+            $transactionId,
+            'p.product_id, transaction_detail_id, p.product_name, pp.product_price, pp.product_magnitude, product_quantity'
+        );
+
+        return ['customer_money' => $customerMoney, 'transaction_details' => $transactionDetails];
+    }
+
+    public function showTransactionDetails()
+    {
+        // if file backup exists
+        if (file_exists(WRITEPATH . 'backup-transaction/data.json')) {
+            // get transaction details rollback transaction
+            ['transaction_id' => $transactionId] = json_decode(file_get_contents(WRITEPATH . 'backup-transaction/data.json'), true);
+            [
+                'customer_money' => $customerMoney,
+                'transaction_details' => $transactionDetails
+            ] =  $this->getTransactionDetailsRollbackTransaction($transactionId);
+
+            return json_encode([
+                'transaction_id' => $transactionId,
+                'customer_money' => $customerMoney,
+                'transaction_details' => $transactionDetails,
+                'type' => 'rollback-transaction'
+            ]);
+        }
+
+        // get transaction details normal transaction
+        $transactionDetails = $this->getTransactionDetailsTransaction();
+
+        return json_encode([
+            'transaction_id' => $_SESSION['transaction_id'] ?? null,
+            'transaction_details' => $transactionDetails,
+            'type' => 'transaction'
+        ]);
+    }
+
+    public function cancelTransaction()
+    {
+        // remove transaction and will automatic remove transaction detail related to transaction
+        $this->transactionsModel->delete($_SESSION['transaction_id']);
+        // remove session transaction id
+        $this->session->remove('transaction_id');
+
+        return json_encode([
+            'status' => 'success',
+            'csrf_value' => csrf_hash()
         ]);
     }
 }

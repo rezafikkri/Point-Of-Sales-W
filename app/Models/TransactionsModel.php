@@ -20,7 +20,8 @@ class TransactionsModel extends Model
 
     public function getTotal(): int
     {
-        return $this->countAll();
+        return $this->where('transaction_status', 'selesai')
+                    ->countAllResults();
     }
 
     public function getAll(int $limit): array
@@ -36,6 +37,7 @@ class TransactionsModel extends Model
                     ->selectSum('product_quantity', 'total_product')
                     ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
                     ->join('users', 'transactions.user_id = users.user_id', 'INNER')
+                    ->where('transaction_status', 'selesai')
                     ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'DESC')
                     ->get()->getResultArray();
     }
@@ -77,8 +79,7 @@ class TransactionsModel extends Model
 
     public function getTotalSearch(string $dateStart, string $dateEnd): int
     {
-        return $this->select('transaction_id')
-                    ->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
+        return $this->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
                     ->countAllResults();
     }
 
@@ -158,11 +159,11 @@ class TransactionsModel extends Model
                     ->get()->getResultArray();
     }
 
-    public function getNotTransactionYetId(): ?string
+    public function getUnfinishedTransactionId(): ?string
     {
-        return $this->select('transaksi_id')
-                    ->getWhere(['status_transaksi' => 'belum', 'pengguna_id' => $_SESSION['posw_user_id']])
-                    ->getRowArray()['transaksi_id'] ?? null;
+        return $this->select('transaction_id')
+                    ->getWhere(['transaction_status' => 'belum', 'user_id' => $_SESSION['sign_in_user_id']])
+                    ->getRowArray()['transaction_id'] ?? null;
     }
 
     public function getTransactionsThreeDaysAgo(string $timestamp_three_days_ago): array

@@ -34,6 +34,8 @@ $routes->setAutoRoute(false);
 $routes->group('cashier', function ($routes) {
     $routes->get('', 'Cashier::index');
     $routes->get('search/products/(:segment)', 'Cashier::searchProducts/$1');
+    $routes->get('show-transaction-details', 'Cashier::showTransactionDetails');
+    $routes->post('cancel-transaction', 'Cashier::cancelTransaction');
 });
 
 $routes->group('admin', function ($routes) {
