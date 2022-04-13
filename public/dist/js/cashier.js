@@ -11,7 +11,7 @@ const searchElement = document.querySelector('a#search');
 const showCartElement = document.querySelector('a#show-cart');
 const cartTableElement = document.querySelector('aside.cart table.table');
 const cancelTransactionElement = document.querySelector('a#cancel-transaction');
-const btn_finish_transaction = document.querySelector('a#finish-transaction');
+const finishTransactionElement = document.querySelector('a#finish-transaction');
 
 // change product price info
 mainElement.addEventListener('change', (e) => {
@@ -195,7 +195,7 @@ function showTransactionDetails(cartTableElement, transactionDetails)
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>
             </a></td>
             <td>${td.product_name}</td>
-            <td id="price" data-price="${td.product_price}">
+            <td id="price" data-price="${td.product_price}" data-magnitude="${td.product_magnitude}">
                 ${numberFormatterToCurrency(parseInt(td.product_price))} / ${td.product_magnitude}
             </td>
             <td id="qty" data-qty="${td.product_quantity}">${td.product_quantity}</td>
@@ -303,12 +303,7 @@ function resetShoppingCart(cartTableElement)
     cartTableElement.querySelector('td#payment-total').innerText = 'Rp 0';
     cartTableElement.querySelector('td#payment-total').dataset.paymentTotal = 0;
     document.querySelector('input[name="customer_money"]').value = '';
-    document.querySelector('input[name="change_money"]').value = '';
-
-    const allFormMessage = document.querySelectorAll('aside.cart small.form-message');
-    if (allFormMessage.length > 0) {
-        allFormMessage.forEach(el => el.remove());
-    }
+    document.querySelector('input[name="change_money"]').value = ''; 
 
     // remove dataset type-show in cart table
     delete cartTableElement.dataset.typeShow;
@@ -316,6 +311,12 @@ function resetShoppingCart(cartTableElement)
 
 async function cancelTransaction(csrfName, csrfValue, cartTableElement, mainElement, baseUrl)
 {
+    // remove all form message
+    const allFormMessage = document.querySelectorAll('aside.cart small.form-message');
+    if (allFormMessage.length > 0) {
+        allFormMessage.forEach(el => el.remove());
+    }
+
     // loading
     document.querySelector('div#cart-loading').classList.remove('d-none');
 
@@ -417,34 +418,169 @@ cancelTransactionElement.addEventListener('click', (e) => {
     }
 });
 
-// calculate change money
-function calculateChangeMoney(customer_money, payment_total)
+// show form message in cart
+function showFormErrorMessageCustomerMoney(message)
 {
-    const change_money_el = document.querySelector('input[name="change_money"]');
+    // if exists form message
+    const formMessageCustomerMoney = document.querySelector('aside.cart div#customer-money small.form-message');
+    if (formMessageCustomerMoney != null) {
+        formMessageCustomerMoney.innerText = message;
+
+    } else {
+        const smallElement = document.createElement('small');
+        smallElement.classList.add('form-message');
+        smallElement.classList.add(`form-message--danger`);
+        smallElement.innerText = message;
+        // add form message to after customer money input
+        document.querySelector('aside.cart div#customer-money').append(smallElement);
+    }
+}
+
+async function finishTransaction(csrfName, csrfValue, cartTableElement, mainElement, closeCartElement, customerMoney, productHistories, baseUrl)
+{
+    // remove all form message
+    const allFormMessage = document.querySelectorAll('aside.cart small.form-message');
+    if (allFormMessage.length > 0) {
+        allFormMessage.forEach(el => el.remove());
+    }
+
+    // loading
+    document.querySelector('div#cart-loading').classList.remove('d-none');
+
+    try { 
+        const responseJson = await postData(
+            `${baseUrl}/cashier/finish-transaction`,
+            `${csrfName}=${csrfValue}&customer_money=${customerMoney}&product_histories=${JSON.stringify(productHistories)}`
+        );
+
+        // set new csrf hash to main tag
+        if (responseJson.csrf_value != undefined) {
+            mainElement.dataset.csrfValue = responseJson.csrf_value;
+        }
+
+        // if success
+        if (responseJson.status == 'success') {
+            // close cart
+            closeCartElement.click();
+            // reset shopping cart
+            resetShoppingCart(cartTableElement);
+        }
+        // if not success
+        else if (responseJson.status == 'fail') {
+            showFormErrorMessageCustomerMoney(responseJson.message);
+        }
+    } catch (error) {
+        console.error(error)
+    }
+
+    // loading
+    document.querySelector('div#cart-loading').classList.add('d-none');
+}
+
+function finish_rollback_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money)
+{
+    // loading
+    document.querySelector('div#cart-loading').classList.remove('d-none');
+
+    fetch('/kasir/rollback_transaksi_selesai', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `customer_money=${customer_money}&${csrfName}=${csrfValue}`
+    })
+    .finally(() => {
+        // loading
+        document.querySelector('div#cart-loading').classList.add('d-none');
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(json => {
+        // set new csrf hash to table tag
+        if (json.csrfValue !== undefined) {
+            main.dataset.csrfValue = json.csrfValue;
+        }
+
+        // if success
+        if (json.status === 'success') {
+            // close cart
+            btn_close_cart.click();
+
+            // reset shopping cart
+            reset_shopping_cart(cart_table);
+        }
+        // if false and form message exists
+        if (json.status === 'fail') {
+            show_form_error_message_customer_money(json.message);
+        }
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
+// finish transaction
+finishTransactionElement.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const csrfName = mainElement.dataset.csrfName;
+    const csrfValue = mainElement.dataset.csrfValue;
+    const customerMoney = document.querySelector('input[name="customer_money"]').value;
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
+    
+    let productHistories = [];
+    const trElements = cartTableElement.querySelectorAll('tbody tr');
+    trElements.forEach((trElement, i) => {
+        const tdPriceElement = trElement.querySelector('td#price');
+        productHistories[i] = {
+            transactionDetailId: trElement.dataset.transactionDetailId,
+            productName: tdPriceElement.previousElementSibling.textContent,
+            productPrice: tdPriceElement.dataset.price,
+            productMagnitude: tdPriceElement.dataset.magnitude
+        };
+    });
+
+    // if exists dataset type-show = transaction
+    if (cartTableElement.dataset.typeShow == 'transaction') {
+        finishTransaction(csrfName, csrfValue, cartTableElement, mainElement, closeCartElement, customerMoney, productHistories, baseUrl);
+    }
+
+    // else if exists dataset type-show = rollback-transaction
+    else if (cartTableElement.dataset.typeShow === 'rollback-transaction') {
+        finish_rollback_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money);
+    }
+});
+
+// calculate change money
+function calculateChangeMoney(customerMoney, paymentTotal)
+{
+    const changeMoneyElement = document.querySelector('input[name="change_money"]');
     // if customer money >= payment total
-    if (customer_money >= payment_total) {
-        change_money_el.value = number_formatter_to_currency(customer_money - payment_total);
+    if (customerMoney >= paymentTotal) {
+        changeMoneyElement.value = numberFormatterToCurrency(customerMoney - paymentTotal);
     }
     // else if change money exists
-    else if (change_money_el.value !== '') {
+    else if (changeMoneyElement.value != '') {
         // reset input change money
-        change_money_el.value = '';
+        changeMoneyElement.value = '';
     }
 }
 
 // calculate change money
 let calculate = true;
 document.querySelector('aside.cart input[name="customer_money"]').addEventListener('input', (e) => {
-    if (calculate === true) {
+    if (calculate) {
         // set calculate = false
         calculate = false;
 
         // calculate change money after 300ms
         setTimeout(() => {
-            const customer_money = parseInt(e.target.value);
-            const payment_total = parseInt(document.querySelector('aside.cart td#payment-total').dataset.paymentTotal);
+            const customerMoney = parseInt(e.target.value);
+            const paymentTotal = parseInt(document.querySelector('aside.cart td#payment-total').dataset.paymentTotal);
 
-            calculateChangeMoney(customer_money, payment_total);
+            calculateChangeMoney(customerMoney, paymentTotal);
 
             calculate = true;
         }, 300);
@@ -864,130 +1000,6 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
             csrfValue,
             main
         );
-    }
-});
-
-// show form message in cart
-function show_form_error_message_customer_money(message)
-{
-    // if exists form message
-    const form_message_customer_money = document.querySelector('aside.cart div#customer-money small.form-message');
-    if (form_message_customer_money !== null) {
-        form_message_customer_money.innerText = message;
-
-    } else {
-        const small_node = document.createElement('small');
-        small_node.classList.add('form-message');
-        small_node.classList.add(`form-message--danger`);
-        small_node.innerText = message;
-        // add form message to after customer money input
-        document.querySelector('aside.cart div#customer-money').append(small_node);
-    }
-}
-
-function finish_rollback_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money)
-{
-    // loading
-    document.querySelector('div#cart-loading').classList.remove('d-none');
-
-    fetch('/kasir/rollback_transaksi_selesai', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `customer_money=${customer_money}&${csrfName}=${csrfValue}`
-    })
-    .finally(() => {
-        // loading
-        document.querySelector('div#cart-loading').classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
-        // set new csrf hash to table tag
-        if (json.csrfValue !== undefined) {
-            main.dataset.csrfValue = json.csrfValue;
-        }
-
-        // if success
-        if (json.status === 'success') {
-            // close cart
-            btn_close_cart.click();
-
-            // reset shopping cart
-            reset_shopping_cart(cart_table);
-        }
-        // if false and form message exists
-        if (json.status === 'fail') {
-            show_form_error_message_customer_money(json.message);
-        }
-    })
-    .catch(error => {
-        console.error(error);
-    });
-}
-
-function finish_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money)
-{
-    // loading
-    document.querySelector('div#cart-loading').classList.remove('d-none');
-
-    fetch('/kasir/transaksi_selesai', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `customer_money=${customer_money}&${csrfName}=${csrfValue}`
-    })
-    .finally(() => {
-        // loading
-        document.querySelector('div#cart-loading').classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
-        // set new csrf hash to main tag
-        if (json.csrfValue !== undefined) {
-            main.dataset.csrfValue = json.csrfValue;
-        }
-
-        // if success
-        if (json.status === 'success') {
-            // close cart
-            btn_close_cart.click();
-            // reset shopping cart
-            reset_shopping_cart(cart_table);
-        }
-        // if not success
-        if (json.status === 'fail') {
-            show_form_error_message_customer_money(json.message);
-        }
-    })
-    .catch(error => {
-        console.error(error);
-    });
-}
-
-// finish transaction
-btn_finish_transaction.addEventListener('click', e => {
-    e.preventDefault();
-
-    const csrfName = main.dataset.csrfName;
-    const csrfValue = main.dataset.csrfValue;
-    const customer_money = document.querySelector('input[name="customer_money"]').value;
-
-    // if exists dataset type-show = transaction
-    if (cartTableElement.dataset.typeShow === 'transaction') {
-        finish_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money);
-    }
-
-    // else if exists dataset type-show = rollback-transaction
-    else if (cartTableElement.dataset.typeShow === 'rollback-transaction') {
-        finish_rollback_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money);
     }
 });
 

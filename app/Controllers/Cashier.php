@@ -78,7 +78,7 @@ class Cashier extends BaseController
             'products' => $bestSellerProducts,
             'product_ids' => $productIds
         ] = $this->remapProducts($this->productsModel->getBestSeller(static::BESTSELLER_PRODUCT_LIMIT), true);
-        $remainderProducts = $this->remapProducts($this->productsModel->getRemainderForCashier($productIds, static::PRODUCT_LIMIT));
+        $remainderProducts = $this->remapProducts($this->productsModel->getRemainder($productIds, static::PRODUCT_LIMIT));
 
         $data['title'] = 'Home . POSW';
         $data['totalProduct'] = $this->productsModel->getTotalForCashier();
@@ -182,12 +182,80 @@ class Cashier extends BaseController
     public function cancelTransaction()
     {
         // remove transaction and will automatic remove transaction detail related to transaction
-        $this->transactionsModel->delete($_SESSION['transaction_id']);
-        // remove session transaction id
-        $this->session->remove('transaction_id');
+        $deleteTransaction = $this->transactionsModel->delete($_SESSION['transaction_id']);
 
+        if ($deleteTransaction == true) {
+            // remove session transaction id
+            $this->session->remove('transaction_id');
+    
+            return json_encode([
+                'status' => 'success',
+                'csrf_value' => csrf_hash()
+            ]);
+        }
         return json_encode([
             'status' => 'success',
+            'message' => 'Transaksi gagal dibatalkan',
+            'csrf_value' => csrf_hash()
+        ]);
+    }
+
+    public function finishTransaction()
+    {
+        if (!$this->validate([
+            'customer_money' => [
+                'label' => 'Uang Pembeli',
+                'rules' => 'required|integer|max_length[10]'
+            ]
+        ])) {
+            return json_encode([
+                'status' => 'fail',
+                'message' => $this->validator->getErrors()['customer_money'],
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        $customerMoney = $this->request->getPost('customer_money', FILTER_SANITIZE_NUMBER_INT);
+        $productHistories = json_decode($this->request->getPost('product_histories'), true);
+        $productHistoriesFiltered = [];
+        foreach ($productHistories as $ph) {
+            $productHistoriesFiltered[] = [
+                'transaction_detail_id' => filter_var($ph['transactionDetailId'], FILTER_SANITIZE_STRING),
+                'product_name' => filter_var($ph['productName'], FILTER_SANITIZE_STRING),
+                'product_price' => filter_var($ph['productPrice'], FILTER_SANITIZE_STRING),
+                'product_magnitude' => filter_var($ph['productMagnitude'], FILTER_SANITIZE_STRING)
+            ];
+        }
+        
+        $this->transactionsModel->transStart();
+
+        // update customer money in db and update status transaction
+        $updateTransaction = $this->transactionsModel->update($_SESSION['transaction_id'], [
+            'customer_money' => $customerMoney,
+            'transaction_status' => 'selesai',
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+        // update product name, product price and product magnitude in product details table
+        $updateProductHistories = $this->transactionDetailsModel->updateBatch(
+            $productHistoriesFiltered,
+            'transaction_detail_id'
+        );
+
+        $this->transactionsModel->transComplete();
+
+        if ($updateTransaction == true && $updateProductHistories == true) {
+            // remove session status transaction
+            $this->session->remove('transaction_id');
+
+            return json_encode([
+                'status' => 'success',
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        return json_encode([
+            'status' => 'fail',
+            'message' => 'Transaksi gagal',
             'csrf_value' => csrf_hash()
         ]);
     }

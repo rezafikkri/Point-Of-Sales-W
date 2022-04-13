@@ -78,12 +78,16 @@ $this->extend('admin_layout');
                     // if exists transaction
                     if ($countTransaction > 0) :
                         $i = 1;
-                    foreach($transactions as $t) :
-                        $createdAt = Time::createFromFormat('Y-m-d H:i:s', $t['created_at']);
-                        $editedAt = Time::createFromFormat('Y-m-d H:i:s', $t['edited_at']);
 
-                    // if $i is prime number
-                    if (($i%2) != 0) :
+                        foreach($transactions as $t) :
+                            $createdAt = Time::createFromFormat('Y-m-d H:i:s', $t['created_at'])->toLocalizedString('dd MMM y HH:mm');
+                            // if edited at is not null
+                            if ($t['edited_at']) {
+                                $editedAt = Time::createFromFormat('Y-m-d H:i:s', $t['edited_at'])->toLocalizedString('dd MMM y HH:mm');
+                            }
+
+                            // if $i is prime number
+                            if (($i%2) != 0) :
                 ?>
                 <tr class="table__row-odd">
                 <?php else: ?>
@@ -109,8 +113,8 @@ $this->extend('admin_layout');
                     <?php endif ?>
 
                     <td><?= $t['full_name'] ?></td>
-                    <td><?= $createdAt->toLocalizedString('dd MMM y HH:mm') ?></td>
-                    <td><?= $editedAt->toLocalizedString('dd MMM y HH:mm') ?></td>
+                    <td><?= $createdAt ?></td>
+                    <td><?= $editedAt ?? null ?></td>
                 </tr>
                 <?php $i++; endforeach; else : ?>
                 <tr class="table__row-odd">

@@ -73,15 +73,15 @@ class Products extends BaseController
         if (!$this->validate([
             'product_category' => [
                 'label' => 'Kategori produk',
-                'rules' => 'required',
+                'rules' => 'required'
             ],
             'product_name' => [
                 'label' => 'Nama produk',
-                'rules' => 'required|max_length[50]|is_unique[products.product_name]',
+                'rules' => 'required|max_length[50]|is_unique[products.product_name]'
             ],
             'product_status' => [
                 'label' => 'Status Produk',
-                'rules' => 'in_list[ada,tiada]',
+                'rules' => 'in_list[ada,tiada]'
             ],
             'product_photo' => 'product_photo',
             'product_magnitudes' => 'product_magnitude',
