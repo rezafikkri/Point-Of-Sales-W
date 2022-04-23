@@ -39,11 +39,10 @@ class TransactionDetailsModel extends Model
                     ->update($transaction_detail_id, ['product_quantity'=>$product_qty_new]);
     }
 
-    public function removeTransactionDetail(string $transaction_detail_id, string $transactionId): int
+    public function deleteOne(string $transactionDetailId, string $transactionId): bool
     {
-        $this->where('transaction_id', $transactionId)
-             ->delete($transaction_detail_id);
-        return $this->db->affectedRows();
+        return $this->where('transaction_id', $transactionId)
+             ->delete($transactionDetailId);
     }
 
     public function removeTransactionDetails(array $transaction_detail_ids, string $transactionId): int

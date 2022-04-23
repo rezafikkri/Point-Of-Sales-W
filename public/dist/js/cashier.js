@@ -324,8 +324,8 @@ async function cancelTransaction(csrfName, csrfValue, cartTableElement, mainElem
         const responseJson = await postData(`${baseUrl}/cashier/cancel-transaction`, `${csrfName}=${csrfValue}`);
 
         // set new csrf hash to main tag
-        if (responseJson.csrfValue != undefined) {
-            main.dataset.csrfValue = responseJson.csrfValue;
+        if (responseJson.csrf_value != undefined) {
+            main.dataset.csrfValue = responseJson.csrf_value;
         }
 
         // if success
@@ -792,77 +792,63 @@ function update_product_qty(
     });
 }
 
-// remove product from shopping cart
-function remove_product_from_shopping_cart(
-    target,
-    cart_table,
-    qty_total_new,
-    payment_total_new,
-    product_sale_el,
-    product_sale_new,
-    transaction_detail_id,
+// delete product from shopping cart
+async function deleteProduct(
+    targetElement,
+    cartTableElement,
+    newTotalQty,
+    newTotalPayment,
+    transactionDetailId,
     csrfName,
     csrfValue,
-    main
+    mainElement,
+    baseUrl
 ) {
     // loading
     document.querySelector('div#cart-loading').classList.remove('d-none');
 
-    fetch('/kasir/hapus_produk_dari_keranjang_belanja', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `transaction_detail_id=${transaction_detail_id}&${csrfName}=${csrfValue}`
-    })
-    .finally(() => {
-        // loading
-        document.querySelector('div#cart-loading').classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
+    try {
+        const responseJson = await postData(
+            `${baseUrl}/cashier/delete-product`,
+            `transaction_detail_id=${transactionDetailId}&${csrfName}=${csrfValue}`
+        );
+
         // set new csrf hash to main tag
-        if (json.csrfValue !== undefined) {
-            main.dataset.csrfValue = json.csrfValue;
+        if (responseJson.csrf_value != undefined) {
+            mainElement.dataset.csrfValue = responseJson.csrf_value;
         }
 
-        // if remove product success
-        if (json.status === 'success') {
+        // if delete product success
+        if (responseJson.status == 'success') {
             // update qty total and payment total in cart table
-            update_qty_total_payment(cart_table, qty_total_new, payment_total_new);
+            updateTotalQtyPayment(cartTableElement, newTotalQty, newTotalPayment);
 
-            // if exists product item, update product sale in product item
-            if (product_sale_el !== null) {
-                product_sale_el.innerText = `Terjual ${product_sale_new}`;
-                product_sale_el.dataset.productSale = product_sale_new;
-            }
-
-            const target_tr = target.parentElement.parentElement;
-            // remove product in cart table
-            target_tr.remove();
+            const trElement = targetElement.parentElement.parentElement;
+            // delete product in cart table
+            trElement.remove();
 
             // calculate change money
-            const customer_money = parseInt(document.querySelector('input[name="customer_money"]').value);
-            calculateChangeMoney(customer_money, payment_total_new);
+            const customerMoney = parseInt(document.querySelector('input[name="customer_money"]').value);
+            calculateChangeMoney(customerMoney, newTotalPayment);
 
             // if not exists product in cart table
-            if (cartTableElement.querySelector('tbody tr') === null) {
+            if (cartTableElement.querySelector('tbody tr') == null) {
                 cartTableElement.querySelector('tbody').innerHTML = '<tr id="empty-cart-table"><td colspan="7"></td></tr>';
             }
         }
-    })
-    .catch(error => {
-        console.error(error);
-    });
+    } catch (error) {
+        console.error(error)
+    }
+
+    // loading
+    document.querySelector('div#cart-loading').classList.add('d-none');
 }
 
-// add and reduce product qty and remove product from cart
-document.querySelector('aside.cart table.table tbody').addEventListener('click', e => {
-    const csrfName = main.dataset.csrfName;
-    const csrfValue = main.dataset.csrfValue;
+// add and reduce product qty and delete product from cart
+document.querySelector('aside.cart table.table tbody').addEventListener('click', (e) => {
+    const csrfName = mainElement.dataset.csrfName;
+    const csrfValue = mainElement.dataset.csrfValue;
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
 
     // find true target add, because may be variabel e containing not element a, but element path or svg
     let target_add = e.target;
@@ -874,11 +860,10 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
     if (target_reduce.getAttribute('id') !== 'reduce-product-qty') target_reduce = target_reduce.parentElement;
     if (target_reduce.getAttribute('id') !== 'reduce-product-qty') target_reduce = target_reduce.parentElement;
 
-    // find true target remove, because may be variabel e containing not element a, but element path or svg
-    let target_remove = e.target;
-    if (target_remove.getAttribute('id') !== 'delete-product') target_remove = target_remove.parentElement;
-    if (target_remove.getAttribute('id') !== 'delete-product') target_remove = target_remove.parentElement;
-
+    // find true target delete, because may be variabel e containing not element a, but element path or svg
+    let targetDeleteElement = e.target;
+    if (targetDeleteElement.getAttribute('id') !== 'delete-product') targetDeleteElement = targetDeleteElement.parentElement;
+    if (targetDeleteElement.getAttribute('id') !== 'delete-product') targetDeleteElement = targetDeleteElement.parentElement;
 
     // if user click link for add product qty
     if (target_add.getAttribute('id') === 'add-product-qty') {
@@ -963,40 +948,30 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
     }
 
     // if user click link for remove product from cart
-    else if (target_remove.getAttribute('id') === 'delete-product') {
+    else if (targetDeleteElement.getAttribute('id') == 'delete-product') {
         e.preventDefault();
 
         // get transaction detail id
-        const transaction_detail_id = target_remove.parentElement.parentElement.dataset.transactionDetailId;
+        const transactionDetailId = targetDeleteElement.parentElement.parentElement.dataset.transactionDetailId;
 
         // generate qty total new and payment total new
-        const payment = parseInt(target_remove.parentElement.parentElement.querySelector('td#payment').dataset.payment);
-        const payment_total_old = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
-        const product_qty = parseInt(target_remove.parentElement.parentElement.querySelector('td#qty').dataset.qty);
+        const payment = parseInt(targetDeleteElement.parentElement.parentElement.querySelector('td#payment').dataset.payment);
+        const oldTotalPayment = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
+        const productQty = parseInt(targetDeleteElement.parentElement.parentElement.querySelector('td#qty').dataset.qty);
 
-        const qty_total_new = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty) - product_qty;
-        const payment_total_new = payment_total_old - payment;
+        const newTotalQty = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty) - productQty;
+        const newTotalPayment = oldTotalPayment - payment;
 
-        // generate product sales new
-        const product_id = target_remove.parentElement.parentElement.dataset.productId;
-        const product_sale_el = document.querySelector(`div.product__item[data-product-id="${product_id}"] p.product__sale`);
-        let product_sale_new = 0;
-        // if exists product item
-        if (product_sale_el !== null) {
-            product_sale_new = parseInt(product_sale_el.dataset.productSale) - product_qty;
-        }
-
-        remove_product_from_shopping_cart(
-            target_remove,
-            cart_table,
-            qty_total_new,
-            payment_total_new,
-            product_sale_el,
-            product_sale_new,
-            transaction_detail_id,
+        deleteProduct(
+            targetDeleteElement,
+            cartTableElement,
+            newTotalQty,
+            newTotalPayment,
+            transactionDetailId,
             csrfName,
             csrfValue,
-            main
+            mainElement,
+            baseUrl
         );
     }
 });

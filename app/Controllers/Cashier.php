@@ -356,10 +356,10 @@ class Cashier extends BaseController
         }
 
         // if file backup exists
-        if (file_exists(WRITEPATH . 'transaction_backup/data.json')) {
+        if (file_exists(WRITEPATH . 'transaction-backup/data.json')) {
             [
                 'transaction_id' => $transactionId
-            ] = json_decode(file_get_contents(WRITEPATH.'transaction_backup/data.json'), true);
+            ] = json_decode(file_get_contents(WRITEPATH . 'transaction-backup/data.json'), true);
             $buyProduct = $this->buyProductRollbackTransaction($transactionId, $productQty);
         } else {
             $buyProduct = $this->buyProductTransaction($productQty);
@@ -376,6 +376,32 @@ class Cashier extends BaseController
 
         return json_encode([
             'status' => 'fail',
+            'csrf_value' => csrf_hash()
+        ]);
+    }
+
+    public function deleteProduct()
+    {
+        $transactionDetailId = $this->request->getPost('transaction_detail_id', FILTER_SANITIZE_STRING);
+
+        // if session transaction id exists
+        if (isset($_SESSION['transaction_id'])) {
+            $transactionId = $_SESSION['transaction_id'];
+        }
+        // else if backup file exists
+        else if (file_exists(WRITEPATH . 'transaction-backup/data.json')) {
+            [
+                'transaction_id' => $transactionId
+            ] = json_decode(file_get_contents(WRITEPATH . 'transaction-backup/data.json'), true);
+        } else {
+            return false;
+        }
+
+        // delete product
+        $this->transactionDetailsModel->deleteOne($transactionDetailId, $transactionId);
+
+        return json_encode([
+            'status' => 'success',
             'csrf_value' => csrf_hash()
         ]);
     }
