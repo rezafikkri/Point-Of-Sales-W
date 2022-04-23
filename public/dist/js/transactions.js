@@ -175,7 +175,7 @@ tableElement.querySelector('tbody').addEventListener('click', async (e) => {
                     let li = `
                         <li>
                             <span class="table__title">Uang pelanggan :</span><span class="table__data">
-                                ${responseJson.customer_money}
+                                ${numberFormatterToCurrency(parseInt(responseJson.customer_money))}
                             </span>
                         </li>
                         <li class="border-bottom-0"><span class="table__title">Daftar produk :</span></li>
