@@ -226,7 +226,7 @@ class Cashier extends BaseController
                 'product_magnitude' => filter_var($ph['productMagnitude'], FILTER_SANITIZE_STRING)
             ];
         }
-        
+ 
         $this->transactionsModel->transStart();
 
         // update customer money in db and update status transaction
@@ -244,7 +244,7 @@ class Cashier extends BaseController
         $this->transactionsModel->transComplete();
 
         if ($updateTransaction == true && $updateProductHistories == true) {
-            // remove session status transaction
+            // remove transaction id session
             $this->session->remove('transaction_id');
 
             return json_encode([
@@ -256,6 +256,126 @@ class Cashier extends BaseController
         return json_encode([
             'status' => 'fail',
             'message' => 'Transaksi gagal',
+            'csrf_value' => csrf_hash()
+        ]);
+    }
+
+    private function buyProductTransaction(int $productQty): bool
+    {
+        $productPriceId = $this->request->getPost('product_price_id', FILTER_SANITIZE_STRING);
+
+        // if exists transaction id session
+        if (isset($_SESSION['transaction_id'])) {
+            // add product to transaction detail
+            $transactionDetailId = $this->transactionDetailsModel->insert([
+                'transaction_detail_id' => generate_uuid(),
+                'transaction_id' => $_SESSION['transaction_id'],
+                'product_price_id' => $productPriceId,
+                'product_quantity' => $productQty
+            ]);
+
+            // add transaction detail id to property
+            $this->transactionDetailIdBuyProduct = $transactionDetailId;
+            return true;
+        } else {
+            // if exists not transaction yet
+            $transactionId = $this->transactionsModel->getUnfinishedTransactionId();
+            if ($transactionId != null) {
+                // create session
+                $this->session->set('transaction_id', $transactionId);
+
+                // add product to transaction detail
+                $this->transactionDetailsModel->insert([
+                    'transaction_detail_id' => generate_uuid(),
+                    'transaction_id' => $transactionId,
+                    'product_price_id' => $productPriceId,
+                    'product_quantity' => $productQty
+                ]);
+                return true;
+            }
+            // if not exists not transaction yet
+            else {
+                $this->productsModel->transStart();
+
+                // insert transaction
+                $transactionId = $this->transactionsModel->insert([
+                    'transaction_id' => generate_uuid(),
+                    'user_id' => $_SESSION['sign_in_user_id'],
+                    'transaction_status' => 'belum'
+                ]);
+
+                // add product to transaction detail
+                $transactionDetailId = $this->transactionDetailsModel->insert([
+                    'transaction_detail_id' => generate_uuid(),
+                    'transaction_id' => $transactionId,
+                    'product_price_id' => $productPriceId,
+                    'product_quantity' => $productQty
+                ]);
+
+                $this->productsModel->transComplete();
+
+                // create session
+                $this->session->set('transaction_id', $transactionId);
+
+                // add transaction detail id to property
+                $this->transactionDetailIdBuyProduct = $transactionDetailId;
+                return true;
+            }
+        }
+    }
+
+    private function buyProductRollbackTransaction(string $transaction_id, int $product_qty): bool
+    {
+        try {
+            // add product to transaction detail
+            $this->transaction_detail_model->insertReturning([
+                'transaksi_detail_id' => generate_uuid(),
+                'transaksi_id' => $transaction_id,
+                'harga_produk_id' => $this->request->getPost('product_price_id', FILTER_SANITIZE_STRING),
+                'jumlah_produk' => $product_qty
+            ], 'transaksi_detail_id');
+            $transaction_detail_id = $this->transaction_detail_model->getInsertReturned();
+
+            // add transaction detail id to property
+            $this->transactionDetailIdBuyProduct = $transaction_detail_id;
+            return true;
+
+        } catch (\ErrorException $e) {
+            return false;
+        }
+    }
+
+    public function buyProduct()
+    {
+        helper('generate_uuid');
+
+        $productQty = (int)$this->request->getPost('product_qty', FILTER_SANITIZE_STRING);
+        // if product qty = 0
+        if ($productQty <= 0) {
+            return false;
+        }
+
+        // if file backup exists
+        if (file_exists(WRITEPATH . 'transaction_backup/data.json')) {
+            [
+                'transaction_id' => $transactionId
+            ] = json_decode(file_get_contents(WRITEPATH.'transaction_backup/data.json'), true);
+            $buyProduct = $this->buyProductRollbackTransaction($transactionId, $productQty);
+        } else {
+            $buyProduct = $this->buyProductTransaction($productQty);
+        }
+
+        // if buy product success
+        if ($buyProduct == true) {
+            return json_encode([
+                'status' => 'success',
+                'transaction_detail_id' => $this->transactionDetailIdBuyProduct,
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        return json_encode([
+            'status' => 'fail',
             'csrf_value' => csrf_hash()
         ]);
     }

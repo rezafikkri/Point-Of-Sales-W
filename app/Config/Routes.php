@@ -37,6 +37,7 @@ $routes->group('cashier', function ($routes) {
     $routes->get('show-transaction-details', 'Cashier::showTransactionDetails');
     $routes->post('cancel-transaction', 'Cashier::cancelTransaction');
     $routes->post('finish-transaction', 'Cashier::finishTransaction');
+    $routes->post('buy-product', 'Cashier::buyProduct');
 });
 
 $routes->group('admin', function ($routes) {

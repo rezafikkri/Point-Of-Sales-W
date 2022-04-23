@@ -168,12 +168,12 @@ searchElement.addEventListener('click', async (e) => {
 });
 
 // update qty total and payment total in cart table
-function updateTotalQtyPayment(cartTableElement, qtyTotal, paymentTotal)
+function updateTotalQtyPayment(cartTableElement, totalQty, totalPayment)
 {
-    cartTableElement.querySelector('td#qty-total').innerText = qtyTotal;
-    cartTableElement.querySelector('td#qty-total').dataset.qtyTotal = qtyTotal;
-    cartTableElement.querySelector('td#payment-total').innerText = numberFormatterToCurrency(paymentTotal);
-    cartTableElement.querySelector('td#payment-total').dataset.paymentTotal = paymentTotal;
+    cartTableElement.querySelector('td#total-qty').innerText = totalQty;
+    cartTableElement.querySelector('td#total-qty').dataset.totalQty = totalQty;
+    cartTableElement.querySelector('td#total-payment').innerText = numberFormatterToCurrency(totalPayment);
+    cartTableElement.querySelector('td#total-payment').dataset.totalPayment = totalPayment;
 }
 
 // show transaction detail in cart table
@@ -259,7 +259,7 @@ showCartElement.addEventListener('click', async (e) => {
                     document.querySelector('input[name="customer_money"]').value = customerMoney;
 
                     // calculate change money
-                    const paymentTotal = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
+                    const paymentTotal = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
                     calculateChangeMoney(customerMoney, paymentTotal);
                 }
                 
@@ -298,10 +298,10 @@ function resetShoppingCart(cartTableElement)
 {
     // empty cart
     cartTableElement.querySelector('tbody').innerHTML = '<tr id="empty-cart-table"><td colspan="7"></td></tr>';
-    cartTableElement.querySelector('td#qty-total').innerText = 0;
-    cartTableElement.querySelector('td#qty-total').dataset.qtyTotal = 0;
-    cartTableElement.querySelector('td#payment-total').innerText = 'Rp 0';
-    cartTableElement.querySelector('td#payment-total').dataset.paymentTotal = 0;
+    cartTableElement.querySelector('td#total-qty').innerText = 0;
+    cartTableElement.querySelector('td#total-qty').dataset.totalQty = 0;
+    cartTableElement.querySelector('td#total-payment').innerText = 'Rp 0';
+    cartTableElement.querySelector('td#total-payment').dataset.totalPayment = 0;
     document.querySelector('input[name="customer_money"]').value = '';
     document.querySelector('input[name="change_money"]').value = ''; 
 
@@ -578,7 +578,7 @@ document.querySelector('aside.cart input[name="customer_money"]').addEventListen
         // calculate change money after 300ms
         setTimeout(() => {
             const customerMoney = parseInt(e.target.value);
-            const paymentTotal = parseInt(document.querySelector('aside.cart td#payment-total').dataset.paymentTotal);
+            const paymentTotal = parseInt(document.querySelector('aside.cart td#total-payment').dataset.totalPayment);
 
             calculateChangeMoney(customerMoney, paymentTotal);
 
@@ -587,89 +587,79 @@ document.querySelector('aside.cart input[name="customer_money"]').addEventListen
     }
 });
 
-// buy product transaction and rollback transaksi
-main.querySelector('div.container-xl').addEventListener('click', e => {
-    let target = e.target;
+// update qty total and payment total in cart table
+function update_total_qty_payment(cartTableElement, totalQty, totalPayment)
+{
+    cartTableElement.querySelector('td#total-qty').innerText = totalQty;
+    cartTableElement.querySelector('td#total-qty').dataset.totalQty = totalPayment;
+    cartTableElement.querySelector('td#total-payment').innerText = numberFormatterToCurrency(totalPayment);
+    cartTableElement.querySelector('td#total-payment').dataset.totalPayment = totalPayment;
+}
 
-    if (target.getAttribute('id') !== 'buy-rollback') target = target.parentElement;
-    if (target.getAttribute('id') !== 'buy-rollback') target = target.parentElement;
+// buy product
+mainElement.querySelector('div.container-xl').addEventListener('click', async (e) => {
+    let targetElement = e.target;
 
-    if (target.getAttribute('id') === 'buy-rollback') {
+    if (targetElement.getAttribute('id') != 'buy-rollback') targetElement = targetElement.parentElement;
+    if (targetElement.getAttribute('id') != 'buy-rollback') targetElement = targetElement.parentElement;
+
+    if (targetElement.getAttribute('id') == 'buy-rollback') {
         e.preventDefault();
 
-        const product_price_id = target.parentElement.previousElementSibling.querySelector('select[name="magnitude"]').value;
-        const product_qty = target.previousElementSibling.value;
-        const csrfName = main.dataset.csrfName;
-        const csrfValue = main.dataset.csrfValue;
+        const productPriceId = targetElement.parentElement.previousElementSibling.querySelector('select[name="magnitude"]').value;
+        const productQty = targetElement.previousElementSibling.value;
+        const csrfName = mainElement.dataset.csrfName;
+        const csrfValue = mainElement.dataset.csrfValue;
+        const baseUrl = document.querySelector('html').dataset.baseUrl;
 
         // if empty product qty
-        if (product_qty.trim() === '') {
+        if (productQty.trim() == '') {
             return false;
         }
 
         // loading
         document.querySelector('div#transaction-loading').classList.remove('d-none');
         // disabled button search, cancel and finish transaction
-        btn_search_product.classList.add('btn--disabled');
-        btn_cancel_transaction.classList.add('btn--disabled');
-        btn_finish_transaction.classList.add('btn--disabled');
+        searchElement.classList.add('btn--disabled');
+        cancelTransactionElement.classList.add('btn--disabled');
+        finishTransactionElement.classList.add('btn--disabled');
 
-        fetch('/kasir/beli_produk', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: `product_price_id=${product_price_id}&product_qty=${product_qty}&${csrfName}=${csrfValue}`
-        })
-        .finally(() => {
-            // loading
-            document.querySelector('div#transaction-loading').classList.add('d-none');
-            // enabled button search, cancel and finish transaction
-            btn_search_product.classList.remove('btn--disabled');
-            btn_cancel_transaction.classList.remove('btn--disabled');
-            btn_finish_transaction.classList.remove('btn--disabled');
-        })
-        .then(response => {
-            return response.json();
-        })
-        .then(json => {
+        try {
+            const responseJson = await postData(
+                `${baseUrl}/cashier/buy-product`,
+                `product_price_id=${productPriceId}&product_qty=${productQty}&${csrfName}=${csrfValue}`
+            );
+
             // set new csrf hash to main tag
-            if (json.csrfValue !== undefined) {
-                main.dataset.csrfValue = json.csrfValue;
+            if (responseJson.csrf_value != undefined) {
+                mainElement.dataset.csrfValue = responseJson.csrf_value;
             }
 
             // reset form number of product
-            target.previousElementSibling.value = '';
+            targetElement.previousElementSibling.value = '';
 
             // if buy product success
-            if (json.status === 'success') {
-                // update product sale
-                const product_sale_el = target.parentElement.previousElementSibling.querySelector('p.product__sale');
-                const product_sale_new = parseInt(product_qty) + parseInt(product_sale_el.dataset.productSale);
-                product_sale_el.innerText = `Terjual ${product_sale_new}`;
-                product_sale_el.dataset.productSale = product_sale_new;
-
+            if (responseJson.status == 'success') {
                 // if dataset type-show exists in cart table
-                if (cartTableElement.dataset.typeShow !== undefined) {
+                if (cartTableElement.dataset.typeShow != undefined) {
                     // if not exists product in cart table
-                    if (cartTableElement.querySelector('tr#empty-cart-table') !== null) {
+                    if (cartTableElement.querySelector('tr#empty-cart-table') != null) {
                         cartTableElement.querySelector('tr#empty-cart-table').remove();
                     }
 
-                    const product_id = target.parentElement.parentElement.dataset.productId;
-                    const product_info_el = target.parentElement.previousElementSibling;
-                    const product_name = product_info_el.querySelector('p.product__name').textContent;
-                    const product_price = product_info_el.querySelector('select[name="magnitude"]').selectedOptions[0].dataset.productPrice;
-                    const product_magnitude = product_info_el.querySelector('select[name="magnitude"]').selectedOptions[0].text;
-                    const payment = parseInt(product_price) * parseInt(product_qty);
+                    const productId = targetElement.parentElement.parentElement.dataset.productId;
+                    const productInfoElement = targetElement.parentElement.previousElementSibling;
+                    const productName = productInfoElement.querySelector('p.product__name').textContent;
+                    const productPrice = productInfoElement.querySelector('select[name="magnitude"]').selectedOptions[0].dataset.productPrice;
+                    const productMagnitude = productInfoElement.querySelector('select[name="magnitude"]').selectedOptions[0].text;
+                    const payment = parseInt(productPrice) * parseInt(productQty);
 
                     // add product to cart table
-                    const tr = document.createElement('tr');
-                    tr.setAttribute('data-product-id', product_id);
-                    tr.setAttribute('data-transaction-detail-id', json.transaction_detail_id);
+                    const trElement = document.createElement('tr');
+                    trElement.setAttribute('data-product-id', productId);
+                    trElement.setAttribute('data-transaction-detail-id', responseJson.transaction_detail_id);
 
-                    tr.innerHTML = `<td width="10"><a href="#" title="Hapus produk" id="delete-product"  class="text-hover-red">
+                    trElement.innerHTML = `<td width="10"><a href="#" title="Hapus produk" id="delete-product" class="text-hover-red">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" fill="currentColor" viewBox="0 0 16 16"><path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/></svg>
                         </a></td>
                         <td width="10"><a href="#" title="Tambah jumlah produk" id="add-product-qty">
@@ -679,39 +669,47 @@ main.querySelector('div.container-xl').addEventListener('click', e => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="17" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/></svg>
                         </a></td>
 
-                        <td>${product_name}</td>
-                        <td id="price" data-price="${product_price}">
-                            ${number_formatter_to_currency(parseInt(product_price))} / ${product_magnitude}
+                        <td>${productName}</td>
+                        <td id="price" data-price="${productPrice}" data-magnitude="${productMagnitude}">
+                            ${numberFormatterToCurrency(parseInt(productPrice))} / ${productMagnitude}
                         </td>
-                        <td id="qty" data-qty="${product_qty}">${product_qty}</td>
-                        <td id="payment" data-payment="${payment}">${number_formatter_to_currency(payment)}</td>`;
+                        <td id="qty" data-qty="${productQty}">${productQty}</td>
+                        <td id="payment" data-payment="${payment}">${numberFormatterToCurrency(payment)}</td>`;
 
                     // append tr to cart table
-                    cartTableElement.querySelector('tbody').append(tr);
+                    cartTableElement.querySelector('tbody').append(trElement);
 
-                    const payment_total_old = cartTableElement.querySelector('td#payment-total').dataset.paymentTotal;
-                    const qty_total_old = cartTableElement.querySelector('td#qty-total').dataset.qtyTotal;
-                    const payment_total_new = payment + parseInt(payment_total_old);
-                    const qty_total_new = parseInt(product_qty) + parseInt(qty_total_old);
+                    const oldTotalPayment = cartTableElement.querySelector('td#total-payment').dataset.totalPayment;
+                    const oldTotalQty = cartTableElement.querySelector('td#total-qty').dataset.totalQty;
+                    const newTotalPayment = payment + parseInt(oldTotalPayment);
+                    const newTotalQty = parseInt(productQty) + parseInt(oldTotalQty);
 
                     // update qty total and payment total in cart table
-                    update_qty_total_payment(cart_table, qty_total_new, payment_total_new);
+                    updateTotalQtyPayment(cartTableElement, newTotalQty, newTotalPayment);
 
                     // calculate change money
-                    const customer_money = parseInt(document.querySelector('input[name="customer_money"]').value);
-                    calculateChangeMoney(customer_money, payment_total_new);
+                    const customerMoney = parseInt(document.querySelector('input[name="customer_money"]').value);
+                    calculateChangeMoney(customerMoney, newTotalPayment);
                 }
-            } else if (json.status === 'fail') {
-                const alert_node = create_alert_node(
-                    ['alert--warning', 'alert--fixed-rb'],
-                    `Beli produk gagal, muat ulang halaman lalu coba kembali!`
-                );
-                main.append(alert_node);
+            } else if (responseJson.status == 'fail') {
+                const parentElement = document.querySelector('main.main');
+                const referenceElement = document.querySelector('div.container-xl');
+                renderAlert(parentElement, referenceElement, responseJson.message, [
+                    'alert--warning',
+                    'alert--fixed-rb',
+                    'mb-3'
+                ]);
             }
-        })
-        .catch(error => {
-            console.error(error);
-        });
+        } catch (error) {
+            console.error(error)
+        }
+
+        // loading
+        document.querySelector('div#transaction-loading').classList.add('d-none');
+        // enabled button search, cancel and finish transaction
+        searchElement.classList.remove('btn--disabled');
+        cancelTransactionElement.classList.remove('btn--disabled');
+        finishTransactionElement.classList.remove('btn--disabled');
     }
 });
 
@@ -891,10 +889,10 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
 
         // generate product qty new, qty total new, payment new and payment total new
         const product_price = parseInt(target_add.parentElement.parentElement.querySelector('td#price').dataset.price);
-        const payment_total_old = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
+        const payment_total_old = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
 
         const product_qty_new = parseInt(target_add.parentElement.parentElement.querySelector('td#qty').dataset.qty)+1;
-        const qty_total_new = parseInt(cartTableElement.querySelector('td#qty-total').dataset.qtyTotal)+1;
+        const qty_total_new = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty)+1;
         const payment_new = product_qty_new * product_price;
         const payment_total_new = payment_total_old + product_price;
 
@@ -932,10 +930,10 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
 
         // generate product qty new, qty total new, payment new and payment total new
         const product_price = parseInt(target_reduce.parentElement.parentElement.querySelector('td#price').dataset.price);
-        const payment_total_old = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
+        const payment_total_old = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
 
         const product_qty_new = parseInt(target_reduce.parentElement.parentElement.querySelector('td#qty').dataset.qty)-1;
-        const qty_total_new = parseInt(cartTableElement.querySelector('td#qty-total').dataset.qtyTotal)-1;
+        const qty_total_new = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty)-1;
         const payment_new = product_qty_new * product_price;
         const payment_total_new = payment_total_old - product_price;
 
@@ -973,10 +971,10 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
 
         // generate qty total new and payment total new
         const payment = parseInt(target_remove.parentElement.parentElement.querySelector('td#payment').dataset.payment);
-        const payment_total_old = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
+        const payment_total_old = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
         const product_qty = parseInt(target_remove.parentElement.parentElement.querySelector('td#qty').dataset.qty);
 
-        const qty_total_new = parseInt(cartTableElement.querySelector('td#qty-total').dataset.qtyTotal) - product_qty;
+        const qty_total_new = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty) - product_qty;
         const payment_total_new = payment_total_old - payment;
 
         // generate product sales new
@@ -1202,7 +1200,7 @@ document.querySelector('div.modal a#show-transaction-detail').addEventListener('
         document.querySelector('input[name="customer_money"]').value = customer_money;
 
         // calculate change money
-        const payment_total = parseInt(cartTableElement.querySelector('td#payment-total').dataset.paymentTotal);
+        const payment_total = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
         calculateChangeMoney(customer_money, payment_total);
 
         // add dataset type-show = rollback-transaction
