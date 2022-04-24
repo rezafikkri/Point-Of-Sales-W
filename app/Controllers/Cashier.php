@@ -184,7 +184,7 @@ class Cashier extends BaseController
         // remove transaction and will automatic remove transaction detail related to transaction
         $deleteTransaction = $this->transactionsModel->delete($_SESSION['transaction_id']);
 
-        if ($deleteTransaction == true) {
+        if ($deleteTransaction) {
             // remove session transaction id
             $this->session->remove('transaction_id');
     
@@ -243,7 +243,7 @@ class Cashier extends BaseController
 
         $this->transactionsModel->transComplete();
 
-        if ($updateTransaction == true && $updateProductHistories == true) {
+        if ($updateTransaction && $updateProductHistories) {
             // remove transaction id session
             $this->session->remove('transaction_id');
 
@@ -366,7 +366,7 @@ class Cashier extends BaseController
         }
 
         // if buy product success
-        if ($buyProduct == true) {
+        if ($buyProduct) {
             return json_encode([
                 'status' => 'success',
                 'transaction_detail_id' => $this->transactionDetailIdBuyProduct,
@@ -398,10 +398,62 @@ class Cashier extends BaseController
         }
 
         // delete product
-        $this->transactionDetailsModel->deleteOne($transactionDetailId, $transactionId);
+        $deleteProduct = $this->transactionDetailsModel->deleteOne($transactionDetailId, $transactionId);
+
+        // if delete product success
+        if ($deleteProduct) {
+            return json_encode([
+                'status' => 'success',
+                'csrf_value' => csrf_hash()
+            ]);
+        }
 
         return json_encode([
-            'status' => 'success',
+            'status' => 'fail',
+            'csrf_value' => csrf_hash()
+        ]);
+    }
+
+    public function updateProductQty()
+    {
+        $transactionDetailId = $this->request->getPost('transaction_detail_id', FILTER_SANITIZE_STRING);
+        $newProductQty = (int) $this->request->getPost('new_product_qty', FILTER_SANITIZE_STRING);
+
+        // if new product qty <= 0
+        if ($newProductQty <= 0) {
+            return false;
+        }
+
+        // if session transaction id exists
+        if (isset($_SESSION['transaction_id'])) {
+            $transactionId = $_SESSION['transaction_id'];
+        }
+        // if file backup exists
+        else if (file_exists(WRITEPATH . 'transaction-backup/data.json')) {
+            [
+                'transaction_id' => $transactionId
+            ] = json_decode(file_get_contents(WRITEPATH . 'transaction-backup/data.json'), true);
+        } else {
+            return false;
+        }
+
+        // update product qty
+        $updateProductQty = $this->transactionDetailsModel->updateProductQty(
+            $transactionDetailId,
+            $newProductQty,
+            $transactionId
+        );
+        
+        // if update product qty success
+        if ($updateProductQty) {
+            return json_encode([
+                'status' => 'success',
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        return json_encode([
+            'status' => 'fail',
             'csrf_value' => csrf_hash()
         ]);
     }

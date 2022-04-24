@@ -587,15 +587,6 @@ document.querySelector('aside.cart input[name="customer_money"]').addEventListen
     }
 });
 
-// update qty total and payment total in cart table
-function update_total_qty_payment(cartTableElement, totalQty, totalPayment)
-{
-    cartTableElement.querySelector('td#total-qty').innerText = totalQty;
-    cartTableElement.querySelector('td#total-qty').dataset.totalQty = totalPayment;
-    cartTableElement.querySelector('td#total-payment').innerText = numberFormatterToCurrency(totalPayment);
-    cartTableElement.querySelector('td#total-payment').dataset.totalPayment = totalPayment;
-}
-
 // buy product
 mainElement.querySelector('div.container-xl').addEventListener('click', async (e) => {
     let targetElement = e.target;
@@ -714,82 +705,65 @@ mainElement.querySelector('div.container-xl').addEventListener('click', async (e
 });
 
 // update qty and payment product in cart table
-function update_qty_payment(target_tr, product_qty_new, payment_new)
+function updateQtyPayment(trElement, newProductQty, newPayment)
 {
-    target_tr.querySelector('td#qty').innerText = product_qty_new;
-    target_tr.querySelector('td#qty').dataset.qty = product_qty_new;
-    target_tr.querySelector('td#payment').innerText = number_formatter_to_currency(payment_new);
-    target_tr.querySelector('td#payment').dataset.payment = payment_new;
+    trElement.querySelector('td#qty').innerText = newProductQty;
+    trElement.querySelector('td#qty').dataset.qty = newProductQty;
+    trElement.querySelector('td#payment').innerText = numberFormatterToCurrency(newPayment);
+    trElement.querySelector('td#payment').dataset.payment = newPayment;
 }
 
 // update product quantity
-function update_product_qty(
-    target,
-    cart_table,
-    product_qty_new,
-    qty_total_new,
-    payment_new,
-    payment_total_new,
-    product_sale_el,
-    product_sale_new,
-    transaction_detail_id,
+async function updateProductQty(
+    targetElement,
+    cartTableElement,
+    newProductQty,
+    newTotalQty,
+    newPayment,
+    newTotalPayment,
+    transactionDetailId,
     csrfName,
     csrfValue,
-    main
+    mainElement,
+    baseUrl
 ) {
-    if (product_qty_new <= 0) {
+    if (newProductQty <= 0) {
         return false;
     }
 
     // loading
     document.querySelector('div#cart-loading').classList.remove('d-none');
 
-    fetch('/kasir/ubah_jumlah_produk', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `product_qty_new=${product_qty_new}&transaction_detail_id=${transaction_detail_id}&${csrfName}=${csrfValue}`
-    })
-    .finally(() => {
-        // loading
-        document.querySelector('div#cart-loading').classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
+    try {
+        const responseJson = await postData(
+            `${baseUrl}/cashier/update-product-qty`,
+            `new_product_qty=${newProductQty}&transaction_detail_id=${transactionDetailId}&${csrfName}=${csrfValue}`
+        );
+
         // set new csrf hash to main tag
-        if (json.csrfValue !== undefined) {
-            main.dataset.csrfValue = json.csrfValue;
+        if (responseJson.csrf_value != undefined) {
+            mainElement.dataset.csrfValue = responseJson.csrf_value;
         }
 
         // if update product qty success
-        if (json.status === 'success') {
-            const target_tr = target.parentElement.parentElement;
+        if (responseJson.status == 'success') {
+            const trElement = targetElement.parentElement.parentElement;
 
             // update product qty and payment in cart table
-            update_qty_payment(target_tr, product_qty_new, payment_new);
-            // update qty total and payment total in cart table
-            update_qty_total_payment(cart_table, qty_total_new, payment_total_new);
-
-            // update product sale in product item
-            const product_sale_el = document.querySelector(`div.product__item[data-product-id="${target_tr.dataset.productId}"] p.product__sale`);
-            // if exists product item
-            if (product_sale_el !== null) {
-                product_sale_el.innerText = `Terjual ${product_sale_new}`;
-                product_sale_el.dataset.productSale = product_sale_new;
-            }
+            updateQtyPayment(trElement, newProductQty, newPayment);
+            // update total qty and total payment in cart table
+            updateTotalQtyPayment(cartTableElement, newTotalQty, newTotalPayment);
 
             // calculate change money
-            const customer_money = parseInt(document.querySelector('input[name="customer_money"]').value);
-            calculateChangeMoney(customer_money, payment_total_new);
+            const customerMoney = parseInt(document.querySelector('input[name="customer_money"]').value);
+            calculateChangeMoney(customerMoney, newTotalPayment);
         }
-    })
-    .catch(error => {
-        console.error(error);
-    });
+    } catch (error) {
+        console.error(error)
+    }
+
+    // loading
+    document.querySelector('div#cart-loading').classList.add('d-none');
 }
 
 // delete product from shopping cart
@@ -851,9 +825,9 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
     const baseUrl = document.querySelector('html').dataset.baseUrl;
 
     // find true target add, because may be variabel e containing not element a, but element path or svg
-    let target_add = e.target;
-    if (target_add.getAttribute('id') !== 'add-product-qty') target_add = target_add.parentElement;
-    if (target_add.getAttribute('id') !== 'add-product-qty') target_add = target_add.parentElement;
+    let targetAddElement = e.target;
+    if (targetAddElement.getAttribute('id') != 'add-product-qty') targetAddElement = targetAddElement.parentElement;
+    if (targetAddElement.getAttribute('id') != 'add-product-qty') targetAddElement = targetAddElement.parentElement;
 
     // find true target reduce, because may be variabel e containing not element a, but element path or svg
     let target_reduce = e.target;
@@ -862,47 +836,36 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
 
     // find true target delete, because may be variabel e containing not element a, but element path or svg
     let targetDeleteElement = e.target;
-    if (targetDeleteElement.getAttribute('id') !== 'delete-product') targetDeleteElement = targetDeleteElement.parentElement;
-    if (targetDeleteElement.getAttribute('id') !== 'delete-product') targetDeleteElement = targetDeleteElement.parentElement;
+    if (targetDeleteElement.getAttribute('id') != 'delete-product') targetDeleteElement = targetDeleteElement.parentElement;
+    if (targetDeleteElement.getAttribute('id') != 'delete-product') targetDeleteElement = targetDeleteElement.parentElement;
 
     // if user click link for add product qty
-    if (target_add.getAttribute('id') === 'add-product-qty') {
+    if (targetAddElement.getAttribute('id') == 'add-product-qty') {
         e.preventDefault();
 
         // get transaction detail id
-        const transaction_detail_id = target_add.parentElement.parentElement.dataset.transactionDetailId;
+        const transactionDetailId = targetAddElement.parentElement.parentElement.dataset.transactionDetailId;
 
-        // generate product qty new, qty total new, payment new and payment total new
-        const product_price = parseInt(target_add.parentElement.parentElement.querySelector('td#price').dataset.price);
-        const payment_total_old = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
+        // generate new product qty, new total qty, new payment and new total payment
+        const productPrice = parseInt(targetAddElement.parentElement.parentElement.querySelector('td#price').dataset.price);
+        const oldTotalPayment = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
+        const newProductQty = parseInt(targetAddElement.parentElement.parentElement.querySelector('td#qty').dataset.qty) + 1;
+        const newTotalQty = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty) + 1;
+        const newPayment = newProductQty * productPrice;
+        const newTotalPayment = oldTotalPayment + productPrice;
 
-        const product_qty_new = parseInt(target_add.parentElement.parentElement.querySelector('td#qty').dataset.qty)+1;
-        const qty_total_new = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty)+1;
-        const payment_new = product_qty_new * product_price;
-        const payment_total_new = payment_total_old + product_price;
-
-        // generate product sales new
-        const product_id = target_add.parentElement.parentElement.dataset.productId;
-        const product_sale_el = document.querySelector(`div.product__item[data-product-id="${product_id}"] p.product__sale`);
-        let product_sale_new = 0;
-        // if exists product item
-        if (product_sale_el !== null) {
-            product_sale_new = parseInt(product_sale_el.dataset.productSale) + 1;
-        }
-
-        update_product_qty(
-            target_add,
-            cart_table,
-            product_qty_new,
-            qty_total_new,
-            payment_new,
-            payment_total_new,
-            product_sale_el,
-            product_sale_new,
-            transaction_detail_id,
+        updateProductQty(
+            targetAddElement,
+            cartTableElement,
+            newProductQty,
+            newTotalQty,
+            newPayment,
+            newTotalPayment,
+            transactionDetailId,
             csrfName,
             csrfValue,
-            main
+            mainElement,
+            baseUrl
         );
     }
 

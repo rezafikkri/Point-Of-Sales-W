@@ -39,6 +39,7 @@ $routes->group('cashier', function ($routes) {
     $routes->post('finish-transaction', 'Cashier::finishTransaction');
     $routes->post('buy-product', 'Cashier::buyProduct');
     $routes->post('delete-product', 'Cashier::deleteProduct');
+    $routes->post('update-product-qty', 'Cashier::updateProductQty');
 });
 
 $routes->group('admin', function ($routes) {

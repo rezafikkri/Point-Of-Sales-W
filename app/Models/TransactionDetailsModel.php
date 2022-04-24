@@ -33,10 +33,10 @@ class TransactionDetailsModel extends Model
                     ->getResultArray();
     }
 
-    public function updateProductQty(string $transaction_detail_id, int $product_qty_new, string $transactionId): bool
+    public function updateProductQty(string $transactionDetailId, int $newProductQty, string $transactionId): bool
     {
         return $this->where('transaction_id', $transactionId)
-                    ->update($transaction_detail_id, ['product_quantity'=>$product_qty_new]);
+                    ->update($transactionDetailId, ['product_quantity' => $newProductQty]);
     }
 
     public function deleteOne(string $transactionDetailId, string $transactionId): bool
