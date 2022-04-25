@@ -830,9 +830,9 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
     if (targetAddElement.getAttribute('id') != 'add-product-qty') targetAddElement = targetAddElement.parentElement;
 
     // find true target reduce, because may be variabel e containing not element a, but element path or svg
-    let target_reduce = e.target;
-    if (target_reduce.getAttribute('id') !== 'reduce-product-qty') target_reduce = target_reduce.parentElement;
-    if (target_reduce.getAttribute('id') !== 'reduce-product-qty') target_reduce = target_reduce.parentElement;
+    let targetReduceElement = e.target;
+    if (targetReduceElement.getAttribute('id') != 'reduce-product-qty') targetReduceElement = targetReduceElement.parentElement;
+    if (targetReduceElement.getAttribute('id') != 'reduce-product-qty') targetReduceElement = targetReduceElement.parentElement;
 
     // find true target delete, because may be variabel e containing not element a, but element path or svg
     let targetDeleteElement = e.target;
@@ -870,43 +870,32 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
     }
 
     // if user click link for reduce product qty
-    else if (target_reduce.getAttribute('id') === 'reduce-product-qty') {
+    else if (targetReduceElement.getAttribute('id') == 'reduce-product-qty') {
         e.preventDefault();
 
         // get transaction detail id
-        const transaction_detail_id = target_reduce.parentElement.parentElement.dataset.transactionDetailId;
+        const transactionDetailId = targetReduceElement.parentElement.parentElement.dataset.transactionDetailId;
 
-        // generate product qty new, qty total new, payment new and payment total new
-        const product_price = parseInt(target_reduce.parentElement.parentElement.querySelector('td#price').dataset.price);
-        const payment_total_old = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
+        // generate new product qty, new total qty, new payment and new total payment
+        const productPrice = parseInt(targetReduceElement.parentElement.parentElement.querySelector('td#price').dataset.price);
+        const oldTotalPayment = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
+        const newProductQty = parseInt(targetReduceElement.parentElement.parentElement.querySelector('td#qty').dataset.qty) - 1;
+        const newTotalQty = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty) - 1;
+        const newPayment = newProductQty * productPrice;
+        const newTotalPayment = oldTotalPayment - productPrice;
 
-        const product_qty_new = parseInt(target_reduce.parentElement.parentElement.querySelector('td#qty').dataset.qty)-1;
-        const qty_total_new = parseInt(cartTableElement.querySelector('td#total-qty').dataset.totalQty)-1;
-        const payment_new = product_qty_new * product_price;
-        const payment_total_new = payment_total_old - product_price;
-
-        // generate product sales new
-        const product_id = target_reduce.parentElement.parentElement.dataset.productId;
-        const product_sale_el = document.querySelector(`div.product__item[data-product-id="${product_id}"] p.product__sale`);
-        let product_sale_new = 0;
-        // if exists product item
-        if (product_sale_el !== null) {
-            product_sale_new = parseInt(product_sale_el.dataset.productSale) - 1;
-        }
-
-        update_product_qty(
-            target_reduce,
-            cart_table,
-            product_qty_new,
-            qty_total_new,
-            payment_new,
-            payment_total_new,
-            product_sale_el,
-            product_sale_new,
-            transaction_detail_id,
+        updateProductQty(
+            targetReduceElement,
+            cartTableElement,
+            newProductQty,
+            newTotalQty,
+            newPayment,
+            newTotalPayment,
+            transactionDetailId,
             csrfName,
             csrfValue,
-            main
+            mainElement,
+            baseUrl
         );
     }
 
