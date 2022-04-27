@@ -64,7 +64,6 @@ $this->extend('admin_layout');
                     <th class="text-center" colspan="2">Aksi</th>
                     <th>Total Produk</th>
                     <th>Total Bayaran</th>
-                    <th width="100">Status</th>
                     <th>Kasir</th>
                     <th width="160">Dibuat</th>
                     <th width="160">Diedit</th>
@@ -81,8 +80,9 @@ $this->extend('admin_layout');
 
                         foreach($transactions as $t) :
                             $createdAt = Time::createFromFormat('Y-m-d H:i:s', $t['created_at'])->toLocalizedString('dd MMM y HH:mm');
-                            // if edited at is not null
-                            if ($t['edited_at']) {
+                            
+                            // if created at not equal to edited at
+                            if ($t['created_at'] != $t['edited_at']) {
                                 $editedAt = Time::createFromFormat('Y-m-d H:i:s', $t['edited_at'])->toLocalizedString('dd MMM y HH:mm');
                             }
 
@@ -105,12 +105,6 @@ $this->extend('admin_layout');
 
                     <td><?= $t['total_product'] ?? 0 ?></td>
                     <td><?= $fmt->formatCurrency($t['total_payment'] ?? 0, 'IDR') ?></td>
-
-                    <?php if ($t['transaction_status'] == 'selesai') : ?>
-                    <td><span class="text-green">Selesai</span></td>
-                    <?php else : ?>
-                    <td><span class="text-red">Berlangsung</span></td>
-                    <?php endif ?>
 
                     <td><?= $t['full_name'] ?></td>
                     <td><?= $createdAt ?></td>

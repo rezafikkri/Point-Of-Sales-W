@@ -211,11 +211,11 @@
         </div>
         <div class="modal__body">
             <h4 class="mb-2">Rollback Transaksi</h4>
-            <p class="mb-4">Pilih riwayat transaksi jika ingin melakukan Rollback Transaksi lalu klik Oke!
+            <p class="mb-4">Pilih transaksi jika ingin melakukan Rollback Transaksi lalu klik Oke!
             </p>
-            <select name="transactions_three_days_ago" class="form-select mb-4"></select>
+            <select name="transactions_five_hours_ago" class="form-select mb-4"></select>
             <div class="position-relative d-inline-block">
-                <a class="btn btn--blue-outline" href="#" id="show-transaction-detail">Oke</a>
+                <a class="btn btn--blue" href="#" id="show-transaction-detail">Oke</a>
 
                 <div class="loading-bg rounded position-absolute top-0 bottom-0 end-0 start-0 d-flex justify-content-center align-items-center d-none">
                     <div class="loading loading--blue">

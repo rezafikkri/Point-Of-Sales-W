@@ -6,7 +6,6 @@ use CodeIgniter\Controller;
 use App\Models\{TransactionsModel, UsersModel, TransactionDetailsModel};
 use PhpOffice\PhpSpreadsheet\{Spreadsheet, Writer\Xlsx};
 use CodeIgniter\I18n\Time;
-use Box\Spout\Writer\Common\{Creator\WriterEntityFactory, Entity\Row};
 
 class Transactions extends BaseController
 {
@@ -50,7 +49,11 @@ class Transactions extends BaseController
             $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
 
             $transactions[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM y HH:mm');
-            $transactions[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM y HH:mm');
+
+            // if created at not equal to edited at
+            if ($value['created_at'] != $value['edited_at']) {
+                $transactions[$key]['indo_edited_at'] = $editedAt->toLocalizedString('dd MMM y HH:mm');
+            }
 
             // check permission to delete
             $transactions[$key]['delete_permission'] = is_allowed_delete_transaction($value['edited_at']);

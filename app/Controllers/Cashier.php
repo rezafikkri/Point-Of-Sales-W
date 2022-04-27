@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\{ProductsModel, TransactionsModel, TransactionDetailsModel};
+use CodeIgniter\I18n\Time;
 
 class Cashier extends BaseController
 {
@@ -230,10 +231,12 @@ class Cashier extends BaseController
         $this->transactionsModel->transStart();
 
         // update customer money in db and update status transaction
+        $createdAt = date('Y-m-d H:i:s');
         $updateTransaction = $this->transactionsModel->update($_SESSION['transaction_id'], [
             'customer_money' => $customerMoney,
             'transaction_status' => 'selesai',
-            'created_at' => date('Y-m-d H:i:s')
+            'created_at' => $createdAt,
+            'edited_at' => $createdAt
         ]);
         // update product name, product price and product magnitude in product details table
         $updateProductHistories = $this->transactionDetailsModel->updateBatch(
@@ -285,12 +288,15 @@ class Cashier extends BaseController
                 $this->session->set('transaction_id', $transactionId);
 
                 // add product to transaction detail
-                $this->transactionDetailsModel->insert([
+                $transactionDetailId = $this->transactionDetailsModel->insert([
                     'transaction_detail_id' => generate_uuid(),
                     'transaction_id' => $transactionId,
                     'product_price_id' => $productPriceId,
                     'product_quantity' => $productQty
                 ]);
+
+                // add transaction detail id to property
+                $this->transactionDetailIdBuyProduct = $transactionDetailId;
                 return true;
             }
             // if not exists not transaction yet
@@ -454,6 +460,58 @@ class Cashier extends BaseController
 
         return json_encode([
             'status' => 'fail',
+            'csrf_value' => csrf_hash()
+        ]);
+    }
+
+    public function showTransactionsFiveHoursAgo()
+    {
+        $timestampFiveHoursAgo = date(
+            'Y-m-d H:i:s',
+            mktime(date('H'), date('i'), date('s'), date('m'), date('d'), date('Y')) - (60 * 60 * 5)
+        );
+        $transactionsFiveHoursAgo = $this->transactionsModel->getTransactionsFiveHoursAgo($timestampFiveHoursAgo);
+
+        // convert timestamp
+        foreach ($transactionsFiveHoursAgo as $key => $value) {
+            $createdAt = Time::createFromFormat('Y-m-d H:i:s', $value['created_at']);
+            $transactionsFiveHoursAgo[$key]['created_at'] = $createdAt->toLocalizedString('dd MMM y HH:mm');
+
+            // if edited at is not null
+            if ($value['edited_at']) {
+                $editedAt = Time::createFromFormat('Y-m-d H:i:s', $value['edited_at']);
+                $transactionsFiveHoursAgo[$key]['edited_at'] = $editedAt->toLocalizedString('dd MMM y HH:mm');
+            }
+        }
+
+        return json_encode([
+            'transactions_five_hours_ago' => $transactionsFiveHoursAgo,
+            'csrf_value' => csrf_hash()
+        ]);
+    }
+
+    public function showTransactionDetailsThreeDaysAgo()
+    {
+        $transaction_id = $this->request->getPost('transaction_id', FILTER_SANITIZE_STRING);
+        // change transaction status
+        $this->transaction_model->update($transaction_id, [
+            'status_transaksi' => 'belum'
+        ]);
+
+        // get customer money and transaction detail
+        $customer_money = $this->transaction_model->findTransaction($transaction_id, 'uang_pembeli')['uang_pembeli']??null;
+        $transaction_details = $this->transaction_detail_model->getTransactionDetails(
+            $transaction_id,
+            'produk.produk_id, harga_produk.harga_produk_id, transaksi_detail_id, nama_produk, harga_produk, besaran_produk, jumlah_produk'
+        );
+
+        // backup transaction and transaction detail to json file
+        $data_backup = json_encode(['transaction_id'=>$transaction_id, 'transaction_details'=>$transaction_details]);
+        file_put_contents(WRITEPATH.'transaction_backup/data.json', $data_backup);
+
+        return json_encode([
+            'customer_money' => $customer_money,
+            'transaction_details' => $transaction_details,
             'csrf_value' => csrf_hash()
         ]);
     }

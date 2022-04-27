@@ -28,7 +28,6 @@ class TransactionsModel extends Model
     {
         return $this->select('
                         transactions.transaction_id,
-                        transaction_status,
                         transactions.created_at,
                         transactions.edited_at,
                         full_name,
@@ -63,7 +62,6 @@ class TransactionsModel extends Model
     {
         return $this->select('
                         transactions.transaction_id,
-                        transaction_status,
                         transactions.created_at,
                         transactions.edited_at,
                         full_name,
@@ -72,7 +70,7 @@ class TransactionsModel extends Model
                     ->selectSum('product_quantity', 'total_product')
                     ->join('transaction_details', 'transactions.transaction_id = transaction_details.transaction_id', 'LEFT')
                     ->join('users', 'transactions.user_id = users.user_id', 'INNER')
-                    ->where(['transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
+                    ->where(['transaction_status' => 'selesai', 'transactions.edited_at >=' => $dateStart, 'transactions.edited_at <=' => $dateEnd])
                     ->limit($limit)->groupBy(['transactions.transaction_id', 'full_name'])->orderBy('transactions.edited_at', 'ASC')
                     ->get()->getResultArray();
     }
@@ -166,11 +164,11 @@ class TransactionsModel extends Model
                     ->getRowArray()['transaction_id'] ?? null;
     }
 
-    public function getTransactionsThreeDaysAgo(string $timestamp_three_days_ago): array
+    public function getTransactionsFiveHoursAgo(string $timestampFiveHoursAgo): array
     {
-        return $this->select('transaksi_id, waktu_buat')
-                    ->orderBy('waktu_buat', 'desc')
-                    ->getWhere(['waktu_buat >=' => $timestamp_three_days_ago, 'pengguna_id' => $_SESSION['posw_user_id']])
+        return $this->select('transaction_id, created_at, edited_at')
+                    ->orderBy('edited_at', 'desc')
+                    ->getWhere(['edited_at >=' => $timestampFiveHoursAgo, 'user_id' => $_SESSION['sign_in_user_id']])
                     ->getResultArray();
     } 
 }

@@ -104,6 +104,16 @@ async function postData(url = '', data = '')
     return response.json();
 }
 
+async function getData(url = '')
+{
+    const response = await fetch(url, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    });
+    return response.json();
+}
+
 // format number like 100k
 function abbreviateNumber(number)
 {
@@ -135,5 +145,6 @@ export {
     renderAlert,
     numberFormatterToCurrency,
     postData,
+    getData,
     abbreviateNumber
 };

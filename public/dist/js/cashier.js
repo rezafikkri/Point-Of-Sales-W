@@ -3,7 +3,8 @@ import {
     numberFormatterToCurrency,
     showModal,
     hideModal,
-    postData
+    postData,
+    getData
 } from './module.js';
 
 const mainElement = document.querySelector('main.main');
@@ -325,7 +326,7 @@ async function cancelTransaction(csrfName, csrfValue, cartTableElement, mainElem
 
         // set new csrf hash to main tag
         if (responseJson.csrf_value != undefined) {
-            main.dataset.csrfValue = responseJson.csrf_value;
+            mainElement.dataset.csrfValue = responseJson.csrf_value;
         }
 
         // if success
@@ -928,7 +929,7 @@ document.querySelector('aside.cart table.table tbody').addEventListener('click',
     }
 });
 
-//
+
 function generate_transaction_details_for_update_product_sale(transaction_details_backup, transaction_details_cart_table)
 {
     let transaction_details = [];
@@ -986,93 +987,91 @@ function generate_transaction_detail_ids(transaction_details_cart_table)
     return transaction_detail_ids;
 }
 
-const modal = document.querySelector('.modal');
-const modal_content = modal.querySelector('.modal__content');
-// show transaction three days ago in select input
-document.querySelector('a#rollback-transaction').addEventListener('click', e => {
+const modalElement = document.querySelector('.modal');
+const modalContentElement = modalElement.querySelector('.modal__content');
+// show transaction five hours ago, in input select
+document.querySelector('a#rollback-transaction').addEventListener('click', async (e) => {
     e.preventDefault();
 
     // if exists dataset type-show = transaction in cart table
-    if (cartTableElement.dataset.typeShow === 'transaction') {
-        const alert_node = create_alert_node(
-            ['alert--warning', 'mb-3'],
-            'Tidak bisa melakukan rollback transaksi, karena kamu masih melakukan transaksi. Selesaikan atau batalkan transaksi, lalu coba kembali!'
-        );
-        e.target.parentElement.insertBefore(alert_node, e.target);
+    if (cartTableElement.dataset.typeShow == 'transaction') {
+        const parentElement = e.target.parentElement;
+        const referenceElement = e.target;
+        const message = 'Tidak bisa melakukan rollback transaksi, karena kamu masih melakukan transaksi. Selesaikan atau batalkan transaksi, lalu coba kembali!';
+        renderAlert(parentElement, referenceElement, message, [
+            'alert--warning',
+            'mb-3'
+        ]);
+
         return false;
     }
 
     // if exists dataset type-show = rollback-transaction in cart table
-    if (cartTableElement.dataset.typeShow === 'rollback-transaction') {
-        const alert_node = create_alert_node(
-            ['alert--warning', 'mb-3'],
-            `Tidak bisa melakukan rollback transaksi lagi, karena kamu masih melakukan rollback transaksi. Selesaikan atau batalkan rollback transkasi, lalu coba kembali!`
-        );
-        e.target.parentElement.insertBefore(alert_node, e.target);
+    if (cartTableElement.dataset.typeShow == 'rollback-transaction') {
+        const parentElement = e.target.parentElement;
+        const referenceElement = e.target;
+        const message = `Tidak bisa melakukan rollback transaksi lagi, karena kamu masih melakukan rollback transaksi. Selesaikan atau batalkan rollback transkasi, lalu coba kembali!`;
+        renderAlert(parentElement, referenceElement, message, [
+            'alert--warning',
+            'mb-3'
+        ]);
+
         return false;
     }
 
-    const csrfName = main.dataset.csrfName;
-    const csrfValue = main.dataset.csrfValue;
+    const csrfName = mainElement.dataset.csrfName;
+    const csrfValue = mainElement.dataset.csrfValue;
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
 
     // loading
     document.querySelector('div#cart-loading').classList.remove('d-none');
 
-    fetch('/kasir/tampil_transaksi_tiga_hari_yang_lalu', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `${csrfName}=${csrfValue}`
-    })
-    .finally(() => {
-        // loading
-        document.querySelector('div#cart-loading').classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
-        // set new csrf hash to main tag
-        if (json.csrfValue !== undefined) {
-            main.dataset.csrfValue = json.csrfValue;
-        }
+    try {
+        const responseJson = await getData(`${baseUrl}/cashier/show-transactions-five-hours-ago`);
 
         // if exists transaction
-        if (json.transactions_three_days_ago.length > 0) {
+        if (responseJson.transactions_five_hours_ago.length > 0) {
             // show modal
-            show_modal(modal, modal_content);
+            showModal(modalElement, modalContentElement);
 
             // show data in select input
-            let options = '<option>Riwayat Transaksi</option>';
-            json.transactions_three_days_ago.forEach(t => {
-                options += `<option value="${t.transaksi_id}">${t.waktu_buat}</option>`;
+            let options = '<option>Transaksi</option>';
+            responseJson.transactions_five_hours_ago.forEach((t) => {
+                // if created at not equal to edited at
+                if (t.created_at != t.edited_at) {
+                    options += `<option value="${t.transaction_id}">Dibuat - ${t.created_at}, Diedit - ${t.edited_at}</option>`;
+                } else {
+                    options += `<option value="${t.transaction_id}">Dibuat - ${t.created_at}`;
+                }
             });
 
             // inner html to select
-            modal_content.querySelector('select[name="transactions_three_days_ago"]').innerHTML = options;
+            modalContentElement.querySelector('select[name="transactions_five_hours_ago"]').innerHTML = options;
         } else {
-            const alert_node = create_alert_node(
-                ['alert--info', 'mb-3'],
-                `Tidak ada transaksi dari 3 hari yang lalu.`
-            );
-            e.target.parentElement.insertBefore(alert_node, e.target);
+            const parentElement = e.target.parentElement;
+            const referenceElement = e.target;
+            const message = `Tidak ada transaksi dari 5 jam yang lalu.`;
+            renderAlert(parentElement, referenceElement, message, [
+                'alert--warning',
+                'mb-3'
+            ]);
         }
-    })
-    .catch(error => {
-        console.error(error);
-    });
+    } catch (error) {
+        console.error(error)
+    }
+
+    // loading
+    document.querySelector('div#cart-loading').classList.add('d-none');
 });
 
 // close modal
-modal_content.querySelector('a#btn-close').addEventListener('click', e => {
+modalContentElement.querySelector('a#btn-close').addEventListener('click', (e) => {
     e.preventDefault();
 
     // hide modal
-    hide_modal(modal, modal_content);
+    hideModal(modalElement, modalContentElement);
     // reset modal
-    modal_content.querySelector('select[name="transactions_three_days_ago"]').innerHTML = '';
+    modalContentElement.querySelector('select[name="transactions_five_hours_ago"]').innerHTML = '';
 });
 
 // show transaction detail based on transaction selected in modal

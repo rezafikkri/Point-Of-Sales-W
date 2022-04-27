@@ -76,13 +76,7 @@ searchElement.addEventListener('click', async (e) => {
                     <td>${t.total_product || 0}</td>
                     <td>${numberFormatterToCurrency(parseInt(t.total_payment || 0))}</td>`;
 
-                if (t.transaction_status == 'selesai') {
-                    tr += '<td><span class="text-green">Selesai</span></td>';
-                } else {
-                    tr += '<td><span class="text-red">Belum</span></td>';
-                }
-
-                tr += `<td>${t.full_name}</td><td>${t.created_at}</td><td>${t.indo_edited_at}</td></tr>`;
+                tr += `<td>${t.full_name}</td><td>${t.created_at}</td><td>${t.indo_edited_at || ''}</td></tr>`;
             });
 
             tableElement.querySelector('tbody').innerHTML = tr;
