@@ -156,7 +156,10 @@ class Cashier extends BaseController
         // if file backup exists
         if (file_exists(WRITEPATH . 'backup-transaction/data.json')) {
             // get transaction details rollback transaction
-            ['transaction_id' => $transactionId] = json_decode(file_get_contents(WRITEPATH . 'backup-transaction/data.json'), true);
+            [
+                'transaction_id' => $transactionId
+            ] = json_decode(file_get_contents(WRITEPATH . 'backup-transaction/data.json'), true);
+
             [
                 'customer_money' => $customerMoney,
                 'transaction_details' => $transactionDetails
@@ -362,10 +365,10 @@ class Cashier extends BaseController
         }
 
         // if file backup exists
-        if (file_exists(WRITEPATH . 'transaction-backup/data.json')) {
+        if (file_exists(WRITEPATH . 'backup-transaction/data.json')) {
             [
                 'transaction_id' => $transactionId
-            ] = json_decode(file_get_contents(WRITEPATH . 'transaction-backup/data.json'), true);
+            ] = json_decode(file_get_contents(WRITEPATH . 'backup-transaction/data.json'), true);
             $buyProduct = $this->buyProductRollbackTransaction($transactionId, $productQty);
         } else {
             $buyProduct = $this->buyProductTransaction($productQty);
@@ -395,10 +398,10 @@ class Cashier extends BaseController
             $transactionId = $_SESSION['transaction_id'];
         }
         // else if backup file exists
-        else if (file_exists(WRITEPATH . 'transaction-backup/data.json')) {
+        else if (file_exists(WRITEPATH . 'backup-transaction/data.json')) {
             [
                 'transaction_id' => $transactionId
-            ] = json_decode(file_get_contents(WRITEPATH . 'transaction-backup/data.json'), true);
+            ] = json_decode(file_get_contents(WRITEPATH . 'backup-transaction/data.json'), true);
         } else {
             return false;
         }
@@ -435,10 +438,10 @@ class Cashier extends BaseController
             $transactionId = $_SESSION['transaction_id'];
         }
         // if file backup exists
-        else if (file_exists(WRITEPATH . 'transaction-backup/data.json')) {
+        else if (file_exists(WRITEPATH . 'backup-transaction/data.json')) {
             [
                 'transaction_id' => $transactionId
-            ] = json_decode(file_get_contents(WRITEPATH . 'transaction-backup/data.json'), true);
+            ] = json_decode(file_get_contents(WRITEPATH . 'backup-transaction/data.json'), true);
         } else {
             return false;
         }
@@ -490,28 +493,28 @@ class Cashier extends BaseController
         ]);
     }
 
-    public function showTransactionDetailsThreeDaysAgo()
+    public function showTransactionDetailsFiveHoursAgo()
     {
-        $transaction_id = $this->request->getPost('transaction_id', FILTER_SANITIZE_STRING);
+        $transactionId = $this->request->getGet('transaction_id', FILTER_SANITIZE_STRING);
         // change transaction status
-        $this->transaction_model->update($transaction_id, [
-            'status_transaksi' => 'belum'
+        $this->transactionsModel->update($transactionId, [
+            'transaction_status' => 'belum'
         ]);
 
         // get customer money and transaction detail
-        $customer_money = $this->transaction_model->findTransaction($transaction_id, 'uang_pembeli')['uang_pembeli']??null;
-        $transaction_details = $this->transaction_detail_model->getTransactionDetails(
-            $transaction_id,
-            'produk.produk_id, harga_produk.harga_produk_id, transaksi_detail_id, nama_produk, harga_produk, besaran_produk, jumlah_produk'
+        $customerMoney = $this->transactionsModel->getOne($transactionId, 'customer_money')['customer_money'] ?? null;
+        $transactionDetails = $this->transactionDetailsModel->getAllForCashier(
+            $transactionId,
+            'p.product_id, transaction_detail_id, p.product_name, pp.product_price, pp.product_magnitude, product_quantity'
         );
 
-        // backup transaction and transaction detail to json file
-        $data_backup = json_encode(['transaction_id'=>$transaction_id, 'transaction_details'=>$transaction_details]);
-        file_put_contents(WRITEPATH.'transaction_backup/data.json', $data_backup);
+        // backup transaction and transaction details to json file
+        $dataBackup = json_encode(['transaction_id' => $transactionId, 'transaction_details' => $transactionDetails]);
+        file_put_contents(WRITEPATH . 'backup-transaction/data.json', $dataBackup);
 
         return json_encode([
-            'customer_money' => $customer_money,
-            'transaction_details' => $transaction_details,
+            'customer_money' => $customerMoney,
+            'transaction_details' => $transactionDetails,
             'csrf_value' => csrf_hash()
         ]);
     }

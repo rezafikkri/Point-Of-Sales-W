@@ -161,5 +161,5 @@ public/dist/images/product-photos/*.jpg
 public/dist/images/product-photos/*.jpeg
 
 # ignore transction backup json file and transaction export file
-writable/transaction-backup/*.json
+writable/backup-transaction/*.json
 writable/export-transactions/*.xlsx

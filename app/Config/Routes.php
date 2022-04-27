@@ -41,6 +41,7 @@ $routes->group('cashier', function ($routes) {
     $routes->post('delete-product', 'Cashier::deleteProduct');
     $routes->post('update-product-qty', 'Cashier::updateProductQty');
     $routes->get('show-transactions-five-hours-ago', 'Cashier::showTransactionsFiveHoursAgo');
+    $routes->get('show-transaction-details-five-hours-ago', 'Cashier::showTransactionDetailsFiveHoursAgo');
 });
 
 $routes->group('admin', function ($routes) {

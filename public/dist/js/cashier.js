@@ -1019,8 +1019,6 @@ document.querySelector('a#rollback-transaction').addEventListener('click', async
         return false;
     }
 
-    const csrfName = mainElement.dataset.csrfName;
-    const csrfValue = mainElement.dataset.csrfValue;
     const baseUrl = document.querySelector('html').dataset.baseUrl;
 
     // loading
@@ -1074,65 +1072,48 @@ modalContentElement.querySelector('a#btn-close').addEventListener('click', (e) =
     modalContentElement.querySelector('select[name="transactions_five_hours_ago"]').innerHTML = '';
 });
 
-// show transaction detail based on transaction selected in modal
-document.querySelector('div.modal a#show-transaction-detail').addEventListener('click', e => {
+// show transaction details based on selected transaction in modal
+document.querySelector('div.modal a#show-transaction-detail').addEventListener('click', async (e) => {
     e.preventDefault();
 
-    const csrfName = main.dataset.csrfName;
-    const csrfValue = main.dataset.csrfValue;
-    const transaction_id = modal_content.querySelector('select[name="transactions_three_days_ago"]').value;
+    const transactionId = modalContentElement.querySelector('select[name="transactions_five_hours_ago"]').value;
+    const baseUrl = document.querySelector('html').dataset.baseUrl;
 
     // if transaction not selected
-    if (transaction_id.toLowerCase() === 'riwayat transaksi') {
+    if (transactionId.toLowerCase() == 'transaksi') {
         return false;
     }
 
     // loading
     e.target.nextElementSibling.classList.remove('d-none');
 
-    fetch('/kasir/tampil_transaksi_detail_tiga_hari_yang_lalu', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `transaction_id=${transaction_id}&${csrfName}=${csrfValue}`
-    })
-    .finally(() => {
-        // loading
-        e.target.nextElementSibling.classList.add('d-none');
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(json => {
-        // set new csrf hash to main tag
-        if (json.csrfValue !== undefined) {
-            main.dataset.csrfValue = json.csrfValue;
-        }
+    try { 
+        const responseJson = await getData(`${baseUrl}/cashier/show-transaction-details-five-hours-ago?transaction_id=${transactionId}`);
 
         // hide and reset modal
-        hide_modal(modal, modal_content);
-        modal_content.querySelector('select[name="transactions_three_days_ago"]').innerHTML = '';
+        hideModal(modalElement, modalContentElement);
+        modalContentElement.querySelector('select[name="transactions_five_hours_ago"]').innerHTML = '';
 
         // if exists transaction detail
-        if (json.transactionDetails.length > 0) {
+        if (responseJson.transaction_details.length > 0) {
             // show transaction detail in cart table
-            show_transaction_details(cart_table, json.transaction_details);
+            showTransactionDetails(cartTableElement, responseJson.transaction_details);
         }
 
         // show customer money
-        const customer_money = parseInt(json.customer_money);
-        document.querySelector('input[name="customer_money"]').value = customer_money;
+        const customerMoney = parseInt(responseJson.customer_money);
+        document.querySelector('input[name="customer_money"]').value = customerMoney;
 
         // calculate change money
-        const payment_total = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
-        calculateChangeMoney(customer_money, payment_total);
+        const totalPayment = parseInt(cartTableElement.querySelector('td#total-payment').dataset.totalPayment);
+        calculateChangeMoney(customerMoney, totalPayment);
 
         // add dataset type-show = rollback-transaction
         cartTableElement.dataset.typeShow = 'rollback-transaction';
-    })
-    .catch(error => {
-        console.error(error);
-    });
+    } catch (error) {
+        console.error(error)
+    }
+
+    // loading
+    e.target.nextElementSibling.classList.add('d-none');
 });
