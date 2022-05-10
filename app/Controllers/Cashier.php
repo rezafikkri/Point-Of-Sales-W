@@ -242,9 +242,9 @@ class Cashier extends BaseController
             'edited_at' => $createdAt
         ]);
         // update product name, product price and product magnitude in product details table
-        $updateProductHistories = $this->transactionDetailsModel->updateBatch(
-            $productHistoriesFiltered,
-            'transaction_detail_id'
+        $updateProductHistories = $this->transactionDetailsModel->updateProductHistories(
+            $_SESSION['transaction_id'],
+            $productHistoriesFiltered
         );
 
         $this->transactionsModel->transComplete();
@@ -515,6 +515,74 @@ class Cashier extends BaseController
         return json_encode([
             'customer_money' => $customerMoney,
             'transaction_details' => $transactionDetails,
+            'csrf_value' => csrf_hash()
+        ]);
+    }
+
+    public function finishRollbackTransaction()
+    {
+        if (!$this->validate([
+            'customer_money' => [
+                'label' => 'Uang Pembeli',
+                'rules' => 'required|integer|max_length[10]'
+            ]
+        ])) {
+            return json_encode([
+                'status' => 'fail',
+                'message' => $this->validator->getErrors()['customer_money'],
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        [
+            'transaction_id' => $transactionId
+        ] = json_decode(file_get_contents(WRITEPATH . 'backup-transaction/data.json'), true);
+        $customerMoney = $this->request->getPost('customer_money', FILTER_SANITIZE_NUMBER_INT);
+        $productHistories = json_decode($this->request->getPost('product_histories'), true);
+        $productHistoriesFiltered = [];
+        foreach ($productHistories as $ph) {
+            $productHistoriesFiltered[] = [
+                'transaction_detail_id' => filter_var($ph['transactionDetailId'], FILTER_SANITIZE_STRING),
+                'product_name' => filter_var($ph['productName'], FILTER_SANITIZE_STRING),
+                'product_price' => filter_var($ph['productPrice'], FILTER_SANITIZE_STRING),
+                'product_magnitude' => filter_var($ph['productMagnitude'], FILTER_SANITIZE_STRING)
+            ];
+        }
+
+        $this->transactionsModel->transStart();
+
+        // update customer money, edited at and update status transaction 
+        $editedAt = date('Y-m-d H:i:s');
+        $updateTransaction = $this->transactionsModel->update($transactionId, [
+            'customer_money' => $customerMoney,
+            'transaction_status' => 'selesai',
+            'edited_at' => $editedAt
+        ]);
+
+        // update product name, product price and product magnitude in product details table
+        $updateProductHistories = $this->transactionDetailsModel->updateBatch(
+            $productHistoriesFiltered,
+            'transaction_detail_id'
+        );
+        
+        $this->transactionsModel->transComplete();
+        
+        if ($updateTransaction && $updateProductHistories) {
+            // if exists file backup
+            if (file_exists(WRITEPATH . 'backup-transaction/data.json')) {
+                // remove file backup
+                unlink(WRITEPATH . 'backup-transaction/data.json');
+            }
+    
+            return json_encode([
+                'status' => 'success',
+                'csrf_value' => csrf_hash()
+            ]);
+        }
+
+        return json_encode([
+            'status' => 'fail',
+            'message' => 'Transaksi gagal',
             'csrf_value' => csrf_hash()
         ]);
     }

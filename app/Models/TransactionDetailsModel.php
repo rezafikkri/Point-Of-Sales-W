@@ -45,6 +45,14 @@ class TransactionDetailsModel extends Model
              ->delete($transactionDetailId);
     }
 
+    public function updateProductHistories(string $transactionId, array $productHistoriesFiltered): bool
+    {
+        return $this->where('transaction_id', $transactionId)->updateBatch(
+            $productHistoriesFiltered,
+            'transaction_detail_id'
+        );
+    }
+
     public function removeTransactionDetails(array $transaction_detail_ids, string $transactionId): int
     {
         $this->whereIn('transaction_detail_id', $transaction_detail_ids)

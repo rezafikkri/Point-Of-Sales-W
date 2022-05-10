@@ -87,7 +87,7 @@ searchElement.addEventListener('click', async (e) => {
     // if product exists
     if (responseJson.products.length > 0) {
       product += `<span class="text-muted me-1 d-block mb-3" id="result-status">
-          1 - ${responseJson.products.length} dari ${responseJson.total_product} Total produk hasil pencarian</span>`;
+        1 - ${responseJson.products.length} dari ${responseJson.total_product} Total produk hasil pencarian</span>`;
 
       product += '<h5 class="mb-2 main__title">Produk</h5><div class="product mb-4">';
 
@@ -478,48 +478,39 @@ async function finishTransaction(csrfName, csrfValue, cartTableElement, mainElem
   document.querySelector('div#cart-loading').classList.add('d-none');
 }
 
-function finish_rollback_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money)
+async function finishRollbackTransaction(csrfName, csrfValue, cartTableElement, mainElement, closeCartElement, customerMoney, productHistories, baseUrl)
 {
   // loading
   document.querySelector('div#cart-loading').classList.remove('d-none');
 
-  fetch('/kasir/rollback_transaksi_selesai', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'X-Requested-With': 'XMLHttpRequest'
-    },
-    body: `customer_money=${customer_money}&${csrfName}=${csrfValue}`
-  })
-  .finally(() => {
-    // loading
-    document.querySelector('div#cart-loading').classList.add('d-none');
-  })
-  .then(response => {
-    return response.json();
-  })
-  .then(json => {
-    // set new csrf hash to table tag
-    if (json.csrfValue !== undefined) {
-      main.dataset.csrfValue = json.csrfValue;
+  try {
+    const responseJson = await postData(
+      `${baseUrl}/cashier/finish-rollback-transaction`,
+      `${csrfName}=${csrfValue}&customer_money=${customerMoney}&product_histories=${JSON.stringify(productHistories)}`
+    );
+
+    // set new csrf hash to main tag
+    if (responseJson.csrf_value != undefined) {
+      mainElement.dataset.csrfValue = responseJson.csrf_value;
     }
 
     // if success
-    if (json.status === 'success') {
+    if (responseJson.status == 'success') {
       // close cart
-      btn_close_cart.click();
-
+      closeCartElement.click();
       // reset shopping cart
-      reset_shopping_cart(cart_table);
+      resetShoppingCart(cartTableElement);
     }
-    // if false and form message exists
-    if (json.status === 'fail') {
-      show_form_error_message_customer_money(json.message);
+    // if not success
+    else if (responseJson.status == 'fail') {
+      showFormErrorMessageCustomerMoney(responseJson.message);
     }
-  })
-  .catch(error => {
-    console.error(error);
-  });
+  } catch (error) {
+    console.error(error)
+  }
+
+  // loading
+  document.querySelector('div#cart-loading').classList.add('d-none');
 }
 
 // finish transaction
@@ -549,8 +540,8 @@ finishTransactionElement.addEventListener('click', (e) => {
   }
 
   // else if exists dataset type-show = rollback-transaction
-  else if (cartTableElement.dataset.typeShow === 'rollback-transaction') {
-    finish_rollback_transaction(csrfName, csrfValue, cart_table, main, btn_close_cart, customer_money);
+  else if (cartTableElement.dataset.typeShow == 'rollback-transaction') {
+    finishRollbackTransaction(csrfName, csrfValue, cartTableElement, mainElement, closeCartElement, customerMoney, productHistories, baseUrl);
   }
 });
 
