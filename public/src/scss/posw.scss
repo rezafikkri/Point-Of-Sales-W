@@ -7,37 +7,37 @@
 @import 'variabel.scss';
 
 body {
-    font-family: 'roboto-regular';
-    color: #333;
-    background-color: #fcfcfc;
-    min-height: 100vh;
-    position: relative;
-    padding-bottom: 40px;
+  font-family: 'roboto-regular';
+  color: #333;
+  background-color: #fcfcfc;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 40px;
 
-    @media (max-width: 291px) {
-        padding-bottom: 80px;
-    }
+  @media (max-width: 291px) {
+    padding-bottom: 80px;
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'roboto-medium';
+  font-family: 'roboto-medium';
 }
 
 .main {
-    h5#{&}__title {
-        color: var(--gray);
-    }
+  h5#{&}__title {
+    color: var(--gray);
+  }
 
-    &__box {
-        background-color: #fff;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        padding: 15px;
+  &__box {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 15px;
 
-        @media (max-width: 767.98px) {
-            padding: 12px;
-        }
+    @media (max-width: 767.98px) {
+      padding: 12px;
     }
+  }
 }
 
 @import 'button.scss';
@@ -59,21 +59,21 @@ h1, h2, h3, h4, h5, h6 {
 
 
 @keyframes fade_in {
-    0% {
-        opacity: 0;
-    }
+  0% {
+    opacity: 0;
+  }
 
-    100% {
-        opacity: 1;
-    }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes fade_out {
-    0% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 1;
+  }
 
-    100% {
-        opacity: 0;
-    }
+  100% {
+    opacity: 0;
+  }
 }

@@ -1,83 +1,83 @@
 .dropdown {
-    position: relative;
+  position: relative;
 
-    &--btn {
-        display: flex;
-    }
+  &--btn {
+    display: flex;
+  }
 
-    &--btn ul {
-        list-style-type: none;
-    }
+  &--btn ul {
+    list-style-type: none;
+  }
 
-    &--btn .btn:first-child {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        border-right-color: #6461CE;
-        flex: 1;
-    }
+  &--btn .btn:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-color: #6461CE;
+    flex: 1;
+  }
 }
 
 .dropdown-toggle::after {
-    content: "";
-    border-width: 5px;
-    border-style: solid;
-    border-color: currentcolor transparent transparent transparent;
-    margin-left: 10px;
-    display: inline-block;
+  content: "";
+  border-width: 5px;
+  border-style: solid;
+  border-color: currentcolor transparent transparent transparent;
+  margin-left: 10px;
+  display: inline-block;
 }
 
 .dropdown--btn .dropdown-toggle {
-    padding-top: 10px;
-    padding-bottom: 6px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left: 0;
-    flex-basis: 35px;
+  padding-top: 10px;
+  padding-bottom: 6px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 0;
+  flex-basis: 35px;
 }
 
 .dropdown--btn .dropdown-toggle::after {
-    margin-left: 0;
+  margin-left: 0;
 }
 
 ul.dropdown-menu {
-    position: absolute;
-    z-index: 2;
-    top: 130%;
-    min-width: 10rem;
-    background-color: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    padding: 8px 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+  position: absolute;
+  z-index: 2;
+  top: 130%;
+  min-width: 10rem;
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,.05);
 
-    a {
-        display: block;
-        padding: 4px 16px;
-    }
+  a {
+    display: block;
+    padding: 4px 16px;
+  }
 
-    li hr {
-        margin: 8px 0;
-        background-color: #c8c8c8;
-    }
+  li hr {
+    margin: 8px 0;
+    background-color: #c8c8c8;
+  }
 }
 
 .dropdown--btn ul.dropdown-menu {
-    top: 110%;
+  top: 110%;
 
-    a {
-        text-decoration: none;
-        color: var(--gray);
+  a {
+    text-decoration: none;
+    color: var(--gray);
 
-        &:hover {
-            color: var(--blue);
-        }
+    &:hover {
+      color: var(--blue);
     }
+  }
 }
 
 ul.dropdown-menu--end {
-    right: 0;
+  right: 0;
 }
 
 ul.dropdown-menu--start {
-    left: 0;
+  left: 0;
 }
