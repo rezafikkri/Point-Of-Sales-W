@@ -231,7 +231,7 @@ class Cashier extends BaseController
             ];
         }
  
-        $this->transactionsModel->transStart();
+        $this->transactionsModel->transBegin();
 
         // update customer money in db and update status transaction
         $createdAt = date('Y-m-d H:i:s');
@@ -247,9 +247,9 @@ class Cashier extends BaseController
             $productHistoriesFiltered
         );
 
-        $this->transactionsModel->transComplete();
-
         if ($updateTransaction && $updateProductHistories) {
+            $this->transactionsModel->transCommit();
+
             // remove transaction id session
             $this->session->remove('transaction_id');
 
@@ -258,7 +258,8 @@ class Cashier extends BaseController
                 'csrf_value' => csrf_hash()
             ]);
         }
-
+        
+        $this->transactionsModel->transRollback();
         return json_encode([
             'status' => 'fail',
             'message' => 'Transaksi gagal',
@@ -279,10 +280,6 @@ class Cashier extends BaseController
                 'product_price_id' => $productPriceId,
                 'product_quantity' => $productQty
             ]);
-
-            // add transaction detail id to property
-            $this->transactionDetailIdBuyProduct = $transactionDetailId;
-            return true;
         } else {
             // if exists not transaction yet
             $transactionId = $this->transactionsModel->getUnfinishedTransactionId();
@@ -297,10 +294,6 @@ class Cashier extends BaseController
                     'product_price_id' => $productPriceId,
                     'product_quantity' => $productQty
                 ]);
-
-                // add transaction detail id to property
-                $this->transactionDetailIdBuyProduct = $transactionDetailId;
-                return true;
             }
             // if not exists not transaction yet
             else {
@@ -320,38 +313,40 @@ class Cashier extends BaseController
                     'product_price_id' => $productPriceId,
                     'product_quantity' => $productQty
                 ]);
-
+                
                 $this->productsModel->transComplete();
-
-                // create session
-                $this->session->set('transaction_id', $transactionId);
-
-                // add transaction detail id to property
-                $this->transactionDetailIdBuyProduct = $transactionDetailId;
-                return true;
+                
+                if ($transactionDetailId) {
+                    // create session
+                    $this->session->set('transaction_id', $transactionId);
+                }
             }
         }
+
+        if ($transactionDetailId) {
+            // add transaction detail id to property
+            $this->transactionDetailIdBuyProduct = $transactionDetailId;
+            return true;
+        }
+        return false;
     }
 
-    private function buyProductRollbackTransaction(string $transaction_id, int $product_qty): bool
+    private function buyProductRollbackTransaction(string $transactionId, int $productQty): bool
     {
-        try {
-            // add product to transaction detail
-            $this->transaction_detail_model->insertReturning([
-                'transaksi_detail_id' => generate_uuid(),
-                'transaksi_id' => $transaction_id,
-                'harga_produk_id' => $this->request->getPost('product_price_id', FILTER_SANITIZE_STRING),
-                'jumlah_produk' => $product_qty
-            ], 'transaksi_detail_id');
-            $transaction_detail_id = $this->transaction_detail_model->getInsertReturned();
-
+        // add product to transaction detail
+        $transactionDetailId = $this->transactionDetailsModel->insert([
+            'transaction_detail_id' => generate_uuid(),
+            'transaction_id' => $transactionId,
+            'product_price_id' => $this->request->getPost('product_price_id', FILTER_SANITIZE_STRING),
+            'product_quantity' => $productQty
+        ]);
+        
+        if ($transactionDetailId) {
             // add transaction detail id to property
-            $this->transactionDetailIdBuyProduct = $transaction_detail_id;
+            $this->transactionDetailIdBuyProduct = $transactionDetailId;
             return true;
-
-        } catch (\ErrorException $e) {
-            return false;
         }
+        return false;
     }
 
     public function buyProduct()
@@ -549,7 +544,7 @@ class Cashier extends BaseController
             ];
         }
 
-        $this->transactionsModel->transStart();
+        $this->transactionsModel->transBegin();
 
         // update customer money, edited at and update status transaction 
         $editedAt = date('Y-m-d H:i:s');
@@ -558,16 +553,15 @@ class Cashier extends BaseController
             'transaction_status' => 'selesai',
             'edited_at' => $editedAt
         ]);
-
         // update product name, product price and product magnitude in product details table
-        $updateProductHistories = $this->transactionDetailsModel->updateBatch(
-            $productHistoriesFiltered,
-            'transaction_detail_id'
+        $updateProductHistories = $this->transactionDetailsModel->updateProductHistories(
+            $transactionId,
+            $productHistoriesFiltered
         );
-        
-        $this->transactionsModel->transComplete();
-        
+         
         if ($updateTransaction && $updateProductHistories) {
+            $this->transactionsModel->transCommit();
+
             // if exists file backup
             if (file_exists(WRITEPATH . 'backup-transaction/data.json')) {
                 // remove file backup
@@ -580,6 +574,7 @@ class Cashier extends BaseController
             ]);
         }
 
+        $this->transactionsModel->transRollback();
         return json_encode([
             'status' => 'fail',
             'message' => 'Transaksi gagal',

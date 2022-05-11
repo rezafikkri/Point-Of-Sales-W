@@ -305,19 +305,12 @@ function resetShoppingCart(cartTableElement)
   cartTableElement.querySelector('td#total-payment').dataset.totalPayment = 0;
   document.querySelector('input[name="customer_money"]').value = '';
   document.querySelector('input[name="change_money"]').value = ''; 
-
   // remove dataset type-show in cart table
   delete cartTableElement.dataset.typeShow;
 }
 
 async function cancelTransaction(csrfName, csrfValue, cartTableElement, mainElement, baseUrl)
 {
-  // remove all form message
-  const allFormMessage = document.querySelectorAll('aside.cart small.form-message');
-  if (allFormMessage.length > 0) {
-    allFormMessage.forEach(el => el.remove());
-  }
-
   // loading
   document.querySelector('div#cart-loading').classList.remove('d-none');
 
@@ -409,12 +402,29 @@ cancelTransactionElement.addEventListener('click', (e) => {
   const csrfValue = mainElement.dataset.csrfValue;
   const baseUrl = document.querySelector('html').dataset.baseUrl;
 
+  const typeShow = cartTableElement.dataset.typeShow;
+  // if exists dataset type-show = transaction or rollback-transaction
+  if (typeShow == 'transaction' || typeShow == 'rollback-transaction') {
+    // remove all form message
+    const allFormMessage = document.querySelectorAll('aside.cart small.form-message');
+    if (allFormMessage.length > 0) {
+      allFormMessage.forEach(el => el.remove());
+    }
+
+    // if alert exists
+    const alertElement = cartElement.querySelector('.alert');
+    if (alertElement) {
+      // remove alert
+      alertElement.remove();
+    }
+  }
+
   // if exists dataset type-show = transaction
-  if (cartTableElement.dataset.typeShow == 'transaction') {
+  if (typeShow == 'transaction') {
     cancelTransaction(csrfName, csrfValue, cartTableElement, mainElement, baseUrl);
   }
   // else if exists dataset = rollback-transaction in cart table
-  else if (cartTableElement.dataset.typeShow === 'rollback-transaction') {
+  else if (typeShow === 'rollback-transaction') {
     cancel_rollback_transaction(csrfName, csrfValue, cart_table, main);
   }
 });
@@ -422,29 +432,16 @@ cancelTransactionElement.addEventListener('click', (e) => {
 // show form message in cart
 function showFormErrorMessageCustomerMoney(message)
 {
-  // if exists form message
-  const formMessageCustomerMoney = document.querySelector('aside.cart div#customer-money small.form-message');
-  if (formMessageCustomerMoney != null) {
-    formMessageCustomerMoney.innerText = message;
-
-  } else {
-    const smallElement = document.createElement('small');
-    smallElement.classList.add('form-message');
-    smallElement.classList.add(`form-message--danger`);
-    smallElement.innerText = message;
-    // add form message to after customer money input
-    document.querySelector('aside.cart div#customer-money').append(smallElement);
-  }
+  const smallElement = document.createElement('small');
+  smallElement.classList.add('form-message');
+  smallElement.classList.add(`form-message--danger`);
+  smallElement.innerText = message;
+  // add form message to after customer money input
+  document.querySelector('aside.cart div#customer-money').append(smallElement);
 }
 
 async function finishTransaction(csrfName, csrfValue, cartTableElement, mainElement, closeCartElement, customerMoney, productHistories, baseUrl)
 {
-  // remove all form message
-  const allFormMessage = document.querySelectorAll('aside.cart small.form-message');
-  if (allFormMessage.length > 0) {
-    allFormMessage.forEach(el => el.remove());
-  }
-
   // loading
   document.querySelector('div#cart-loading').classList.remove('d-none');
 
@@ -523,7 +520,7 @@ finishTransactionElement.addEventListener('click', (e) => {
   const baseUrl = document.querySelector('html').dataset.baseUrl;
   
   let productHistories = [];
-  const trElements = cartTableElement.querySelectorAll('tbody tr');
+  const trElements = cartTableElement.querySelectorAll('tbody tr:not(#empty-cart-table)');
   trElements.forEach((trElement, i) => {
     const tdPriceElement = trElement.querySelector('td#price');
     productHistories[i] = {
@@ -533,14 +530,31 @@ finishTransactionElement.addEventListener('click', (e) => {
       productMagnitude: tdPriceElement.dataset.magnitude
     };
   });
+  
+  const typeShow = cartTableElement.dataset.typeShow;
+  // if exists dataset type-show = transaction or rollback-transaction
+  if (typeShow == 'transaction' || typeShow == 'rollback-transaction') {
+    // remove all form message
+    const allFormMessage = document.querySelectorAll('aside.cart small.form-message');
+    if (allFormMessage.length > 0) {
+      allFormMessage.forEach(el => el.remove());
+    }
+
+    // if alert exists
+    const alertElement = cartElement.querySelector('.alert');
+    if (alertElement) {
+      // remove alert
+      alertElement.remove();
+    }
+  }
 
   // if exists dataset type-show = transaction
-  if (cartTableElement.dataset.typeShow == 'transaction') {
+  if (typeShow == 'transaction') {
     finishTransaction(csrfName, csrfValue, cartTableElement, mainElement, closeCartElement, customerMoney, productHistories, baseUrl);
   }
 
   // else if exists dataset type-show = rollback-transaction
-  else if (cartTableElement.dataset.typeShow == 'rollback-transaction') {
+  else if (typeShow == 'rollback-transaction') {
     finishRollbackTransaction(csrfName, csrfValue, cartTableElement, mainElement, closeCartElement, customerMoney, productHistories, baseUrl);
   }
 });
