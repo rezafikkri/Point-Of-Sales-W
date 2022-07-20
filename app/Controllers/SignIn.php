@@ -29,8 +29,8 @@ class SignIn extends BaseController
             return redirect()->to('/')->withInput();
         }
 
-        $username = $this->request->getPost('username', FILTER_SANITIZE_STRING);
-        $password = $this->request->getPost('password', FILTER_SANITIZE_STRING);
+        $username = $this->request->getPost('username');
+        $password = $this->request->getPost('password');
 
         $usersModel = new UsersModel();
         $userSignIn = $usersModel->getSignIn($username);

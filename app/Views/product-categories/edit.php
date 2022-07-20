@@ -14,11 +14,11 @@
         <?= $_SESSION['errors']['edit_product_category'] ?? null ?>
         <div class="main__box">
             <?= form_open('/admin/product-category/update') ?>
-                <input type="hidden" value="<?= $productCategoryId ?>" name="product_category_id">
+                <input type="hidden" value="<?= htmlspecialchars($productCategoryId) ?>" name="product_category_id">
                 <div class="mb-3">
                     <label class="form-label" for="product_category_name">Nama Kategori</label>
                     <input class="form-input" id="product_category_name" type="text"
-                    name="product_category_name" value="<?= $productCategoryDB['product_category_name'] ?? null ?>">
+                    name="product_category_name" value="<?= htmlspecialchars($productCategoryDB['product_category_name']) ?? null ?>">
                     <?= $_SESSION['errors']['product_category_name'] ?? null ?>
                 </div>
                <button class="btn btn--blue" type="submit">Simpan</button>

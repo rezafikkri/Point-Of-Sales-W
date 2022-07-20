@@ -45,7 +45,7 @@ class ProductCategories extends BaseController
 
         helper('generate_uuid');
 
-        $productCategoryName = $this->request->getPost('product_category_name', FILTER_SANITIZE_STRING);
+        $productCategoryName = $this->request->getPost('product_category_name');
         $createdAt = date('Y-m-d H:i:s');
         /**
          * in production and development,
@@ -77,8 +77,6 @@ class ProductCategories extends BaseController
     {
         helper(['active_menu', 'form']);
 
-        $productCategoryId = filter_var($productCategoryId, FILTER_SANITIZE_STRING);
-
         $data['title'] = 'Edit Kategori Produk . POSW';
         $data['productCategoryId'] = $productCategoryId;
         $data['productCategoryDB'] = $this->productCategoriesModel->getOne($productCategoryId);
@@ -88,7 +86,7 @@ class ProductCategories extends BaseController
 
     public function update()
     {
-        $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
+        $productCategoryId = $this->request->getPost('product_category_id');
 
         if (!$this->validate([
             'product_category_name' => [
@@ -101,7 +99,7 @@ class ProductCategories extends BaseController
             return redirect()->to('/admin/product-category/edit/' . $productCategoryId);
         }
 
-        $productCategoryName = $this->request->getPost('product_category_name', FILTER_SANITIZE_STRING);
+        $productCategoryName = $this->request->getPost('product_category_name');
 
         /**
          * in production and development,
@@ -112,7 +110,7 @@ class ProductCategories extends BaseController
             'product_category_name' => $productCategoryName,
             'edited_at' => date('Y-m-d H:i:s')
         ]);
-        
+
         // if success update product category
         if ($updateProductCategory == true) {
             $message = 'Kategori produk berhasil diedit.';
@@ -134,7 +132,7 @@ class ProductCategories extends BaseController
 
     public function delete()
     {
-        $productCategoryId = $this->request->getPost('product_category_id', FILTER_SANITIZE_STRING);
+        $productCategoryId = $this->request->getPost('product_category_id');
         /**
          * in production and development,
          * if insert success, function delete() will be return true.
